@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-08-18T00:48:50.560619",
+  "summary": {
+    "total_checks": 5,
+    "passed": 1,
+    "failed": 4,
+    "success_rate": 20.0
+  },
+  "results": {
+    "Import Check": {
+      "passed": false,
+      "output": "No module named 'dash_bootstrap_components'"
+    },
+    "Ruff Linting": {
+      "passed": false,
+      "output": "error: Failed to parse tools\\metrics\\run_metrics_simple.py:75:9: Unexpected token 'except'\n"
+    },
+    "Ruff Formatting": {
+      "passed": false,
+      "output": "error: Failed to format tools\\metrics\\run_metrics_simple.py: source contains syntax errors: ParseError { error: UnrecognizedToken(Except, None), offset: 1812, source_path: \"<filename>\" }\n"
+    },
+    "MyPy Type Check": {
+      "passed": false,
+      "output": ""
+    },
+    "Unit Tests": {
+      "passed": true,
+      "output": "........                                                                 [100%]\n8 passed in 0.03s\n"
+    }
+  }
+}

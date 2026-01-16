@@ -1,0 +1,32 @@
+name: CI for DS18B20 Project
+on:
+  workflow_dispatch:
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Run Unit Tests each scenario
+        run: |
+          cd run_test
+          ./run_test.bat scenario1
+          ./run_test.bat scenario2
+          ./run_test.bat scenario3
+          ./run_test.bat scenario4
+          ./run_test.bat scenario5
+          ./run_test.bat scenario6
+          ./run_test.bat scenario7
+          ./run_test.bat scenario8
+
+      - name: Save Test Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: run_test/test_result/

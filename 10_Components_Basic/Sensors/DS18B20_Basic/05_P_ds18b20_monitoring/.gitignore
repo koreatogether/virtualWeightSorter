@@ -1,0 +1,106 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project specific
+*.log
+*.tmp
+temp/
+tmp/
+test_exports/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Arduino
+*.hex
+*.elf
+*.map
+
+# Reports (keep structure but ignore content)
+tools/reports/*.json
+tools/metrics/reports/*.html
+tools/metrics/reports/*.json
+tools/metrics/reports/*.md
+tools/metrics/reports/*.png
+tools/metrics/reports/*.jpg
+tools/metrics/reports/*.jpeg
+!tools/metrics/reports/latest_*
+tools/security/*.json
+!tools/security/trufflehog_check.py
+
+# Serial communication logs
+serial_logs/
+*.serial
+
+# Data files
+data/
+*.csv
+*.xlsx
+
+# Backup files
+*.bak
+*.backup
+nul

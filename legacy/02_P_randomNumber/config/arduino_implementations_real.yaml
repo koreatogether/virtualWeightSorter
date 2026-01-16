@@ -1,0 +1,239 @@
+# Arduino Random Number Generator - Real Implementations
+# 실제 Arduino C++ 코드를 기반으로 한 8가지 구현 방식
+# 조건: 3개 숫자(0,1,2) 랜덤 추출, 이전 숫자와 다름, 반복문/논리연산자 사용 불가
+
+implementations:
+  
+  # 1. 재귀 함수 사용 방식
+  - id: "recursive_method"
+    name: "Recursive Method"
+    description: "재귀 함수를 사용하여 같은 숫자가 나올 때까지 재시도"
+    type: "recursive"
+    enabled: true
+    arduino_code: |
+      int prevNum1 = -1;
+      int getRandomNum1(){
+        int num = random(0, 3);
+        if (num == prevNum1){
+          return getRandomNum1();
+        }
+        prevNum1 = num;
+        return num;
+      }
+    logic_description: "재귀 호출로 중복 제거"
+    expected_performance: "low"  # 재귀 호출 오버헤드
+    memory_usage: "medium"       # 스택 사용
+    constraint_compliance: "high"
+    
+  # 2. 배열과 조건문 사용
+  - id: "array_conditional"
+    name: "Array + Conditional"
+    description: "배열과 조건문만 사용하여 다음 인덱스로 이동"
+    type: "array_based"
+    enabled: true
+    arduino_code: |
+      int prevNum2 = -1;
+      int getRandomNum2(){
+        int nums[3] = {0, 1, 2};
+        int idx = random(0, 3);
+        int num = nums[idx];
+        if (num == prevNum2){
+          idx = (idx + 1) % 3;
+          num = nums[idx];
+        }
+        prevNum2 = num;
+        return num;
+      }
+    logic_description: "배열 인덱스 순환으로 중복 회피"
+    expected_performance: "high"
+    memory_usage: "low"
+    constraint_compliance: "high"
+    
+  # 3. Switch문 활용
+  - id: "switch_case"
+    name: "Switch Case Method"
+    description: "switch문을 활용한 조건별 처리"
+    type: "switch_based"
+    enabled: true
+    arduino_code: |
+      int prevNum3 = -1;
+      int getRandomNum3(){
+        int num = random(0, 3);
+        switch (num){
+          case 0:
+            if (prevNum3 == 0) num = 1;
+            break;
+          case 1:
+            if (prevNum3 == 1) num = 2;
+            break;
+          case 2:
+            if (prevNum3 == 2) num = 0;
+            break;
+        }
+        prevNum3 = num;
+        return num;
+      }
+    logic_description: "switch문으로 각 경우별 대체값 지정"
+    expected_performance: "high"
+    memory_usage: "low"
+    constraint_compliance: "high"
+    
+  # 4. 함수 포인터 활용
+  - id: "function_pointer"
+    name: "Function Pointer Method"
+    description: "함수 포인터 배열을 활용한 동적 함수 호출"
+    type: "function_pointer"
+    enabled: true
+    arduino_code: |
+      int prevNum4 = -1;
+      int getNum0() { return prevNum4 == 0 ? 1 : 0; }
+      int getNum1() { return prevNum4 == 1 ? 2 : 1; }
+      int getNum2() { return prevNum4 == 2 ? 0 : 2; }
+      int (*getNumFuncs[3])() = {getNum0, getNum1, getNum2};
+      int getRandomNum4(){
+        int idx = random(0, 3);
+        int num = getNumFuncs[idx]();
+        prevNum4 = num;
+        return num;
+      }
+    logic_description: "함수 포인터로 동적 로직 선택"
+    expected_performance: "medium"
+    memory_usage: "medium"
+    constraint_compliance: "high"
+    
+  # 5. 삼항 연산자와 수식 활용
+  - id: "ternary_formula"
+    name: "Ternary + Formula"
+    description: "삼항 연산자와 수학 공식을 활용한 간결한 구현"
+    type: "ternary_based"
+    enabled: true
+    arduino_code: |
+      int prevNum5 = -1;
+      int getRandomNum5(){
+        int num = random(0, 3);
+        num = (num == prevNum5) ? ((num + 1) % 3) : num;
+        prevNum5 = num;
+        return num;
+      }
+    logic_description: "삼항 연산자로 중복 시 +1 순환"
+    expected_performance: "very_high"
+    memory_usage: "very_low"
+    constraint_compliance: "high"
+    
+  # 6. 중첩 함수(람다) 활용 (C++11)
+  - id: "lambda_function"
+    name: "Lambda Function (C++11)"
+    description: "람다 함수를 활용한 모던 C++ 스타일"
+    type: "lambda_based"
+    enabled: true
+    arduino_code: |
+      int prevNum6 = -1;
+      int getRandomNum6(){
+        auto pick = [](int prev){
+          int n = random(0, 3);
+          if (n == prev)
+            n = (n + 2) % 3;
+          return n;
+        };
+        int num = pick(prevNum6);
+        prevNum6 = num;
+        return num;
+      }
+    logic_description: "람다로 캡슐화된 로직, +2 순환"
+    expected_performance: "high"
+    memory_usage: "low"
+    constraint_compliance: "high"
+    cpp_version: "C++11"
+    
+  # 7. Static 변수 활용
+  - id: "static_variable"
+    name: "Static Variable Method"
+    description: "static 변수를 활용한 상태 관리"
+    type: "static_based"
+    enabled: true
+    arduino_code: |
+      int getRandomNum7(){
+        static int prevNum7 = -1;
+        int num = random(0, 3);
+        if (num == prevNum7)
+          num = (num + 2) % 3;
+        prevNum7 = num;
+        return num;
+      }
+    logic_description: "static 변수로 상태 유지, +2 순환"
+    expected_performance: "very_high"
+    memory_usage: "very_low"
+    constraint_compliance: "high"
+    
+  # 8. 비트 연산 활용
+  - id: "bitwise_operation"
+    name: "Bitwise Operation"
+    description: "비트 연산(XOR)을 활용한 고속 비교"
+    type: "bitwise_based"
+    enabled: true
+    arduino_code: |
+      int prevNum8 = -1;
+      int getRandomNum8(){
+        int num = random(0, 3);
+        if ((num ^ prevNum8) == 0)
+          num = (num + 1) % 3;
+        prevNum8 = num;
+        return num;
+      }
+    logic_description: "XOR 연산으로 동일성 검사, +1 순환"
+    expected_performance: "very_high"
+    memory_usage: "very_low"
+    constraint_compliance: "high"
+
+# 테스트 설정 - 실제 Arduino 조건에 맞춤
+test_config:
+  default_iterations: 10000
+  default_seed: 12345
+  performance_benchmark_iterations: 50000
+  statistical_significance_threshold: 0.05
+  
+  # Arduino 특화 테스트 조건
+  arduino_constraints:
+    no_loops: true              # 반복문 사용 불가
+    no_logical_operators: true  # 논리연산자(||, &&) 사용 불가
+    numbers_range: [0, 1, 2]    # 3개 숫자만 사용
+    no_consecutive_same: true   # 연속된 동일 숫자 불가
+  
+  # 성능 기준
+  performance_criteria:
+    min_generation_rate: 500000    # 최소 50만 gen/sec
+    max_memory_usage: 1024         # 최대 1KB 메모리
+    max_constraint_violations: 0   # 제약 위반 0개
+    
+# 비교 메트릭 - Arduino 특화
+comparison_metrics:
+  - "generation_speed"           # 생성 속도
+  - "memory_efficiency"          # 메모리 효율성
+  - "constraint_compliance"      # 제약 조건 준수
+  - "code_complexity"           # 코드 복잡도
+  - "arduino_compatibility"     # Arduino 호환성
+  - "stack_usage"              # 스택 사용량 (재귀용)
+  - "instruction_count"        # 명령어 수
+  - "compilation_size"         # 컴파일 크기
+
+# 추천 시스템 가중치 - Arduino 최적화
+recommendation_weights:
+  performance: 0.25              # 성능
+  memory_efficiency: 0.25        # 메모리 효율성
+  constraint_compliance: 0.20    # 제약 준수
+  code_simplicity: 0.15         # 코드 단순성
+  arduino_compatibility: 0.15   # Arduino 호환성
+
+# Arduino 보드별 최적화 힌트
+arduino_optimization_hints:
+  "Uno R3": "메모리 제한으로 static 변수나 삼항 연산자 추천"
+  "Uno R4 WiFi": "48MHz 클럭으로 비트 연산이나 함수 포인터 활용 가능"
+  "Nano": "공간 제약으로 인라인 함수나 매크로 활용 권장"
+  "Mega": "충분한 메모리로 배열 기반 방식도 효율적"
+
+# 실제 Arduino IDE 컴파일 옵션
+compiler_settings:
+  optimization_level: "-Os"      # 크기 최적화
+  target_architecture: "avr"     # AVR 아키텍처
+  clock_speed: "16000000L"      # 16MHz (Uno R3 기준)
+  board_variant: "standard"     # 표준 보드

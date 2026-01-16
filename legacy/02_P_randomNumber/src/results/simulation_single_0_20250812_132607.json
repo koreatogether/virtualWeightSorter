@@ -1,0 +1,120 @@
+{
+  "simulation_info": {
+    "total_iterations": 10000,
+    "total_time_seconds": 0.012507200241088867,
+    "generation_rate_per_second": 799539.4498560781,
+    "arduino_board": "Uno R4 WiFi",
+    "simulation_timestamp": "2025-08-12 13:26:07"
+  },
+  "distribution_analysis": {
+    "counts": {
+      "0": 3996,
+      "1": 3517,
+      "2": 2487
+    },
+    "percentages": {
+      "0": 39.96,
+      "1": 35.17,
+      "2": 24.87
+    },
+    "expected_percentage": 33.33
+  },
+  "constraint_verification": {
+    "consecutive_violations": 0,
+    "violation_rate_percent": 0.0,
+    "constraint_satisfied": true
+  },
+  "transition_analysis": {
+    "transitions": {
+      "1->0": 2335,
+      "0->1": 2690,
+      "0->2": 1305,
+      "2->1": 826,
+      "1->2": 1182,
+      "2->0": 1661
+    },
+    "unique_transitions": 6,
+    "expected_transitions": 6
+  },
+  "performance_metrics": {
+    "avg_generation_time_microseconds": 0.5293499827530468,
+    "min_generation_time_microseconds": 0.2999986463692039,
+    "max_generation_time_microseconds": 164.19999883510172,
+    "arduino_instruction_count": 200000,
+    "arduino_function_calls": {
+      "random": 10000
+    },
+    "sram_usage_percent": 0.0
+  },
+  "hardware_simulation": {
+    "clock_speed_mhz": 48.0,
+    "free_memory_bytes": 32768,
+    "random_seed": 0
+  },
+  "sample_sequence": [
+    1,
+    0,
+    1,
+    0,
+    2,
+    1,
+    0,
+    1,
+    0,
+    1,
+    2,
+    0,
+    2,
+    0,
+    1,
+    0,
+    1,
+    2,
+    1,
+    2,
+    0,
+    2,
+    0,
+    1,
+    0,
+    2,
+    0,
+    2,
+    1,
+    0,
+    2,
+    0,
+    1,
+    0,
+    1,
+    2,
+    0,
+    1,
+    2,
+    1,
+    0,
+    2,
+    1,
+    0,
+    2,
+    0,
+    1,
+    2,
+    1,
+    2
+  ],
+  "simulation_config": {
+    "iterations": 10000,
+    "seed": 12345,
+    "show_progress": true,
+    "save_results": true,
+    "output_dir": "src/results",
+    "parallel_workers": 1,
+    "progress_callback": null
+  },
+  "runner_info": {
+    "runner_version": "1.0.0",
+    "execution_timestamp": "2025-08-12 13:26:07",
+    "total_execution_time": 0.015251398086547852
+  }
+}

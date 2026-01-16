@@ -1,0 +1,44 @@
+# DS18B20 Temperature Sensor Management System - Dependencies
+# Hardware Libraries (Arduino IDE / PlatformIO)
+
+# Core DS18B20 Temperature Sensor Libraries
+OneWire>=2.3.7
+DallasTemperature>=3.11.0
+
+# Testing Framework (for unit tests)
+Unity>=2.5.2
+
+# Development Tools (optional)
+# MinGW (for Windows compilation of tests)
+# Python>=3.8 (for test automation scripts)
+
+# Hardware Requirements
+# - Arduino Uno/Nano/Pro Mini (ATmega328P)
+# - DS18B20 Temperature Sensors (1-8 units)
+# - 4.7kΩ pull-up resistor
+# - Breadboard and jumper wires
+
+# Software Development Environment
+# - Arduino IDE 2.0+ OR PlatformIO Core 6.0+
+# - VS Code (recommended for development)
+# - Git 2.30+
+
+# CI/CD Tools (for automated testing)
+# - GitHub Actions (configured)
+# - MinGW-w64 (for Windows test compilation)
+
+# Documentation Tools
+# - Markdown support in IDE
+# - PlantUML (for diagrams, optional)
+
+# Library Installation Commands:
+# Arduino IDE: Tools -> Manage Libraries -> Search and install
+# PlatformIO: pio lib install "paulstoffregen/OneWire" "milesburton/DallasTemperature"
+
+# Version Compatibility:
+# - OneWire: Compatible with Arduino 1.0+
+# - DallasTemperature: Requires OneWire library
+# - Unity: For C/C++ unit testing framework
+
+# Note: This is an embedded C++ project for Arduino
+# Python requirements would be in a separate file if needed for automation scripts

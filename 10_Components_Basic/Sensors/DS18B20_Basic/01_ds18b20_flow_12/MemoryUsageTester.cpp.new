@@ -1,0 +1,8 @@
+// 메모리 분석 기능 비활성화 상태에서는 빈 구현만 포함
+#include "MemoryUsageTester.h"
+
+// 구현 파일은 비활성됨 - exclude_memory_analysis.h 설정 확인
+// 실제 구현은 memory_analysis_disabled 폴더에 백업됨
+
+with open(exclude_file, 'r', encoding='utf-8') as f:
+    content = f.read()

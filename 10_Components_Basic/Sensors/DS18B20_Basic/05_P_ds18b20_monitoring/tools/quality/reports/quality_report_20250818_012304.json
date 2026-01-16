@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-08-18T01:23:04.791124",
+  "summary": {
+    "total_checks": 5,
+    "passed": 0,
+    "failed": 5,
+    "success_rate": 0.0
+  },
+  "results": {
+    "Import Check": {
+      "passed": false,
+      "output": "Core imports failed: simulator.simulator_manager: unexpected indent (simulator_manager.py, line 36) (dashboard optional import skipped: cannot import name 'Input' from 'dash' (unknown location))"
+    },
+    "Ruff Linting": {
+      "passed": false,
+      "output": "error: Failed to parse src\\python\\simulator\\simulator_manager.py:36:1: Unexpected token Indent\n"
+    },
+    "Ruff Formatting": {
+      "passed": false,
+      "output": "error: Failed to format src\\python\\simulator\\simulator_manager.py: source contains syntax errors: ParseError { error: UnrecognizedToken(Indent, None), offset: 958, source_path: \"<filename>\" }\n"
+    },
+    "MyPy Type Check": {
+      "passed": false,
+      "output": ""
+    },
+    "Unit Tests": {
+      "passed": false,
+      "output": ""
+    }
+  }
+}

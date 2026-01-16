@@ -1,0 +1,5 @@
+===== 테스트 시작 =====
+Running scenario2 tests...
+테스트 케이스 시작
+Running test: test_menu_entry_and_cancel
+테스트 케이스 종료: test_menu_entry_and_cancel (PASS)

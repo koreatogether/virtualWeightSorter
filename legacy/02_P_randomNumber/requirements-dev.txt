@@ -1,0 +1,51 @@
+# Random Number Generator Project - Development Dependencies
+# 개발 및 테스트에 필요한 Python 패키지들
+
+# Code Quality Tools
+ruff>=0.1.0              # Fast Python linter and formatter
+black>=23.0.0            # Code formatter
+autoflake>=2.0.0         # Remove unused imports and variables
+isort>=5.12.0            # Import sorter (backup for ruff)
+
+# Type Checking
+pyright>=1.1.0           # Static type checker
+mypy>=1.0.0              # Alternative type checker
+
+# Testing Framework
+pytest>=7.0.0            # Testing framework
+pytest-cov>=4.0.0        # Coverage plugin for pytest
+pytest-benchmark>=4.0.0  # Performance benchmarking
+
+# Documentation
+sphinx>=6.0.0            # Documentation generator
+sphinx-rtd-theme>=1.2.0  # Read the Docs theme
+
+# Development Tools
+pre-commit>=3.0.0        # Git hooks framework
+tox>=4.0.0               # Testing in multiple environments
+
+# Performance Analysis
+memory-profiler>=0.61.0  # Memory usage profiler
+psutil>=5.9.0            # System and process utilities
+matplotlib>=3.6.0        # Plotting for performance graphs
+pandas>=1.5.0            # Data analysis for benchmarks
+
+# Serial Communication (for Arduino testing)
+pyserial>=3.5            # Serial port communication
+
+# Build Tools
+platformio>=6.1.0        # PlatformIO for Arduino/embedded development
+
+# Utility Libraries
+colorama>=0.4.6          # Colored terminal output
+rich>=13.0.0             # Rich text and beautiful formatting
+click>=8.1.0             # Command line interface creation
+pathlib2>=2.3.7          # Enhanced path handling (Python < 3.4 compatibility)
+
+# JSON/YAML Processing
+pyyaml>=6.0              # YAML file processing
+jsonschema>=4.17.0       # JSON schema validation
+
+# Development Server (for web-based reports)
+flask>=2.3.0             # Lightweight web framework
+jinja2>=3.1.0            # Template engine
