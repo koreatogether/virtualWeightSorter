@@ -1,0 +1,30 @@
+# Example alert rules (pseudo-YAML)
+# Adapt to your alerting system (Prometheus Alertmanager, custom scripts, etc.)
+
+alerts:
+  - id: boiler_high_temp
+    severity: critical
+    condition: "boiler.out.temp > 90"
+    for: 5m
+    summary: "Boiler outlet temperature too high"
+    description: "Check boiler operation and safety valves."
+
+  - id: boiler_low_temp_freeze_risk
+    severity: warning
+    condition: "min(zone.*.temp) < 4"
+    for: 10m
+    summary: "Low temp in zone - freeze risk"
+    description: "Consider enabling anti-freeze mode or insulation checks."
+
+  - id: deltaT_drop
+    severity: warning
+    condition: "(boiler.out.temp - boiler.return.temp) < 5"
+    for: 10m
+    summary: "Supply/Return ΔT small - possible flow issue"
+    description: "Check pump operation, valve positions, or air in system."
+
+  - id: legionella_risk
+    severity: warning
+    condition: "tank.top.temp > 20 and tank.top.temp < 45 and time_in_range(tank.top.temp, 20, 45) > 12h"
+    summary: "Potential legionella risk (20-45°C over prolonged period)"
+    description: "Consider periodic sanitization (raise temperature >60°C) or maintenance."

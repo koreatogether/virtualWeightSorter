@@ -1,0 +1,26 @@
+# Sample configuration
+system:
+  name: boiler_temp_monitoring
+  zone_count: 4
+  sampling_interval_seconds: 10
+
+sensors:
+  - id: boiler_out
+    type: pt100
+    location: boiler_outlet
+  - id: boiler_return
+    type: pt100
+    location: boiler_return
+  - id: tank_top
+    type: pt100
+    location: hot_water_tank_top
+
+storage:
+  influxdb:
+    host: 127.0.0.1
+    port: 8086
+    database: boiler_monitor
+
+alerts:
+  enabled: true
+  rules_file: ./alert_rules/boiler_alerts.yaml
