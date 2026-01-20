@@ -35,6 +35,7 @@ const uint8_t ONE_WIRE_BUS = 2;                        // DS18B20 데이터 핀
 const uint8_t MAX_SENSORS = 4;                         // 기대하는 센서 수 (최대)
 const uint8_t LCD_I2C_ADDRESS = 0x27;                  // LCD I2C 주소 (환경에 따라 변경)
 const unsigned long SAMPLE_INTERVAL_MS = 2000;         // 측정 주기 (밀리초)
+const unsigned long DISPLAY_ROTATE_MS = 5000;          // 화면 전환 주기 (밀리초)
 const unsigned long MISSING_SENSOR_REMINDER_MS = 5000; // 센서 미검출 시 알림 간격 (밀리초)
 
 // 전역 객체 및 상태
@@ -43,10 +44,12 @@ DallasTemperature sensors(&oneWire);
 DeviceAddress sensorAddress[MAX_SENSORS];
 uint8_t foundSensors = 0;
 float sensorTemps[MAX_SENSORS];
+uint8_t currentDisplayMode = 0; // 0: 온도차이 모드, 1: 개별 온도 모드
 
 LiquidCrystal_PCF8574 lcd(LCD_I2C_ADDRESS);
 
 unsigned long lastSampleMs = 0;
+unsigned long lastDisplayRotateMs = 0;         // 마지막 화면 전환 시각
 unsigned long lastMissingSensorReminderMs = 0; // 마지막 미검출 알림 시각
 
 // 헬퍼: 주소 출력 (디버그용)
@@ -186,50 +189,84 @@ void readTemperatures()
     }
 }
 
-// LCD 업데이트 (간단한 화면 갱신)
-void updateDisplay()
+// LCD 업데이트 (개별 온도 표시 모드)
+void updateDisplayModeIndividual()
 {
-    lcd.setCursor(0, 0);
-    lcd.print("Temps (C):        "); // 헤더 (잔여 문구 지우기)
-
-    for (uint8_t i = 0; i < foundSensors && i < 3; i++)
+    for (uint8_t i = 0; i < MAX_SENSORS; i++)
     {
-        lcd.setCursor(0, 1 + i);
-        if (sensorTemps[i] == DEVICE_DISCONNECTED_C)
+        lcd.setCursor(0, i);
+        if (i < foundSensors)
         {
-            lcd.print("S");
-            lcd.print(i + 1);
-            lcd.print(": err      ");
+            if (sensorTemps[i] == DEVICE_DISCONNECTED_C)
+            {
+                lcd.print("S");
+                lcd.print(i + 1);
+                lcd.print(": err           ");
+            }
+            else
+            {
+                lcd.print("S");
+                lcd.print(i + 1);
+                lcd.print(": ");
+                lcd.print(sensorTemps[i], 1);
+                lcd.print(" C          ");
+            }
         }
         else
         {
             lcd.print("S");
             lcd.print(i + 1);
-            lcd.print(": ");
-            lcd.print(sensorTemps[i], 1);
-            lcd.print(" C   ");
+            lcd.print(": -             ");
         }
     }
+}
 
-    // 4번째 센서는 0,1,2행을 사용했으므로 4번째가 있을 경우 3행 표시
-    if (foundSensors >= 4)
+// LCD 업데이트 (온도차이 표시 모드 - Display 1)
+void updateDisplayModeDiff()
+{
+    // 1~2번 센서 차이
+    lcd.setCursor(0, 0);
+    if (foundSensors >= 2 && sensorTemps[0] != DEVICE_DISCONNECTED_C && sensorTemps[1] != DEVICE_DISCONNECTED_C)
     {
-        uint8_t i = 3;
-        lcd.setCursor(0, 4 - 1);
-        if (sensorTemps[i] == DEVICE_DISCONNECTED_C)
-        {
-            lcd.print("S");
-            lcd.print(i + 1);
-            lcd.print(": err      ");
-        }
-        else
-        {
-            lcd.print("S");
-            lcd.print(i + 1);
-            lcd.print(": ");
-            lcd.print(sensorTemps[i], 1);
-            lcd.print(" C   ");
-        }
+        lcd.print("01: ");
+        lcd.print(sensorTemps[0], 1);
+        lcd.print("C ");
+        lcd.setCursor(10, 0);
+        lcd.print("02: ");
+        lcd.print(sensorTemps[1], 1);
+        lcd.print("C");
+
+        lcd.setCursor(0, 1);
+        lcd.print("01 - 02 : ");
+        lcd.print(sensorTemps[0] - sensorTemps[1], 1);
+        lcd.print(" C");
+    }
+    else
+    {
+        lcd.print("01-02: Check Sensors");
+    }
+
+    // 3~4번 센서 차이
+    lcd.setCursor(0, 2);
+    if (foundSensors >= 4 && sensorTemps[2] != DEVICE_DISCONNECTED_C && sensorTemps[3] != DEVICE_DISCONNECTED_C)
+    {
+        lcd.print("03: ");
+        lcd.print(sensorTemps[2], 1);
+        lcd.print("C ");
+        lcd.setCursor(10, 2);
+        lcd.print("04: ");
+        lcd.print(sensorTemps[3], 1);
+        lcd.print("C");
+
+        lcd.setCursor(0, 3);
+        lcd.print("03 - 04 : ");
+        lcd.print(sensorTemps[2] - sensorTemps[3], 1);
+        lcd.print(" C");
+    }
+    else if (foundSensors >= 2)
+    {
+        lcd.setCursor(0, 2);
+        lcd.print("03-04: Need 4 Sensors");
     }
 }
 
@@ -237,15 +274,35 @@ void updateDisplay()
 void updateSystem()
 {
     unsigned long now = millis();
+
+    // 센서 데이터 읽기
     if (now - lastSampleMs >= SAMPLE_INTERVAL_MS)
     {
         lastSampleMs = now;
         if (foundSensors > 0)
         {
             readTemperatures();
-            updateDisplay();
+        }
+    }
 
-            // 네트워크 전송(HTTP/MQTT)이나 로그 전송은 여기서 분리하여 구현
+    // 화면 전환 로직
+    if (now - lastDisplayRotateMs >= DISPLAY_ROTATE_MS)
+    {
+        lastDisplayRotateMs = now;
+        currentDisplayMode = (currentDisplayMode + 1) % 2;
+        lcd.clear(); // 모드 전환 시 화면 초기화
+    }
+
+    // LCD 업데이트
+    if (foundSensors > 0)
+    {
+        if (currentDisplayMode == 0)
+        {
+            updateDisplayModeDiff();
+        }
+        else
+        {
+            updateDisplayModeIndividual();
         }
     }
 }

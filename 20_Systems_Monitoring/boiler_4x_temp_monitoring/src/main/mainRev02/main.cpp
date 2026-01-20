@@ -189,33 +189,9 @@ void readTemperatures()
 // LCD 업데이트 (간단한 화면 갱신)
 void updateDisplay()
 {
-    lcd.setCursor(0, 0);
-    lcd.print("Temps (C):        "); // 헤더 (잔여 문구 지우기)
-
-    for (uint8_t i = 0; i < foundSensors && i < 3; i++)
+    for (uint8_t i = 0; i < foundSensors && i < MAX_SENSORS; i++)
     {
-        lcd.setCursor(0, 1 + i);
-        if (sensorTemps[i] == DEVICE_DISCONNECTED_C)
-        {
-            lcd.print("S");
-            lcd.print(i + 1);
-            lcd.print(": err      ");
-        }
-        else
-        {
-            lcd.print("S");
-            lcd.print(i + 1);
-            lcd.print(": ");
-            lcd.print(sensorTemps[i], 1);
-            lcd.print(" C   ");
-        }
-    }
-
-    // 4번째 센서는 0,1,2행을 사용했으므로 4번째가 있을 경우 3행 표시
-    if (foundSensors >= 4)
-    {
-        uint8_t i = 3;
-        lcd.setCursor(0, 4 - 1);
+        lcd.setCursor(0, i);
         if (sensorTemps[i] == DEVICE_DISCONNECTED_C)
         {
             lcd.print("S");
