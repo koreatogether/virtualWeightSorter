@@ -240,6 +240,7 @@ void loop()
     unsigned long currentMillis = millis();
 
     // 네트워크 상시 처리
+    handleMDNS(); // mDNS 갱신
     handleWebServer();
 
     // 버튼 입력 처리

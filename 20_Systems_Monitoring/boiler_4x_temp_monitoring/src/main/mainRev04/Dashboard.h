@@ -99,15 +99,6 @@ const char INDEX_HTML[] = R"=====(
         setInterval(updateData, 2000);
         window.onload = updateData;
     </script>
-                .catch(err => {
-                    document.getElementById('connection-status').innerText = "재연결 중...";
-                    document.getElementById('connection-status').className = "";
-                    console.error('Fetch error:', err);
-                });
-        }
-        setInterval(updateData, 2000);
-        window.onload = updateData;
-    </script>
 </body>
 </html>
 )=====";

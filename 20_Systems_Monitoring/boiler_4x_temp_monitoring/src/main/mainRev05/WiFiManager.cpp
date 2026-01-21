@@ -7,6 +7,8 @@
 #include "wifiCredentials.h"
 
 WiFiServer server(80);
+WiFiUDP udp;
+MDNS mdns(udp);
 
 /**
  * @brief WiFi 모듈 초기화 및 네트워크 연결
@@ -42,11 +44,31 @@ void initWiFi()
     if (WiFi.status() == WL_CONNECTED)
     {
         Serial.println(F("\nConnected to WiFi"));
+
+        // mDNS 시작 (boiler.local)
+        if (!mdns.begin(WiFi.localIP(), "boiler"))
+        {
+            Serial.println(F("Error setting up mDNS responder!"));
+        }
+        else
+        {
+            Serial.println(F("mDNS responder started (boiler.local)"));
+            mdns.addServiceRecord("boiler._http", 80, MDNSServiceTCP);
+        }
+
         server.begin(); // 웹 서버 시작
 
         Serial.print(F("IP Address: "));
         Serial.println(WiFi.localIP());
     }
+}
+
+/**
+ * @brief MDNS 갱신 처리
+ */
+void handleMDNS()
+{
+    mdns.run();
 }
 
 /**
