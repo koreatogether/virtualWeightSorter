@@ -228,45 +228,45 @@ void updateDisplayModeDiff()
     lcd.setCursor(0, 0);
     if (foundSensors >= 2 && sensorTemps[0] != DEVICE_DISCONNECTED_C && sensorTemps[1] != DEVICE_DISCONNECTED_C)
     {
-        lcd.print("01: ");
+        lcd.print("S1: ");
         lcd.print(sensorTemps[0], 1);
         lcd.print("C ");
         lcd.setCursor(10, 0);
-        lcd.print("02: ");
+        lcd.print("S2: ");
         lcd.print(sensorTemps[1], 1);
         lcd.print("C");
 
         lcd.setCursor(0, 1);
-        lcd.print("01 - 02 : ");
+        lcd.print("S1 - S2 : ");
         lcd.print(sensorTemps[0] - sensorTemps[1], 1);
         lcd.print(" C");
     }
     else
     {
-        lcd.print("01-02: Check Sensors");
+        lcd.print("S1-S2: Check Sensors");
     }
 
     // 3~4번 센서 차이
     lcd.setCursor(0, 2);
     if (foundSensors >= 4 && sensorTemps[2] != DEVICE_DISCONNECTED_C && sensorTemps[3] != DEVICE_DISCONNECTED_C)
     {
-        lcd.print("03: ");
+        lcd.print("S3: ");
         lcd.print(sensorTemps[2], 1);
         lcd.print("C ");
         lcd.setCursor(10, 2);
-        lcd.print("04: ");
+        lcd.print("S4: ");
         lcd.print(sensorTemps[3], 1);
         lcd.print("C");
 
         lcd.setCursor(0, 3);
-        lcd.print("03 - 04 : ");
+        lcd.print("S3 - S4 : ");
         lcd.print(sensorTemps[2] - sensorTemps[3], 1);
         lcd.print(" C");
     }
     else if (foundSensors >= 2)
     {
         lcd.setCursor(0, 2);
-        lcd.print("03-04: Need 4 Sensors");
+        lcd.print("S3-S4: Need 4 Sensors");
     }
 }
 

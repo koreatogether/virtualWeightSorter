@@ -4,16 +4,23 @@
 Boiler 및 분배기(매니폴드)의 온도 모니터링 시스템 템플릿입니다. 이 디렉터리는 프로젝트 구조 제안서(`PROJECT_STRUCTURE_PROPOSAL.md`)에 따라 표준화된 하위 폴더(`docs`, `src`, `tests`, `dashboard`, `alert_rules` 등)를 포함하며, 초기 개발·설계에 필요한 기본 파일을 제공합니다.
 
 구성(초기):
-- `docs/` : 아키텍처·설계 문서
-- `src/` : 소스 코드 (데이터 수집·로직)
+- `docs/` : 아키텍처·설계 문서 및 **7일 순환 로그(`docs/logs`)**
+- `src/` : 소스 코드 (아두이노 실시간 수집 및 웹 서버)
+- `tools/` : **PC 데이터 수집 스크립트(`data_collector.py`)**
 - `tests/` : 단위/통합 테스트
 - `dashboard/` : Grafana/대시보드 관련 구성 및 예시
 - `alert_rules/` : 알람 룰(예: Prometheus Alertmanager/YAML)
 - `configs/` : 예시 설정 파일
 
+시스템 특장점:
+- **실시간 대시보드**: 아두이노 자체 웹 서버를 통한 웹 모니터링.
+- **7일 순환 저장**: PC와 연동하여 최근 7일간의 데이터를 JSON으로 자동 백업.
+- **자동 감지**: 아두이노 전원이 켜지면 PC 수집기가 이를 감지하고 기록 시작.
+
 빠른 시작:
-1. `src/main.py`를 참고해 센서 드라이버 또는 시뮬레이터를 실행하세요.
-2. `docs/ARCHITECTURE.md`를 확인해 시스템 경계와 통신 인터페이스를 검토하세요.
+1. 아두이노 업로드: `src/main/mainRev03` 폴더의 코드를 업로드하세요.
+2. PC 수집기 실행: `python tools/data_collector.py` 명령어로 로깅을 시작하세요.
+3. 문서 확인: `docs/ARCHITECTURE.md`에서 전체 시스템 구조를 확인하세요.
 
 ---
 
