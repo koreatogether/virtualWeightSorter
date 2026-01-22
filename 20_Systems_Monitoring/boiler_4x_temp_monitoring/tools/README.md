@@ -17,5 +17,24 @@
 pip install requests
 
 # 스크립트 실행
-python tools/data_collector.py
+python tools/data_collector/data_collector.py
+```
+
+## 2. log_player.py (로그 시각화 플레이어)
+`data_collector.py`로 수집된 JSON 로그 파일들을 읽어 시간 흐름에 따라 재생하고 분석하는 GUI 도구입니다.
+
+### 주요 기능
+- **프레임 단위 이동 (Jog Control)**: 영상 편집기처럼 1프레임, 10프레임 단위로 앞뒤 이동이 가능합니다.
+- **가변 타임라인**: 10초, 1분, 1시간 등 원하는 시간 범위를 설정하여 데이터를 확대해서 볼 수 있습니다.
+- **슬라이더 탐색**: 전체 기록 중 원하는 시점으로 빠르게 점프할 수 있습니다.
+- **인터랙티브 데이터 커서**: 마우스 이동에 따라 모든 센서(S1~S4)의 온도값과 편차(ΔT)를 실시간 툴팁으로 확인합니다.
+- **줌 및 이동 (Zoom & Pan)**: 그래프의 특정 영역을 드래그하여 정밀하게 확대하거나 이동할 수 있는 전문 내비게이션 툴바를 제공합니다.
+
+### 실행 방법
+```powershell
+# 필수 라이브러리 설치 (matplotlib)
+pip install matplotlib
+
+# 플레이어 실행
+python tools/log_player/log_player.py
 ```

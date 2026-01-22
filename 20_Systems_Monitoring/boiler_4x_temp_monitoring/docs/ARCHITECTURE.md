@@ -18,12 +18,17 @@
 
 ### 3.2. 주요 리비전 (Main Implementations)
 - **[Main Rev04](src/main/mainRev04/)**: 물리 버튼 기능이 통합된 버전
-- **[Main Rev05](src/main/mainRev05/)**: 실시간 그래프 기능이 추가된 최종 버전 (권장)
+- **[Main Rev05](src/main/mainRev05/)**: 실시간 그래프 기능이 추가된 버전.
     - **Chart.js 통합**: 웹 대시보드 내에 센서별 온도 추이를 시각화.
     - **인터랙티브 기능**: 사용자 선택에 따른 갱신 주기 변경(1초~5시간) 및 그래프 줌/팬 기능.
     - **상태 모니터링**: PC 데이터 수집기와의 연결 상태를 웹 UI에서 실시간 확인.
     - **DisplayManager**: 물리 버튼 입력을 감지하여 4개의 LCD 화면 페이지를 순환.
     - **모듈화**: 센서, 와이파이, 디스플레이 로직을 각각의 Manager 클래스로 완전 모듈화.
+- **[Main Rev06](src/main/mainRev06/)**: 고급 분석 기능이 강화된 최신 버전 (현재 사용).
+    - **Delta Analysis**: 온도차($\Delta T$) 전용 그래프 및 통계 위젯(Min/Max/Avg) 제공.
+    - **Smart Alerts**: 사용자 설정 임계치에 따른 시각적 경고(Warning/Danger).
+    - **Event Tagging**: 그래프 클릭으로 주요 이벤트(가동/정지) 마킹 기능.
+    - **Fixed IP**: 유지보수 편의를 위해 고정 IP(`192.168.0.29`) 운용.
 
 ## 4. 데이터 로깅 및 지속성 (Data Logging)
 PC와 연동하여 아두이노의 휘발성 데이터를 장기적으로 보관합니다.
