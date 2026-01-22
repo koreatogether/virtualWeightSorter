@@ -29,10 +29,7 @@ void initWiFi()
     IPAddress gateway(IP_GATEWAY);
     IPAddress subnet(IP_SUBNET);
 
-    if (!WiFi.config(local_IP, gateway, subnet))
-    {
-        Serial.println(F("STA Failed to configure"));
-    }
+    WiFi.config(local_IP, gateway, subnet);
 
     uint8_t retryCount = 0;
     while (WiFi.status() != WL_CONNECTED)

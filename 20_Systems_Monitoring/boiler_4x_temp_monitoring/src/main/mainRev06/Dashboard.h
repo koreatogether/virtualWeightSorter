@@ -6,22 +6,23 @@ const char LOGIN_HTML[] = R"=====(
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>로그인 - Boiler Monitor</title>
     <style>
-        body { font-family: sans-serif; background: #2c3e50; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-box { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background: #2980b9; }
-        .error { color: #e74c3c; font-size: 0.8rem; margin-top: 10px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; width: 300px; }
+        h2 { color: #2c3e50; font-size: 1.5rem; margin-bottom: 30px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: #2c3e50; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1rem; transition: background 0.2s; }
+        button:hover { background: #34495e; }
     </style>
 </head>
 <body>
     <div class="login-box">
-        <h2>환경 모니터링 시스템</h2>
+        <h2>System Login</h2>
         <form method="GET" action="/login">
-            <input type="password" name="pass" placeholder="비밀번호를 입력하세요" required>
-            <button type="submit">로그인</button>
+            <input type="password" name="pass" placeholder="Password" required autofocus>
+            <button type="submit">Access Dashboard</button>
         </form>
     </div>
 </body>
@@ -98,16 +99,38 @@ const char INDEX_HTML[] = R"=====(
     <div class="container">
         <!-- Top Controls -->
         <div class="panel controls-row">
-            <div class="threshold-controls">
-                <label>경고 임계값(dT):</label>
-                <input type="number" id="warn-limit" value="10.0" step="0.5">
-                <label>위험 임계값(dT):</label>
-                <input type="number" id="danger-limit" value="20.0" step="0.5">
+            <div class="control-item">
+                <label>갱신 주기: </label>
+                <select id="update-interval" onchange="changeInterval(this.value)">
+                    <optgroup label="실시간 (초)">
+                        <option value="1000">1초</option>
+                        <option value="2000" selected>2초</option>
+                        <option value="5000">5초</option>
+                        <option value="10000">10초</option>
+                    </optgroup>
+                    <optgroup label="모니터링 (분)">
+                        <option value="60000">1분</option>
+                        <option value="180000">3분</option>
+                        <option value="300000">5분</option>
+                        <option value="600000">10분</option>
+                        <option value="1800000">30분</option>
+                    </optgroup>
+                </select>
             </div>
+            <div class="control-item">
+                 <input type="checkbox" id="auto-scroll" checked> <label for="auto-scroll">자동 스크롤 (Auto-Follow)</label>
+            </div>
+
+            <div class="threshold-controls">
+                <label>경고(dT):</label>
+                <input type="number" id="warn-limit" value="10.0" step="0.5" style="width:50px;">
+                <label>위험(dT):</label>
+                <input type="number" id="danger-limit" value="20.0" step="0.5" style="width:50px;">
+            </div>
+            
             <div class="event-controls">
-                <button onclick="addEventAnnotation('가동')">가동 시작</button>
-                <button onclick="addEventAnnotation('정지')">가동 정지</button>
-                <button onclick="addEventAnnotation('점검')">점검</button>
+                <button onclick="addEventAnnotation('가동')">가동</button>
+                <button onclick="addEventAnnotation('정지')">정지</button>
                 <button onclick="resetZoom()" style="background-color: #95a5a6;">줌 초기화</button>
             </div>
         </div>
@@ -175,7 +198,8 @@ const char INDEX_HTML[] = R"=====(
     </div>
 
     <script>
-        const MAX_POINTS = 60;
+        const MAX_POINTS = 300; // 포인트 저장 개수 증가 (2초 * 300 = 600초 = 10분 버퍼)
+        let updateTimer;
         let charts = {};
         let stats = {
             g1: { max: 0, min: 999, sSum: 0, count: 0 },
@@ -186,6 +210,15 @@ const char INDEX_HTML[] = R"=====(
             responsive: true,
             maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
+            scales: {
+                x: {
+                    ticks: {
+                        autoSkip: true,
+                        maxRotation: 0,
+                        maxTicksLimit: 10
+                    }
+                }
+            },
             plugins: {
                 zoom: { 
                     zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' },
@@ -305,11 +338,21 @@ const char INDEX_HTML[] = R"=====(
             });
         }
 
+
+        function changeInterval(ms) {
+            clearInterval(updateTimer);
+            updateTimer = setInterval(updateData, parseInt(ms));
+        }
+
+        function resetZoom() {
+            Object.values(charts).forEach(c => c.resetZoom());
+        }
+
         function updateData() {
             fetch('/data')
                 .then(res => res.json())
                 .then(data => {
-                    const now = new Date().toLocaleTimeString();
+                    const now = new Date().toLocaleTimeString('ko-KR', {hour12: false});
                     
                     // Update Text
                     ['s1', 's2', 's3', 's4'].forEach(k => {
@@ -338,6 +381,11 @@ const char INDEX_HTML[] = R"=====(
                         }
                         chart.data.labels.push(label);
                         values.forEach((v, i) => chart.data.datasets[i].data.push(v));
+                        
+                        // Auto Scroll Logic
+                        if (document.getElementById('auto-scroll').checked) {
+                            chart.resetZoom(); 
+                        }
                         chart.update('none');
                     };
 
@@ -364,7 +412,7 @@ const char INDEX_HTML[] = R"=====(
 
         window.onload = () => {
             initCharts();
-            setInterval(updateData, 2000);
+            updateTimer = setInterval(updateData, 2000);
             updateData();
         };
     </script>

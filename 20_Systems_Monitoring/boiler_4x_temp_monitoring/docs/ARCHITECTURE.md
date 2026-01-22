@@ -28,6 +28,7 @@
     - **Delta Analysis**: 온도차($\Delta T$) 전용 그래프 및 통계 위젯(Min/Max/Avg) 제공.
     - **Smart Alerts**: 사용자 설정 임계치에 따른 시각적 경고(Warning/Danger).
     - **Event Tagging**: 그래프 클릭으로 주요 이벤트(가동/정지) 마킹 기능.
+    - **User Experience**: 자동 스크롤(Auto-Follow) 및 데이터 버퍼 증대(10분), 갱신 주기 즉시 변경 기능 복원.
     - **Fixed IP**: 유지보수 편의를 위해 고정 IP(`192.168.0.29`) 운용.
 
 ## 4. 데이터 로깅 및 지속성 (Data Logging)
