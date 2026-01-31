@@ -56,6 +56,18 @@
    - 결과: 늦게 활성화된 채널도 동일 시점 기준으로 그려짐
    - 파일: [src/main/mainrev07_tftlcd/main001_nextion_04.ino](src/main/mainrev07_tftlcd/main001_nextion_04.ino)
 
+### main001_nextion_05.ino 버퍼 기반 동기화 추가
+
+1. **버퍼 기반 리플레이 구조 추가**
+   - 요구사항: 늦게 활성화된 채널도 다른 채널과 동일 시점부터 그리기
+   - 조치: 2초 간격 샘플을 링 버퍼에 저장하고, 채널 활성화 시 버퍼를 리플레이하여 동일 시점 정렬
+   - 파일: [src/main/mainrev07_tftlcd/main001_nextion_05.ino](src/main/mainrev07_tftlcd/main001_nextion_05.ino)
+
+2. **버퍼 크기 기본값 설정**
+   - 기준: Nano RAM 여유를 고려하여 120 샘플(약 4분) 기본값 적용
+   - 변경: `BUFFER_LENGTH = 120` (채널 4개 기준 약 480바이트)
+   - 파일: [src/main/mainrev07_tftlcd/main001_nextion_05.ino](src/main/mainrev07_tftlcd/main001_nextion_05.ino)
+
 ## 다음 진행 계획
 
 - [x] 화면 보호기 동작 테스트 (절전/터치 복귀 확인)
