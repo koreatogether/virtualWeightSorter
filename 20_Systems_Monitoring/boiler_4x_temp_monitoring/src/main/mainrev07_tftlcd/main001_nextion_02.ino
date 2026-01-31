@@ -1,15 +1,17 @@
 #include <Nextion.h>
+#include <SoftwareSerial.h>
 
 /*
- * [Arduino R4 WiFi 전용] Nextion Waveform Graph Demo (main001_nextion_01 기반)
- * - 01 코드의 통신/그래프 로직을 그대로 유지
- * - 화면 보호기(1분 후 절전, 전영역 터치 복귀) 추가
- * - delay 없이 millis() 기반 비차단 업데이트 적용
+ * [Arduino Nano 전용 - SoftwareSerial 버전] Nextion Waveform Graph Demo
+ * - NexConfig.h에서 SoftwareSerial 사용 설정이 되어 있어야 함
+ * - SoftwareSerial(Pin 10, 11) 사용으로 USB 디버깅(Serial) 가능
+ * - 통신 속도 제약으로 그래프 갱신이 다소 느릴 수 있음 (권장: 9600~38400bps)
  */
 
-// [R4 WiFi 전용 설정]
-// USB 통신(디버깅)은 Serial, 핀 0/1 통신(Nextion)은 Serial1입니다.
-#define HMISerial Serial1
+// [Nano 설정]
+// SoftwareSerial 사용 (RX=10, TX=11)
+// NexConfig.h의 'extern SoftwareSerial HMISerial;'과 이름이 일치해야 함
+SoftwareSerial HMISerial(10, 11);
 
 // [설정] Nextion Waveform ID (메타데이터 기준 11)
 const int WAVEFORM_ID = 11;
@@ -24,7 +26,7 @@ const int TEMP_MIN = 0;          // 최저 온도
 const int TEMP_MAX = 100;        // 최고 온도
 
 // [추가 설정] 가로 간격 조정
-const int LINE_STEPS = 2; // 한 샘플을 가로 2칸으로 표현
+const int LINE_STEPS = 25; // 한 샘플을 가로 2칸으로 표현
 
 // 각 채널별 이전 값 저장용
 int lastPlotValues[4] = {-1, -1, -1, -1};
@@ -42,7 +44,8 @@ void waitForMillis(unsigned long waitMs);
 
 void setup()
 {
-    Serial.begin(115200);
+    // 디버그용 시리얼 초기화 (SoftwareSerial 사용 시 가능)
+    Serial.begin(9600);
 
     // 01 코드의 초기화 흐름 유지
     initNextionDisplay();
@@ -70,12 +73,19 @@ void initNextionDisplay()
     HMISerial.write(0xFF);
     HMISerial.write(0xFF);
 
-    // 통신 속도 고속화 (9600 -> 115200)
-    sendNextionCommand("baud=115200");
-    waitForMillis(200);
+    /*
+     * [SoftwareSerial 속도 제한]
+     * SoftwareSerial은 115200bps에서 데이터 송수신이 불안정할 수 있습니다.
+     * 안정적인 동작을 위해 기본 속도(9600)를 유지하거나, 최대 38400까지만 올리는 것을 권장합니다.
+     * 아래 코드는 속도 변경 없이 9600bps를 유지하는 설정입니다.
+     */
 
+    // 만약 속도를 올리고 싶다면 아래 주석을 해제하고 테스트해보세요 (최대 38400 권장)
+
+    sendNextionCommand("baud=38400");
+    waitForMillis(200);
     HMISerial.end();
-    HMISerial.begin(115200);
+    HMISerial.begin(38400);
 
     // 그래프 초기화 (Clear)
     HMISerial.print("cle ");
