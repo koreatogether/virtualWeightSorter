@@ -63,10 +63,6 @@ const unsigned long CLOCK_INTERVAL = 1000;
 const int PAGE_BUTTON_IDS[4] = {16, 17, 18, 19};
 const int DS_BUTTON_IDS[5] = {20, 21, 22, 23, 24};
 
-const int CHANNEL_MODE_NONE = -1;
-const int CHANNEL_MODE_ALL = 4;
-
-int currentChannelMode = CHANNEL_MODE_NONE;
 bool activeChannels[4] = {false, false, false, false};
 
 // 함수 선언
@@ -82,7 +78,9 @@ void sendTimeToDisplay();
 void tickSecond(DateTime &timeInfo);
 int daysInMonth(int year, int month);
 bool isLeapYear(int year);
-void setChannelMode(int mode);
+void setChannelActive(int channel, bool isActive);
+void setAllChannels(bool isActive);
+bool areAllChannelsActive();
 void syncDualStateButtons();
 void clearWaveformChannel(int channel);
 
@@ -95,8 +93,7 @@ void setup()
     initNextionDisplay();
 
     // 초기 채널 상태: 모두 꺼짐
-    currentChannelMode = CHANNEL_MODE_ALL;
-    setChannelMode(CHANNEL_MODE_NONE);
+    setAllChannels(false);
 
     // 첫 루프에서 즉시 갱신되도록 타이머 보정
     prevUpdateMillis = millis() - UPDATE_INTERVAL;
@@ -357,27 +354,13 @@ void handleTouchEvent(uint8_t pageId, uint8_t componentId, uint8_t eventType)
     {
         if (componentId == DS_BUTTON_IDS[i])
         {
-            if (i == CHANNEL_MODE_ALL)
+            if (i == CHANNELS)
             {
-                if (currentChannelMode == CHANNEL_MODE_ALL)
-                {
-                    setChannelMode(CHANNEL_MODE_NONE);
-                }
-                else
-                {
-                    setChannelMode(CHANNEL_MODE_ALL);
-                }
+                setAllChannels(!areAllChannelsActive());
             }
             else
             {
-                if (currentChannelMode == i)
-                {
-                    setChannelMode(CHANNEL_MODE_NONE);
-                }
-                else
-                {
-                    setChannelMode(i);
-                }
+                setChannelActive(i, !activeChannels[i]);
             }
             return;
         }
@@ -505,43 +488,53 @@ bool isLeapYear(int year)
     return (year % 400) == 0;
 }
 
-void setChannelMode(int mode)
+void setChannelActive(int channel, bool isActive)
 {
-    if (mode == currentChannelMode)
+    if (channel < 0 || channel >= CHANNELS)
     {
         return;
     }
 
-    currentChannelMode = mode;
-
-    bool newActive[4] = {false, false, false, false};
-    if (mode == CHANNEL_MODE_ALL)
+    if (activeChannels[channel] == isActive)
     {
-        for (int ch = 0; ch < CHANNELS; ch++)
-        {
-            newActive[ch] = true;
-        }
-    }
-    else if (mode >= 0 && mode < CHANNELS)
-    {
-        newActive[mode] = true;
+        return;
     }
 
+    activeChannels[channel] = isActive;
+    clearWaveformChannel(channel);
+    if (isActive)
+    {
+        lastPlotValues[channel] = -1;
+    }
+    syncDualStateButtons();
+}
+
+void setAllChannels(bool isActive)
+{
     for (int ch = 0; ch < CHANNELS; ch++)
     {
-        if (activeChannels[ch] != newActive[ch])
+        activeChannels[ch] = isActive;
+        clearWaveformChannel(ch);
+        if (isActive)
         {
-            activeChannels[ch] = newActive[ch];
             lastPlotValues[ch] = -1;
-
-            if (!activeChannels[ch])
-            {
-                clearWaveformChannel(ch);
-            }
         }
     }
 
     syncDualStateButtons();
+}
+
+bool areAllChannelsActive()
+{
+    for (int ch = 0; ch < CHANNELS; ch++)
+    {
+        if (!activeChannels[ch])
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 void syncDualStateButtons()
@@ -549,11 +542,11 @@ void syncDualStateButtons()
     for (int i = 0; i < 5; i++)
     {
         int val = 0;
-        if (i == CHANNEL_MODE_ALL && currentChannelMode == CHANNEL_MODE_ALL)
+        if (i == CHANNELS)
         {
-            val = 1;
+            val = areAllChannelsActive() ? 1 : 0;
         }
-        else if (i < CHANNELS && currentChannelMode == i)
+        else if (i < CHANNELS && activeChannels[i])
         {
             val = 1;
         }

@@ -35,6 +35,27 @@
 
 ---
 
+## 2026-01-31
+
+### main001_nextion_04.ino 듀얼 스테이트 버튼 및 웨이브폼 동작 변경
+
+1. **멀티 채널 선택 지원**
+   - 증상: 기존 로직은 단일 채널만 선택 가능
+   - 원인: `currentChannelMode` 기반 단일 선택 구조
+   - 조치: `activeChannels[]` 기반 멀티 선택 구조로 변경, bt0~bt3 독립 토글, bt4는 전체 ON/OFF 토글
+   - 파일: [src/main/mainrev07_tftlcd/main001_nextion_04.ino](src/main/mainrev07_tftlcd/main001_nextion_04.ino)
+
+2. **채널 OFF 시 화면에서 제거**
+   - 요구사항: 비활성화 시 해당 채널 그래프가 보이지 않도록 처리
+   - 조치: 채널 OFF 시 `cle <waveformId>,<channel>` 호출로 해당 채널만 지움
+   - 파일: [src/main/mainrev07_tftlcd/main001_nextion_04.ino](src/main/mainrev07_tftlcd/main001_nextion_04.ino)
+
+3. **늦게 활성화된 채널 동기화**
+   - 증상: 늦게 켠 채널이 과거 시점부터 그려져 시점이 뒤쳐짐
+   - 조치: 채널 ON 시 `cle` 후 `lastPlotValues[ch] = -1`로 초기화하여 현재 시점부터 그리기
+   - 결과: 늦게 활성화된 채널도 동일 시점 기준으로 그려짐
+   - 파일: [src/main/mainrev07_tftlcd/main001_nextion_04.ino](src/main/mainrev07_tftlcd/main001_nextion_04.ino)
+
 ## 다음 진행 계획
 
 - [x] 화면 보호기 동작 테스트 (절전/터치 복귀 확인)
