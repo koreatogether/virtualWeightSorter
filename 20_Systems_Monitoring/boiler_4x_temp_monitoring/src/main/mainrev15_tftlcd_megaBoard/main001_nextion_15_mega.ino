@@ -14,10 +14,9 @@
 #endif
 
 /*
-05버전에서는 나노 보드 기준으로 작동하되
-버퍼 관리 방식으로 웨이브폼을 동기화한다.
-채널을 늦게 활성화해도 동일 시점부터 그려지도록
-버퍼를 재생(replay)한다.
+06버전에서는 이벤트 큐 기반 처리로 터치 입력 지연을 줄인다.
+그래프 그리기 명령을 큐에 적재하고, 매 루프마다 제한된 개수만 전송한다.
+High/Low 큐로 우선순위를 분리하여 UI 이벤트가 먼저 처리되도록 한다.
 */
 
 // [설정] Nextion Waveform ID (메타데이터 기준 11)
@@ -38,6 +37,14 @@ const int LINE_STEPS = 25; // 한 샘플을 가로 2칸으로 표현
 // [버퍼 설정]
 // 2초 간격 샘플 기준, 120개 = 약 4분
 const int BUFFER_LENGTH = 120;
+const uint16_t REPLAY_MAX_SAMPLES = 40;
+const unsigned long DRAW_SUSPEND_MS = 150;
+
+// [명령 큐 설정]
+const uint8_t HIGH_QUEUE_SIZE = 16;
+const uint8_t LOW_QUEUE_SIZE = 64;
+const uint8_t MAX_COMMANDS_PER_LOOP = 12;
+const uint8_t COMMAND_TEXT_SIZE = 64;
 
 // 각 채널별 이전 값 저장용
 int lastPlotValues[4] = {-1, -1, -1, -1};
@@ -46,6 +53,8 @@ int lastPlotValues[4] = {-1, -1, -1, -1};
 uint8_t waveformBuffer[CHANNELS][BUFFER_LENGTH];
 uint16_t bufferIndex = 0;
 uint16_t bufferCount = 0;
+bool drawSuspended = false;
+unsigned long drawResumeMillis = 0;
 
 // 타이머 관리 (비차단)
 unsigned long prevUpdateMillis = 0;
@@ -72,6 +81,30 @@ const int DS_BUTTON_IDS[5] = {20, 21, 22, 23, 24};
 
 bool activeChannels[4] = {false, false, false, false};
 
+// 명령 큐 구조
+enum CommandType
+{
+    COMMAND_TEXT = 0,
+    COMMAND_ADD = 1
+};
+
+struct NextionCommand
+{
+    uint8_t type;
+    char text[COMMAND_TEXT_SIZE];
+    uint8_t channel;
+    uint8_t value;
+};
+
+NextionCommand highQueue[HIGH_QUEUE_SIZE];
+NextionCommand lowQueue[LOW_QUEUE_SIZE];
+uint8_t highHead = 0;
+uint8_t highTail = 0;
+uint8_t highCount = 0;
+uint8_t lowHead = 0;
+uint8_t lowTail = 0;
+uint8_t lowCount = 0;
+
 // 함수 선언
 void initNextionDisplay();
 void manageDisplaySystem();
@@ -90,9 +123,16 @@ void setAllChannels(bool isActive);
 bool areAllChannelsActive();
 void syncDualStateButtons();
 void clearWaveformChannel(int channel);
+void clearWaveformAll();
 void storeWaveformSamples(const int plotValues[4]);
 void replayChannel(int channel);
 void sendWaveformPoint(int channel, int value);
+void suspendWaveformDraw();
+void flushCommandQueues();
+bool enqueueHighText(const char *cmd);
+bool enqueueLowText(const char *cmd);
+bool enqueueLowAdd(uint8_t channel, int value);
+void clearLowQueue();
 
 void setup()
 {
@@ -142,6 +182,9 @@ void loop()
 
     // 4. 비차단 방식으로 그래프 업데이트
     updateWaveformData();
+
+    // 5. 큐 전송 (UI 이벤트 우선)
+    flushCommandQueues();
 }
 
 void initNextionDisplay()
@@ -152,12 +195,7 @@ void initNextionDisplay()
     HMISerial.write(0xFF);
 
     // 그래프 초기화 (Clear)
-    HMISerial.print("cle ");
-    HMISerial.print(WAVEFORM_ID);
-    HMISerial.print(",255");
-    HMISerial.write(0xFF);
-    HMISerial.write(0xFF);
-    HMISerial.write(0xFF);
+    clearWaveformAll();
 
     // 초기 시간 표시
     sendTimeToDisplay();
@@ -229,12 +267,9 @@ void updateWaveformData()
         }
 
         int xfloatVal = (int)(currentTemps[ch] * 10);
-        HMISerial.print(XFLOAT_OBJS[ch]);
-        HMISerial.print(".val=");
-        HMISerial.print(xfloatVal);
-        HMISerial.write(0xFF);
-        HMISerial.write(0xFF);
-        HMISerial.write(0xFF);
+        char cmd[32];
+        snprintf(cmd, sizeof(cmd), "%s.val=%d", XFLOAT_OBJS[ch], xfloatVal);
+        enqueueLowText(cmd);
     }
 
     // 3. 버퍼 저장 (채널 상태와 무관하게 기록)
@@ -244,17 +279,21 @@ void updateWaveformData()
     int diff1 = (int)((currentTemps[0] - currentTemps[1]) * 10);
     int diff2 = (int)((currentTemps[2] - currentTemps[3]) * 10);
 
-    HMISerial.print("x4.val=");
-    HMISerial.print(diff1);
-    HMISerial.write(0xFF);
-    HMISerial.write(0xFF);
-    HMISerial.write(0xFF);
+    char diffCmd[24];
+    snprintf(diffCmd, sizeof(diffCmd), "x4.val=%d", diff1);
+    enqueueLowText(diffCmd);
+    snprintf(diffCmd, sizeof(diffCmd), "x5.val=%d", diff2);
+    enqueueLowText(diffCmd);
 
-    HMISerial.print("x5.val=");
-    HMISerial.print(diff2);
-    HMISerial.write(0xFF);
-    HMISerial.write(0xFF);
-    HMISerial.write(0xFF);
+    if (drawSuspended)
+    {
+        if (millis() < drawResumeMillis)
+        {
+            return;
+        }
+
+        drawSuspended = false;
+    }
 
     // 5. 그래프 그리기 (점과 점 사이를 직선으로 채움)
     // LINE_STEPS 만큼 점을 전송하여 직선 구간을 형성
@@ -286,10 +325,7 @@ void updateWaveformData()
 
 void sendNextionCommand(const char *cmd)
 {
-    HMISerial.print(cmd);
-    HMISerial.write(0xFF);
-    HMISerial.write(0xFF);
-    HMISerial.write(0xFF);
+    enqueueHighText(cmd);
 }
 
 void waitForMillis(unsigned long waitMs)
@@ -533,20 +569,27 @@ void setChannelActive(int channel, bool isActive)
 
 void setAllChannels(bool isActive)
 {
+    if (!isActive)
+    {
+        for (int ch = 0; ch < CHANNELS; ch++)
+        {
+            activeChannels[ch] = false;
+            lastPlotValues[ch] = -1;
+        }
+
+        clearLowQueue();
+        clearWaveformAll();
+        suspendWaveformDraw();
+        syncDualStateButtons();
+        return;
+    }
+
     for (int ch = 0; ch < CHANNELS; ch++)
     {
-        activeChannels[ch] = isActive;
-        if (isActive)
+        activeChannels[ch] = true;
+        if (bufferCount > 0)
         {
-            if (bufferCount > 0)
-            {
-                replayChannel(ch);
-            }
-            else
-            {
-                clearWaveformChannel(ch);
-                lastPlotValues[ch] = -1;
-            }
+            replayChannel(ch);
         }
         else
         {
@@ -598,13 +641,16 @@ void clearWaveformChannel(int channel)
         return;
     }
 
-    HMISerial.print("cle ");
-    HMISerial.print(WAVEFORM_ID);
-    HMISerial.print(",");
-    HMISerial.print(channel);
-    HMISerial.write(0xFF);
-    HMISerial.write(0xFF);
-    HMISerial.write(0xFF);
+    char cmd[24];
+    snprintf(cmd, sizeof(cmd), "cle %d,%d", WAVEFORM_ID, channel);
+    enqueueHighText(cmd);
+}
+
+void clearWaveformAll()
+{
+    char cmd[24];
+    snprintf(cmd, sizeof(cmd), "cle %d,255", WAVEFORM_ID);
+    enqueueHighText(cmd);
 }
 
 void storeWaveformSamples(const int plotValues[4])
@@ -642,10 +688,16 @@ void replayChannel(int channel)
 
     clearWaveformChannel(channel);
 
-    uint16_t startIndex = (bufferIndex + BUFFER_LENGTH - bufferCount) % BUFFER_LENGTH;
+    uint16_t sampleCount = bufferCount;
+    if (sampleCount > REPLAY_MAX_SAMPLES)
+    {
+        sampleCount = REPLAY_MAX_SAMPLES;
+    }
+
+    uint16_t startIndex = (bufferIndex + BUFFER_LENGTH - sampleCount) % BUFFER_LENGTH;
     uint8_t previousValue = waveformBuffer[channel][startIndex];
 
-    for (uint16_t i = 0; i < bufferCount; i++)
+    for (uint16_t i = 0; i < sampleCount; i++)
     {
         uint16_t index = (startIndex + i) % BUFFER_LENGTH;
         uint8_t currentValue = waveformBuffer[channel][index];
@@ -663,15 +715,151 @@ void replayChannel(int channel)
     lastPlotValues[channel] = previousValue;
 }
 
+void suspendWaveformDraw()
+{
+    drawSuspended = true;
+    drawResumeMillis = millis() + DRAW_SUSPEND_MS;
+}
+
 void sendWaveformPoint(int channel, int value)
 {
-    HMISerial.print("add ");
-    HMISerial.print(WAVEFORM_ID);
-    HMISerial.print(",");
-    HMISerial.print(channel);
-    HMISerial.print(",");
-    HMISerial.print(value);
-    HMISerial.write(0xFF);
-    HMISerial.write(0xFF);
-    HMISerial.write(0xFF);
+    enqueueLowAdd((uint8_t)channel, value);
+}
+
+void flushCommandQueues()
+{
+    uint8_t sent = 0;
+
+    while (sent < MAX_COMMANDS_PER_LOOP)
+    {
+        NextionCommand cmd;
+        bool hasCommand = false;
+
+        if (highCount > 0)
+        {
+            cmd = highQueue[highHead];
+            highHead = (highHead + 1) % HIGH_QUEUE_SIZE;
+            highCount--;
+            hasCommand = true;
+        }
+        else if (lowCount > 0)
+        {
+            cmd = lowQueue[lowHead];
+            lowHead = (lowHead + 1) % LOW_QUEUE_SIZE;
+            lowCount--;
+            hasCommand = true;
+        }
+
+        if (!hasCommand)
+        {
+            break;
+        }
+
+        if (cmd.type == COMMAND_TEXT)
+        {
+            HMISerial.print(cmd.text);
+            HMISerial.write(0xFF);
+            HMISerial.write(0xFF);
+            HMISerial.write(0xFF);
+        }
+        else if (cmd.type == COMMAND_ADD)
+        {
+            HMISerial.print("add ");
+            HMISerial.print(WAVEFORM_ID);
+            HMISerial.print(",");
+            HMISerial.print(cmd.channel);
+            HMISerial.print(",");
+            HMISerial.print(cmd.value);
+            HMISerial.write(0xFF);
+            HMISerial.write(0xFF);
+            HMISerial.write(0xFF);
+        }
+
+        sent++;
+    }
+}
+
+bool enqueueHighText(const char *cmd)
+{
+    if (!cmd)
+    {
+        return false;
+    }
+
+    if (highCount >= HIGH_QUEUE_SIZE)
+    {
+        highHead = (highHead + 1) % HIGH_QUEUE_SIZE;
+        highCount--;
+    }
+
+    NextionCommand &slot = highQueue[highTail];
+    slot.type = COMMAND_TEXT;
+    strncpy(slot.text, cmd, COMMAND_TEXT_SIZE - 1);
+    slot.text[COMMAND_TEXT_SIZE - 1] = '\0';
+    slot.channel = 0;
+    slot.value = 0;
+
+    highTail = (highTail + 1) % HIGH_QUEUE_SIZE;
+    highCount++;
+    return true;
+}
+
+bool enqueueLowText(const char *cmd)
+{
+    if (!cmd)
+    {
+        return false;
+    }
+
+    if (lowCount >= LOW_QUEUE_SIZE)
+    {
+        lowHead = (lowHead + 1) % LOW_QUEUE_SIZE;
+        lowCount--;
+    }
+
+    NextionCommand &slot = lowQueue[lowTail];
+    slot.type = COMMAND_TEXT;
+    strncpy(slot.text, cmd, COMMAND_TEXT_SIZE - 1);
+    slot.text[COMMAND_TEXT_SIZE - 1] = '\0';
+    slot.channel = 0;
+    slot.value = 0;
+
+    lowTail = (lowTail + 1) % LOW_QUEUE_SIZE;
+    lowCount++;
+    return true;
+}
+
+bool enqueueLowAdd(uint8_t channel, int value)
+{
+    if (value < 0)
+    {
+        value = 0;
+    }
+    if (value > 255)
+    {
+        value = 255;
+    }
+
+    if (lowCount >= LOW_QUEUE_SIZE)
+    {
+        lowHead = (lowHead + 1) % LOW_QUEUE_SIZE;
+        lowCount--;
+    }
+
+    NextionCommand &slot = lowQueue[lowTail];
+    slot.type = COMMAND_ADD;
+    slot.text[0] = '\0';
+    slot.channel = channel;
+    slot.value = (uint8_t)value;
+
+    lowTail = (lowTail + 1) % LOW_QUEUE_SIZE;
+    lowCount++;
+    return true;
+}
+
+void clearLowQueue()
+{
+    lowHead = 0;
+    lowTail = 0;
+    lowCount = 0;
 }
