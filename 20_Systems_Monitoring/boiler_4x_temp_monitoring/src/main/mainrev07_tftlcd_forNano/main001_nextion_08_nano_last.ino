@@ -1,4 +1,6 @@
 #include <Nextion.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
 
 // [자동 포트 감지 매크로]
 // 보드 매크로를 확인하여 Serial1 존재 여부 판단
@@ -25,6 +27,13 @@
 const int WAVEFORM_ID = 11;
 const int CHANNELS = 4; // 4채널 사용
 
+// [설정] DS18B20 센서 핀
+#define ONE_WIRE_BUS 2
+OneWire oneWire(ONE_WIRE_BUS);
+DallasTemperature sensors(&oneWire);
+DeviceAddress sensorAddresses[4];
+bool sensorFound[4] = {false, false, false, false};
+
 // [설정] Xfloat 컴포넌트 정보 (x0 ~ x3)
 const char *XFLOAT_OBJS[4] = {"x0", "x1", "x2", "x3"};
 
@@ -45,8 +54,8 @@ const int SEND_DELAY_MS = 1;
 // [안정화] 채널 간 딜레이 (ms)
 const int CHANNEL_DELAY_MS = 5;
 
-// [버퍼 설정]
-const int BUFFER_LENGTH = 120;
+// [버퍼 설정] RAM 부족 방지를 위해 100으로 조정
+const int BUFFER_LENGTH = 100;
 const uint16_t REPLAY_MAX_SAMPLES = 40;
 const unsigned long DRAW_SUSPEND_MS = 200;
 
@@ -88,14 +97,12 @@ unsigned long prevClockMillis = 0;
 const unsigned long CLOCK_INTERVAL = 1000;
 
 // 버튼/채널 설정
-const int PAGE_BUTTON_IDS[5] = {16, 17, 18, 19, 25};
 const int DS_BUTTON_IDS[5] = {20, 21, 22, 23, 24};
 
 bool activeChannels[4] = {false, false, false, false};
 
 // 함수 선언
 void initNextionDisplay();
-void manageDisplaySystem();
 void updateWaveformData();
 void sendNextionCommand(const char *cmd);
 void sendNextionCommandWithDelay(const char *cmd, int delayMs);
@@ -122,6 +129,9 @@ void flushSerialAndWait();
 void syncChannelToCurrentPosition(int channel);
 void replayAllChannelsLockstep();
 
+// DS18B20 주소 관리 함수
+void initSensors();
+
 void setup()
 {
 #if DEBUG_ENABLE
@@ -143,6 +153,9 @@ void setup()
     initNextionDisplay();
     setAllChannels(false);
     
+    // [센서 초기화 및 매칭]
+    initSensors();
+    
     // 글로벌 카운터 초기화
     globalPointCount = 0;
     for (int ch = 0; ch < CHANNELS; ch++)
@@ -155,7 +168,6 @@ void setup()
 
 void loop()
 {
-    manageDisplaySystem();
     processNextionInput();
     updateClock();
     updateWaveformData();
@@ -186,17 +198,7 @@ void initNextionDisplay()
     sendTimeToDisplay();
 }
 
-void manageDisplaySystem()
-{
-    static bool isConfigApplied = false;
 
-    if (!isConfigApplied)
-    {
-        sendNextionCommand("thsp=60");
-        sendNextionCommand("thup=1");
-        isConfigApplied = true;
-    }
-}
 
 void sendNextionCommandWithDelay(const char *cmd, int delayMs)
 {
@@ -361,81 +363,60 @@ void syncChannelToCurrentPosition(int channel)
 void updateWaveformData()
 {
     unsigned long currentMillis = millis();
-
-    if (currentMillis - prevUpdateMillis < UPDATE_INTERVAL)
-    {
-        return;
-    }
-
+    if (currentMillis - prevUpdateMillis < UPDATE_INTERVAL) return;
     prevUpdateMillis = currentMillis;
 
-    float currentTemps[4];
+    float readTemps[4] = {0.0, 0.0, 0.0, 0.0};
     int plotValues[4];
 
-    // 1. 센서 데이터 생성 (시뮬레이션)
-    for (int ch = 0; ch < CHANNELS; ch++)
+    // 1. 센서 값 읽기 (독립)
+    for (int i = 0; i < CHANNELS; i++)
     {
-        currentTemps[ch] = random(400 + (ch * 50), 800 - (ch * 50)) / 10.0;
-    }
-
-    if (currentTemps[1] > currentTemps[0])
-    {
-        currentTemps[1] = currentTemps[0];
-    }
-    if (currentTemps[3] > currentTemps[2])
-    {
-        currentTemps[3] = currentTemps[2];
-    }
-
-    // 2. 값 매핑 및 Xfloat 전송
-    for (int ch = 0; ch < CHANNELS; ch++)
-    {
-        plotValues[ch] = map((int)currentTemps[ch], TEMP_MIN, TEMP_MAX, 0, WAVEFORM_HEIGHT - 1);
-
-        if (plotValues[ch] < 0)
+        if (sensorFound[i])
         {
-            plotValues[ch] = 0;
+            float t = sensors.getTempC(sensorAddresses[i]);
+            if (t > -50.0 && t < 150.0) readTemps[i] = t;
+            else readTemps[i] = 0.0;
         }
-        if (plotValues[ch] > 255)
+    }
+    sensors.requestTemperatures(); // 다음 루프를 위해 비차단 요청
+
+    // 2. Nextion x0~x3 전송 및 plotValues 계산
+    for (int i = 0; i < CHANNELS; i++)
+    {
+        // 웨이브폼 매핑 (0~255)
+        plotValues[i] = map((int)readTemps[i], TEMP_MIN, TEMP_MAX, 0, WAVEFORM_HEIGHT - 1);
+        if (plotValues[i] < 0) plotValues[i] = 0;
+        if (plotValues[i] > 255) plotValues[i] = 255;
+
+        if (activeChannels[i] && lastPlotValues[i] == -1)
         {
-            plotValues[ch] = 255;
+            lastPlotValues[i] = plotValues[i];
         }
 
-        if (activeChannels[ch] && lastPlotValues[ch] == -1)
-        {
-            lastPlotValues[ch] = plotValues[ch];
-        }
-
-        int xfloatVal = (int)(currentTemps[ch] * 10);
+        // x0, x1, x2, x3 값 전송
         char cmd[32];
-        snprintf(cmd, sizeof(cmd), "%s.val=%d", XFLOAT_OBJS[ch], xfloatVal);
+        snprintf(cmd, sizeof(cmd), "%s.val=%d", XFLOAT_OBJS[i], (int)(readTemps[i] * 10));
         sendNextionCommand(cmd);
     }
 
-    // 3. 버퍼 저장
+    // 3. 차이값 x4(S1-S2), x5(S3-S4) 계산
+    char diffCmd[32];
+    snprintf(diffCmd, sizeof(diffCmd), "x4.val=%d", (int)((readTemps[0] - readTemps[1]) * 10));
+    sendNextionCommand(diffCmd);
+    snprintf(diffCmd, sizeof(diffCmd), "x5.val=%d", (int)((readTemps[2] - readTemps[3]) * 10));
+    sendNextionCommand(diffCmd);
+
+    // 4. 웨이브폼 버퍼 저장 및 동기화 전송 시작
     storeWaveformSamples(plotValues);
-
-    // 4. 차이값 업데이트
-    int diff1 = (int)((currentTemps[0] - currentTemps[1]) * 10);
-    int diff2 = (int)((currentTemps[2] - currentTemps[3]) * 10);
-
-    char cmd[32];
-    snprintf(cmd, sizeof(cmd), "x4.val=%d", diff1);
-    sendNextionCommand(cmd);
-
-    snprintf(cmd, sizeof(cmd), "x5.val=%d", diff2);
-    sendNextionCommand(cmd);
 
     if (drawSuspended)
     {
-        if (millis() < drawResumeMillis)
-        {
-            return;
-        }
+        if (millis() < drawResumeMillis) return;
         drawSuspended = false;
     }
 
-    // 5. [X축 동기화] 스텝별 순차 전송 - 모든 활성 채널에 동시 추가
+    // 5. [X축 동기화] 스텝별 순차 전송
     int activeCount = 0;
     for (int ch = 0; ch < CHANNELS; ch++)
     {
@@ -547,40 +528,34 @@ void processNextionInput()
 
 void handleTouchEvent(uint8_t pageId, uint8_t componentId, uint8_t eventType)
 {
+    // 0: 눌림(Press), 1: 뗌(Release) 이벤트만 처리
     if (eventType != 0 && eventType != 1)
     {
         return;
     }
 
-    (void)pageId;
-
-    for (int i = 0; i < 5; i++)
+    // [채널 제어] bt0 ~ bt4 버튼 (메인 페이지 page 0에서만 동작)
+    // 페이지 이동은 Nextion MCU에서 직접 처리하므로 코드를 제거함
+    if (pageId == 0)
     {
-        if (componentId == DS_BUTTON_IDS[i])
+        for (int i = 0; i < 5; i++)
         {
-            if (i == CHANNELS)
+            if (componentId == DS_BUTTON_IDS[i])
             {
-                setAllChannels(!areAllChannelsActive());
+                if (i == CHANNELS)
+                {
+                    setAllChannels(!areAllChannelsActive());
+                }
+                else
+                {
+                    setChannelActive(i, !activeChannels[i]);
+                }
+                return;
             }
-            else
-            {
-                setChannelActive(i, !activeChannels[i]);
-            }
-            return;
-        }
-    }
-
-    for (int i = 0; i < 5; i++)
-    {
-        if (componentId == PAGE_BUTTON_IDS[i])
-        {
-            char cmd[16];
-            snprintf(cmd, sizeof(cmd), "page %d", i);
-            sendNextionCommand(cmd);
-            return;
         }
     }
 }
+
 
 void updateClock()
 {
@@ -948,4 +923,28 @@ void suspendWaveformDraw()
 {
     drawSuspended = true;
     drawResumeMillis = millis() + DRAW_SUSPEND_MS;
+}
+
+// [개선] 센서 초기화 및 안정적인 주소 획득
+void initSensors()
+{
+    sensors.begin();
+    delay(150); // 버스 안정화 대기
+    
+    // 발견된 모든 센서를 CHANNELS 만큼만 바인딩
+    for (int i = 0; i < CHANNELS; i++)
+    {
+        if (sensors.getAddress(sensorAddresses[i], i))
+        {
+            sensors.setResolution(sensorAddresses[i], 10);
+            sensorFound[i] = true;
+        }
+        else
+        {
+            sensorFound[i] = false;
+            // 누락된 주소는 0으로 초기화하여 안전성 확보
+            memset(sensorAddresses[i], 0, 8);
+        }
+    }
+    sensors.requestTemperatures();
 }
