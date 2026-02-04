@@ -38,3 +38,31 @@ pip install matplotlib
 # 플레이어 실행 (최신 Rev02)
 python tools/log_player/mainrev02/log_player.py
 ```
+## 3. Data Collector R4 WiFi (추천 - R4 WiFi 전용)
+UNO R4 WiFi 보드의 mDNS(`boiler.local`) 기능을 활용하여 더욱 안정적으로 데이터를 수집하는 현대적인 수집기입니다.
+
+### 주요 기능
+- **mDNS 및 고정 IP 지원**: `boiler.local` 도메인을 사용하거나 IP가 변경되어도 자동으로 검색하여 연결합니다.
+- **자동 인증**: 설정 파일(`config_r4.json`)에 저장된 비밀번호로 자동 인증을 수행합니다.
+- **컬러 콘솔 로그**: 연결 상태와 저장 현황을 색상으로 구분하여 가독성을 높였습니다.
+- **설정 분리**: 모든 접속 정보와 수집 옵션을 별도 JSON 파일에서 관리합니다.
+
+### 실행 방법
+1. `tools/data_collector/config_r4.json`에서 장치 정보(IP/Password)를 수정합니다.
+2. 다음 명령어로 실행합니다:
+```powershell
+python tools/data_collector/data_collector_r4wifi.py
+```
+
+## 4. Web Log Player (추천 - R4 WiFi 전용)
+설치가 필요 없는 웹 브라우저 기반의 로그 분석 도구입니다.
+
+### 주요 기능
+- **브라우저 실행**: HTML 파일을 크롬/엣지로 열기만 하면 즉시 사용 가능합니다.
+- **폴더 통째로 로드**: 로그가 담긴 폴더를 선택하면 수천 개의 파일을 한 번에 분석합니다.
+- **Chart.js 기반 시각화**: 부드러운 줌, 이동, 실시간 데이터 툴팁을 제공합니다.
+- **통계 및 가이드**: 현재 화면 구간의 Max/Avg 온도차를 계산하고, 임계치 라인을 표시합니다.
+
+### 실행 방법
+1. `tools/log_player/web_r4wifi/log_player.html` 파일을 브라우저로 드래그하여 엽니다.
+2. **[로그 폴더 선택]** 버튼을 클릭하고 로그 데이터가 저장된 폴더(`docs/logs/YYYY-MM-DD`)를 선택합니다.
