@@ -32,6 +32,6 @@ constexpr int LINE_STEPS = 5;
 constexpr int SEND_DELAY_MS = 1;
 
 // --- 웹 대시보드 설정 ---
-constexpr const char* DASHBOARD_PASS = "1234"; // 대시보드 접속 비밀번호
+constexpr const char* DASHBOARD_PASS = "REDACTED"; // 대시보드 접속 비밀번호
 
 #endif // CONFIG_H

@@ -7,7 +7,7 @@ from datetime import datetime
 
 # 설정
 ARDUINO_IP = "192.168.0.29:80"  # 아두이노 접속 IP
-DASHBOARD_PASS = "1234"         # 아두이노 인증 비밀번호
+DASHBOARD_PASS = "REDACTED"     # 아두이노 인증 비밀번호
 BASE_LOG_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "docs", "logs"))
 FETCH_INTERVAL = 10  # 10초마다 기록 (필요시 조정)
 MAX_DAYS = 7  # 최대 7일간 저장

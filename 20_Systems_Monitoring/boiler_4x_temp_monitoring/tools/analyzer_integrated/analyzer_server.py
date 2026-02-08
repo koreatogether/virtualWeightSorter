@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 # --- 설정 ---
 ARDUINO_IP = "192.168.0.150"    # ESP32C3 Xiao 실제 IP
 ARDUINO_PORT = 80
-DASHBOARD_PASS = "1234"
+DASHBOARD_PASS = "REDACTED"
 FETCH_INTERVAL = 2              # 수집 간격 (초)
 SERVER_PORT = 8080
 MAX_DAYS = 14                   # 로그 보관 일수

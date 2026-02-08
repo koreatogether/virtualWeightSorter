@@ -3,7 +3,7 @@
         "hostname": "boiler.local",
         "ip_address": "192.168.0.150",
         "port": 80,
-        "password": "1234"
+        "password": "REDACTED"
     },
     "logging": {
         "interval_seconds": 10,
