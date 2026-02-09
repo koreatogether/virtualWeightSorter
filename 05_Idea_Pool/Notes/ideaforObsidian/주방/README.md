@@ -1,28 +1,18 @@
-﻿# 주방
+﻿# 🍳 주방 자동화 및 편의 도구
 
-- 상태: 정리 필요
-- 목적: 주제별 연결과 프로젝트 승격 후보 정리
+- 상위 노드: [[../Main_MOC|Main MOC]]
+- 상태: 🟠 정리 중
+- 목적: 가사 노동 절감 및 주방 환경 개선 아이디어
 
-## 핵심
-- [[고무장갑건조대\implementation_plan.md]]
-- [[고무장갑벗기는바람\implementation_plan.md]]
-- [[따라하기_발빝에물트는발판\implementation_plan.md]]
-- [[씽크대위로봇팔에있는수전\implementation_plan.md]]
+## 🧺 설거지 및 건조 편의
+- [[고무장갑건조대/README|고무장갑 건조대]]: 위생적인 보관 및 건조 시스템
+- [[고무장갑벗기는바람/README|고무장갑 벗기기 어시스트]]: 공기압 등을 이용한 착용 및 탈의 보조
 
-## 관련
-- [[고무장갑건조대\README.MD]]
-- [[고무장갑벗기는바람\README.MD]]
-- [[따라하기_발빝에물트는발판\README.MD]]
-- [[씽크대위로봇팔에있는수전\README.MD]]
+## 🚰 수전 및 물 절약
+- [[따라하기_발빝에물트는발판/README|발판 수전]]: 발로 제어하는 물 절약 시스템
+- [[씽크대위로봇팔에있는수전/README|로봇팔 수전]]: 다각도 조절 및 자동 제어가 가능한 스마트 수전
 
-## 보류
+## 🔗 관련 분야
+- [[../아두이노아이디어/README|하드웨어 제어]]
 
-## 문서 목록
-- [[고무장갑건조대\implementation_plan.md]]
-- [[고무장갑벗기는바람\implementation_plan.md]]
-- [[따라하기_발빝에물트는발판\implementation_plan.md]]
-- [[씽크대위로봇팔에있는수전\implementation_plan.md]]
-- [[고무장갑건조대\README.MD]]
-- [[고무장갑벗기는바람\README.MD]]
-- [[따라하기_발빝에물트는발판\README.MD]]
-- [[씽크대위로봇팔에있는수전\README.MD]]
+#Kitchen #HomeAutomation #Design #Idea

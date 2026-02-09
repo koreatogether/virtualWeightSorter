@@ -11,14 +11,10 @@
             "id": "050a5d94ac3d08e2",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "농사/열사병/구조물.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "구조물"
+              "type": "graph",
+              "state": {},
+              "icon": "lucide-git-fork",
+              "title": "그래프 뷰"
             }
           }
         ]
@@ -53,7 +49,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "농사",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -74,8 +70,7 @@
               "title": "북마크"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -186,12 +181,15 @@
   },
   "active": "050a5d94ac3d08e2",
   "lastOpenFiles": [
+    "모니터링/README.md",
+    "Main_MOC.md",
+    "ai용웹생태계/ai통신방식.md",
+    "농사/열사병/구조물.md",
     "농사/노지농사/기계도입농사_recovered.md",
     "농사/농사/노지농사/기계도입농사.md",
     "농사/README.md",
     "농사/농사/노지농사",
     "농사/농사",
-    "농사/열사병/구조물.md",
     "농사/노지농사/기계도입농사.md",
     "농사/노지농사",
     "구축아파트_배관/README.md",
@@ -213,9 +211,6 @@
     "구축아파트_배관/freeThink/display.md",
     "구축아파트_배관/freeThink/calculation.md",
     "구축아파트_배관/freeThink",
-    "플랫폼_웹_블로그/새로운접근의블로그플랫폼.md",
-    "플랫폼_웹_블로그/블로그플랫폼_구현난이도분석.md",
-    "트럭_경사계/알고리즘조사보고서_전도예측_251222.md",
     "트럭_경사계/설계",
     "트럭_경사계/test_src/display_11Inch/images/Gemini_Generated_Image_ibtfvibtfvibtfvi.png",
     "트럭_경사계/test_src/display_11Inch/images/Gemini_Generated_Image_jkwx05jkwx05jkwx.png",
