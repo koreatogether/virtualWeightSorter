@@ -49,6 +49,7 @@ $script:timer.add_Elapsed({
   if (-not $status) { return }
 
   git commit -m "auto: update" | Out-Null
+  Write-Log "commit created"
 
   $hasRemote = git remote
   if (-not $hasRemote) { return }
@@ -70,6 +71,7 @@ $watcher.EnableRaisingEvents = $true
 
 $action = {
   if ($Event.SourceEventArgs.FullPath -match "\\\.git\\") { return }
+  Write-Log "change detected: $($Event.SourceEventArgs.ChangeType) $($Event.SourceEventArgs.FullPath)"
   $script:pending = $true
   $script:timer.Stop()
   $script:timer.Start()
