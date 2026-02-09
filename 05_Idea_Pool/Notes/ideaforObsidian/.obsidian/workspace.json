@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "농사/열사병/구조물.md",
+                "file": "Main_MOC.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "구조물"
+              "title": "Main_MOC"
             }
           }
         ]
@@ -53,7 +53,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "농사",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -74,8 +74,7 @@
               "title": "북마크"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "horizontal",
@@ -186,12 +185,23 @@
   },
   "active": "050a5d94ac3d08e2",
   "lastOpenFiles": [
+    "ai용사이트/ai에게좋은사이트.md",
+    "ai용사이트",
+    "도로공사차량싸인보드/기존코드/signBoard.ino",
+    "도로공사차량싸인보드/기존코드/01_signBoard_리뷰.md",
+    "도로공사차량싸인보드/기존코드",
+    "도로공사차량싸인보드",
+    "주방/README.md",
+    "주방/고무장갑벗기는바람/README.MD",
+    "모니터링/README.md",
+    "Main_MOC.md",
+    "ai용웹생태계/ai통신방식.md",
+    "농사/열사병/구조물.md",
     "농사/노지농사/기계도입농사_recovered.md",
     "농사/농사/노지농사/기계도입농사.md",
     "농사/README.md",
     "농사/농사/노지농사",
     "농사/농사",
-    "농사/열사병/구조물.md",
     "농사/노지농사/기계도입농사.md",
     "농사/노지농사",
     "구축아파트_배관/README.md",
@@ -208,22 +218,11 @@
     "구축아파트_배관/freeThink/naver_cafe.md",
     "구축아파트_배관/freeThink/longLifeBoard.md",
     "구축아파트_배관/freeThink/intro.md",
-    "구축아파트_배관/freeThink/longLifeBattery.md",
-    "구축아파트_배관/freeThink/18b20_data.md",
-    "구축아파트_배관/freeThink/display.md",
-    "구축아파트_배관/freeThink/calculation.md",
     "구축아파트_배관/freeThink",
-    "플랫폼_웹_블로그/새로운접근의블로그플랫폼.md",
-    "플랫폼_웹_블로그/블로그플랫폼_구현난이도분석.md",
-    "트럭_경사계/알고리즘조사보고서_전도예측_251222.md",
     "트럭_경사계/설계",
     "트럭_경사계/test_src/display_11Inch/images/Gemini_Generated_Image_ibtfvibtfvibtfvi.png",
     "트럭_경사계/test_src/display_11Inch/images/Gemini_Generated_Image_jkwx05jkwx05jkwx.png",
     "트럭_경사계/test_src/display_11Inch/images",
-    "트럭_경사계/test_src/display_11Inch/display3.pde",
-    "트럭_경사계/test_src/display_11Inch/display.pde",
-    "트럭_경사계/test_src/display_11Inch/display2.pde",
-    "트럭_경사계/test_src/display_11Inch",
     "트럭_경사계/iamges/image.png",
     "트럭_경사계/트럭_경사계_유선_디스플레이/test_src/display_11Inch/images/Gemini_Generated_Image_jkwx05jkwx05jkwx.png",
     "트럭_경사계/트럭_경사계_유선_디스플레이/test_src/display_11Inch/images/Gemini_Generated_Image_ibtfvibtfvibtfvi.png",
