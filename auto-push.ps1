@@ -32,55 +32,52 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
   exit 1
 }
 
-$script:pending = $false
-Write-Log "auto-push started"
-$script:pending = $false
-$script:timer = New-Object Timers.Timer
-$script:timer.Interval = $DebounceSeconds * 1000
-$script:timer.AutoReset = $false
-$script:timer.add_Elapsed({
-  if (-not $script:pending) { return }
-  $script:pending = $false
+Write-Log "auto-push started (polling)"
+Write-Log "watching $Repo"
 
+$lastSeenChangesAt = $null
+
+while ($true) {
+  Start-Sleep -Seconds 2
   Set-Location $Repo
 
-  git add -A
   $status = git status --porcelain
-  if (-not $status) { return }
+  if (-not $status) {
+    $lastSeenChangesAt = $null
+    continue
+  }
+
+  if (-not $lastSeenChangesAt) {
+    $lastSeenChangesAt = Get-Date
+    Write-Log "changes detected (poll)"
+    continue
+  }
+
+  $elapsed = (Get-Date) - $lastSeenChangesAt
+  if ($elapsed.TotalSeconds -lt $DebounceSeconds) { continue }
+
+  git add -A
+  $status2 = git status --porcelain
+  if (-not $status2) {
+    $lastSeenChangesAt = $null
+    continue
+  }
 
   git commit -m "auto: update" | Out-Null
   Write-Log "commit created"
 
   $hasRemote = git remote
-  if (-not $hasRemote) { return }
-
-  for ($i = 1; $i -le $PushRetryCount; $i++) {
-    git push | Out-Null
-    if ($LASTEXITCODE -eq 0) {
-      Write-Log "push success"
-      break
+  if ($hasRemote) {
+    for ($i = 1; $i -le $PushRetryCount; $i++) {
+      git push | Out-Null
+      if ($LASTEXITCODE -eq 0) {
+        Write-Log "push success"
+        break
+      }
+      Write-Log "push failed (attempt $i/$PushRetryCount), retrying in $PushRetryDelaySeconds s"
+      Start-Sleep -Seconds $PushRetryDelaySeconds
     }
-    Write-Log "push failed (attempt $i/$PushRetryCount), retrying in $PushRetryDelaySeconds s"
-    Start-Sleep -Seconds $PushRetryDelaySeconds
   }
-})
 
-$watcher = New-Object IO.FileSystemWatcher $Repo, "*"
-$watcher.IncludeSubdirectories = $true
-$watcher.EnableRaisingEvents = $true
-
-$action = {
-  if ($Event.SourceEventArgs.FullPath -match "\\\.git\\") { return }
-  Write-Log "change detected: $($Event.SourceEventArgs.ChangeType) $($Event.SourceEventArgs.FullPath)"
-  $script:pending = $true
-  $script:timer.Stop()
-  $script:timer.Start()
+  $lastSeenChangesAt = $null
 }
-
-Register-ObjectEvent $watcher Changed -Action $action | Out-Null
-Register-ObjectEvent $watcher Created -Action $action | Out-Null
-Register-ObjectEvent $watcher Deleted -Action $action | Out-Null
-Register-ObjectEvent $watcher Renamed -Action $action | Out-Null
-
-Write-Log "watching $Repo"
-while ($true) { Start-Sleep -Seconds 1 }

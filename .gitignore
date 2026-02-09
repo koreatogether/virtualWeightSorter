@@ -18,3 +18,6 @@ env/
 # OS
 .DS_Store
 Thumbs.db
+
+# Auto push logs
+auto-push.log*
