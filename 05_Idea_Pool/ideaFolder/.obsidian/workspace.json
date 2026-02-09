@@ -18,22 +18,6 @@
             }
           }
         ]
-      },
-      {
-        "id": "c953658a35d0714a",
-        "type": "tabs",
-        "children": [
-          {
-            "id": "c16adc985959ec7f",
-            "type": "leaf",
-            "state": {
-              "type": "graph",
-              "state": {},
-              "icon": "lucide-git-fork",
-              "title": "그래프 뷰"
-            }
-          }
-        ]
       }
     ],
     "direction": "vertical"
@@ -195,8 +179,9 @@
       "bases:새 베이스 생성하기": false
     }
   },
-  "active": "8ba8ff560c875118",
+  "active": "3b450505f7e08871",
   "lastOpenFiles": [
+    "무제",
     "무제.base",
     "mpu6050.md",
     "환영합니다!.md"
