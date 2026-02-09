@@ -14,6 +14,8 @@ env/
 # IDEs
 .vscode/
 .idea/
+.obsidian/
+**/.obsidian/
 
 # OS
 .DS_Store
