@@ -38,7 +38,7 @@ if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
 
 $repoBytes = [Text.Encoding]::UTF8.GetBytes($Repo)
 $hash = [BitConverter]::ToString([Security.Cryptography.SHA256]::Create().ComputeHash($repoBytes)).Replace("-", "")
-$mutexName = "Local\\AutoGitPush_$hash"
+$mutexName = "Local\AutoGitPush_$hash"
 $mutex = New-Object System.Threading.Mutex($false, $mutexName)
 if (-not $mutex.WaitOne(0)) {
   Write-Log "another instance is already running; exiting"
