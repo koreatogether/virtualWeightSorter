@@ -3,7 +3,7 @@ param(
   [int]$DebounceSeconds = 5,
   [int]$PushRetryCount = 5,
   [int]$PushRetryDelaySeconds = 10,
-  [string]$LogPath = "c:\project\private_projects\auto-push.log",
+  [string]$LogPath = "$env:LOCALAPPDATA\\AutoGitPush\\auto-push.log",
   [int]$LogMaxBytes = 1MB,
   [int]$LogKeepFiles = 5
 )
@@ -13,6 +13,10 @@ Set-Location $Repo
 function Write-Log {
   param([string]$Message)
   $ts = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+  $logDir = Split-Path -Parent $LogPath
+  if (-not (Test-Path $logDir)) {
+    New-Item -ItemType Directory -Path $logDir -Force | Out-Null
+  }
   if (Test-Path $LogPath) {
     $size = (Get-Item $LogPath).Length
     if ($size -ge $LogMaxBytes) {
