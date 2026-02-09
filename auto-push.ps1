@@ -1,5 +1,5 @@
 param(
-  [string]$Repo = "c:\project\private_projects",
+  [string]$Repo = $PWD.Path,
   [int]$DebounceSeconds = 5,
   [int]$PushRetryCount = 5,
   [int]$PushRetryDelaySeconds = 10,
