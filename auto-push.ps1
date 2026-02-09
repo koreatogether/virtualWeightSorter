@@ -3,12 +3,13 @@ param(
   [int]$DebounceSeconds = 5,
   [int]$PushRetryCount = 5,
   [int]$PushRetryDelaySeconds = 10,
-  [string]$LogPath = "$env:LOCALAPPDATA\\AutoGitPush\\auto-push.log",
+  [string]$LogPath = "$env:LOCALAPPDATA\AutoGitPush\auto-push.log",
   [int]$LogMaxBytes = 1MB,
   [int]$LogKeepFiles = 5
 )
 
 Set-Location $Repo
+Write-Host "Script started for repo: $Repo"
 
 function Write-Log {
   param([string]$Message)
