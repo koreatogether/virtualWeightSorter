@@ -1,0 +1,155 @@
+{
+  "schedules": [
+    {
+      "id": "5e8d5198",
+      "order_id": "7cdc80ff",
+      "printer_id": "2b626f24",
+      "planned_quantity": 45,
+      "actual_quantity": 0,
+      "status": "pending",
+      "start_time": "2026-02-14T09:00",
+      "created_at": "2026-02-11T02:40:29.669256",
+      "conflict": false
+    },
+    {
+      "id": "68f0aa58",
+      "order_id": "7cdc80ff",
+      "printer_id": "2b626f24",
+      "planned_quantity": 45,
+      "actual_quantity": 0,
+      "status": "pending",
+      "start_time": "2026-02-15T09:00",
+      "created_at": "2026-02-11T02:40:29.669296",
+      "conflict": false
+    },
+    {
+      "id": "a706fe67",
+      "order_id": "7cdc80ff",
+      "printer_id": "2b626f24",
+      "planned_quantity": 45,
+      "actual_quantity": 0,
+      "status": "pending",
+      "start_time": "2026-02-16T09:00",
+      "created_at": "2026-02-11T02:40:29.669321",
+      "conflict": false
+    },
+    {
+      "id": "80048b84",
+      "order_id": "7cdc80ff",
+      "printer_id": "2b626f24",
+      "planned_quantity": 45,
+      "actual_quantity": 0,
+      "status": "pending",
+      "start_time": "2026-02-17T09:00",
+      "created_at": "2026-02-11T02:40:29.669343",
+      "conflict": false
+    },
+    {
+      "id": "7d8ae7b4",
+      "order_id": "7cdc80ff",
+      "printer_id": "2b626f24",
+      "planned_quantity": 15,
+      "actual_quantity": 0,
+      "status": "pending",
+      "start_time": "2026-02-18T09:00",
+      "created_at": "2026-02-11T02:40:29.669367",
+      "conflict": false
+    },
+    {
+      "id": "c110d708",
+      "order_id": "21b84580",
+      "printer_id": "2b626f24",
+      "planned_quantity": 30,
+      "actual_quantity": 0,
+      "status": "pending",
+      "start_time": "2026-02-11T09:00",
+      "created_at": "2026-02-11T02:50:56.987918",
+      "conflict": false
+    },
+    {
+      "id": "3279fc2f",
+      "order_id": "21b84580",
+      "printer_id": "2b626f24",
+      "planned_quantity": 30,
+      "actual_quantity": 0,
+      "status": "pending",
+      "start_time": "2026-02-12T09:00",
+      "created_at": "2026-02-11T02:50:56.987949",
+      "conflict": false
+    },
+    {
+      "id": "56c27ffb",
+      "order_id": "21b84580",
+      "printer_id": "2b626f24",
+      "planned_quantity": 18,
+      "actual_quantity": 0,
+      "status": "pending",
+      "start_time": "2026-02-13T09:00",
+      "created_at": "2026-02-11T02:50:56.987969",
+      "conflict": false
+    }
+  ],
+  "inventory": [
+    {
+      "material": "PLA",
+      "color": "검정",
+      "remaining_weight_g": 350,
+      "id": "6a8b06c4"
+    },
+    {
+      "material": "PLA",
+      "color": "검정",
+      "remaining_weight_g": 600,
+      "id": "c4bc6861"
+    },
+    {
+      "material": "PLA",
+      "color": "검정",
+      "remaining_weight_g": 1000,
+      "id": "1453767e"
+    },
+    {
+      "material": "PLA",
+      "color": "백색",
+      "remaining_weight_g": 700,
+      "id": "87cd5912"
+    }
+  ],
+  "printers": [
+    {
+      "model": "P2SC",
+      "purchase_date": "2026-02-04",
+      "id": "2b626f24",
+      "status": "idle",
+      "asset_id": "002"
+    }
+  ],
+  "orders": [
+    {
+      "product_name": "LED점멸기_바디",
+      "target_quantity": 200,
+      "initial_stock": 122,
+      "material": "PLA",
+      "color": "검정",
+      "unit_weight_g": 10,
+      "deadline": "2026-02-19",
+      "id": "21b84580",
+      "completed_quantity": 0,
+      "status": "in_progress",
+      "created_at": "2026-02-11T02:35:19.593935"
+    },
+    {
+      "product_name": "LED점멸기_커버",
+      "target_quantity": 200,
+      "initial_stock": 5,
+      "material": "PLA",
+      "color": "검정",
+      "unit_weight_g": 6,
+      "deadline": "2026-02-19",
+      "id": "7cdc80ff",
+      "completed_quantity": 0,
+      "status": "in_progress",
+      "created_at": "2026-02-11T02:36:17.754147"
+    }
+  ]
+}

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D 출력 생산 관리 시스템</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        /* Flatpickr 커스텀 스타일 (가능한 날짜 녹색 표시 등) */
+        .flatpickr-day:not(.flatpickr-disabled) {
+            background: #e8f5e9; /* 연한 녹색 배경 */
+            border-color: #e8f5e9;
+        }
+        .flatpickr-day.selected {
+            background: #28a745 !important; /* 선택시 진한 녹색 */
+            border-color: #28a745 !important;
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <header>
+        <h1>3D 출력 생산 관리 시스템 (MES Lite)</h1>
+        <nav>
+            <ul>
+                <li><a href="#orders">주문 관리</a></li>
+                <li><a href="#schedule">생산 계획/실적</a></li>
+                <li><a href="#dashboard">대시보드</a></li>
+                <li><a href="#inventory">재고/자산</a></li>
+            </ul>
+            <button id="theme-toggle">테마 변경</button>
+        </nav>
+    </header>
+
+    <main>
+        <!-- 1. 주문 관리 (Order Management) -->
+        <section id="orders">
+            <h2>주문 관리 (Production Orders)</h2>
+            <fieldset>
+                <legend>새 주문 등록</legend>
+                <form id="order-form">
+                    <input type="text" id="order_product" placeholder="제품명 (예: LED 바디)" required>
+                    <input type="number" id="order_target" placeholder="목표 수량" required>
+                    <input type="number" id="order_initial_stock" placeholder="기존 재고(개)">
+                    <select id="order_material" required>
+                        <option value="">-- 재질 선택 --</option>
+                    </select>
+                    <select id="order_color" required>
+                        <option value="">-- 색상 선택 --</option>
+                    </select>
+                    <input type="number" id="order_unit_weight" placeholder="개당 무게(g)" required>
+                    <input type="date" id="order_deadline">
+                    <button type="submit">주문 생성</button>
+                </form>
+            </fieldset>
+
+            <div id="order-list">
+                <!-- JS로 주문 카드들이 여기에 렌더링됨 -->
+            </div>
+
+            <!-- 주문 수정용 숨겨진 폼 -->
+            <div id="order-edit-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+                <div style="background:var(--bg-color); max-width:500px; margin:100px auto; padding:20px; border-radius:8px;">
+                    <h3>주문 정보 수정</h3>
+                    <form id="order-edit-form" style="display:flex; flex-direction:column; gap:10px;">
+                        <input type="hidden" id="edit_order_id">
+                        <label>제품명: <input type="text" id="edit_order_product" required></label>
+                        <label>목표 수량: <input type="number" id="edit_order_target" required></label>
+                        <label>기존 재고: <input type="number" id="edit_order_initial_stock" placeholder="기존 재고(개)"></label>
+                        <label>재질: 
+                            <select id="edit_order_material" required></select>
+                        </label>
+                        <label>색상: 
+                            <select id="edit_order_color" required></select>
+                        </label>
+                        <label>개당 무게(g): <input type="number" id="edit_order_unit_weight" required></label>
+                        <label>마감 기한: <input type="date" id="edit_order_deadline"></label>
+                        <div style="display:flex; gap:10px; margin-top:10px;">
+                            <button type="submit">저장</button>
+                            <button type="button" onclick="closeOrderEdit()" style="background:#6c757d;">취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 생산 계획 및 실적 -->
+        <section id="schedule">
+            <h2>일일 생산 계획 및 실적 (Daily Runs)</h2>
+            
+            <fieldset>
+                <legend>생산 작업 할당 (Run Schedule)</legend>
+                <form id="schedule-form">
+                    <div style="width: 100%; margin-bottom: 10px;">
+                        <label>
+                            <input type="checkbox" id="auto_schedule_mode"> 
+                            <strong>자동 계획 생성 모드</strong> (잔여 수량 채울 때까지 일별 계획 자동 생성)
+                        </label>
+                    </div>
+                    
+                    <select id="schedule_order_id" required>
+                        <option value="">-- 주문 선택 --</option>
+                        <!-- JS로 채워짐 -->
+                    </select>
+                    <select id="printer_id" required>
+                        <!-- JS로 채워짐 -->
+                    </select>
+                    <input type="number" id="planned_qty" placeholder="계획 수량 (1회/1일)" required>
+                    <!-- Flatpickr가 적용될 입력창 -->
+                    <input type="text" id="start_date_picker" placeholder="시작 날짜/시간 선택" required>
+                    <!-- 기존 input들은 hidden으로 처리하거나 제거 -->
+                    <input type="hidden" id="start_date_only"> 
+                    <input type="hidden" id="start_time">
+                    <button type="submit" id="schedule-btn">작업 할당</button>
+                </form>
+            </fieldset>
+
+            <div class="view-controls">
+                <button onclick="switchView('list')">리스트 뷰</button>
+                <button onclick="switchView('timeline')">타임라인(간트) 뷰</button>
+            </div>
+
+            <div id="list-view">
+                <table id="schedule-table">
+                    <thead>
+                        <tr>
+                            <th>생산 날짜</th>
+                            <th>관련 주문(제품)</th>
+                            <th>프린터</th>
+                            <th>수량 (계획/실적)</th>
+                            <th>관리</th>
+                            <th>작업 ID</th>
+                        </tr>
+                    </thead>
+                    <tbody id="schedule-body">
+                        <!-- JS로 채워짐 -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="timeline-view" style="display: none;">
+                <div class="timeline-wrapper">
+                    <table id="gantt-table">
+                        <thead>
+                            <tr id="gantt-header">
+                                <th>프린터 \ 시간</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gantt-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. 대시보드 -->
+        <section id="dashboard">
+            <h2>종합 현황</h2>
+            <div class="stats-container">
+                <article id="stat-progress">
+                    <h3>전체 진행률</h3>
+                    <p class="data-value">0%</p>
+                </article>
+                <article id="stat-printers">
+                    <h3>가동 프린터</h3>
+                    <p class="data-value">0</p>
+                </article>
+                <article id="stat-inventory">
+                    <h3>재고 경고</h3>
+                    <p class="data-value">정상</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- 4. 재고 및 자산 관리 -->
+        <section id="inventory">
+            <h2>재고 및 자산 관리</h2>
+            <div class="flex-row">
+                <div class="flex-half">
+                    <h3>필라멘트 재고</h3>
+                    <form id="inventory-form">
+                        <input type="text" id="material" placeholder="재질" required>
+                        <input type="text" id="color" placeholder="색상" required>
+                        <input type="number" id="remaining_weight_g" placeholder="무게(g)" required>
+                        <button type="submit">추가</button>
+                    </form>
+                    <table id="inventory-table">
+                        <thead>
+                            <tr><th>재질</th><th>색상</th><th>잔량</th><th>관리</th></tr>
+                        </thead>
+                        <tbody id="inventory-body"></tbody>
+                    </table>
+                </div>
+                <div class="flex-half">
+                    <h3>프린터 자산</h3>
+                    <form id="printer-form">
+                        <input type="text" id="printer_model" placeholder="모델명 (예: P2SC)" required>
+                        <input type="text" id="printer_asset_id" placeholder="식별번호 (예: 101)" required>
+                        <input type="date" id="purchase_date" required>
+                        <button type="submit">추가</button>
+                    </form>
+                    <table id="printer-table">
+                        <thead>
+                            <tr><th>모델</th><th>식별번호</th><th>구입일</th><th>관리</th></tr>
+                        </thead>
+                        <tbody id="printer-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 재고 수정용 숨겨진 폼 -->
+            <div id="inventory-edit-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1001;">
+                <div style="background:var(--bg-color); max-width:400px; margin:150px auto; padding:20px; border-radius:8px;">
+                    <h3>재고 정보 수정</h3>
+                    <form id="inventory-edit-form" style="display:flex; flex-direction:column; gap:10px;">
+                        <input type="hidden" id="edit_inv_id">
+                        <label>재질: <input type="text" id="edit_inv_material" required></label>
+                        <label>색상: <input type="text" id="edit_inv_color" required></label>
+                        <label>잔량(g): <input type="number" id="edit_inv_weight" required></label>
+                        <div style="display:flex; gap:10px; margin-top:10px;">
+                            <button type="submit">저장</button>
+                            <button type="button" onclick="closeInventoryEdit()" style="background:#6c757d;">취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 프린터 수정용 숨겨진 폼 -->
+            <div id="printer-edit-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1002;">
+                <div style="background:var(--bg-color); max-width:400px; margin:150px auto; padding:20px; border-radius:8px;">
+                    <h3>프린터 정보 수정</h3>
+                    <form id="printer-edit-form" style="display:flex; flex-direction:column; gap:10px;">
+                        <input type="hidden" id="edit_printer_id">
+                        <label>모델명: <input type="text" id="edit_printer_model" required></label>
+                        <label>식별번호: <input type="text" id="edit_printer_asset_id" required></label>
+                        <label>구입일: <input type="date" id="edit_printer_purchase" required></label>
+                        <div style="display:flex; gap:10px; margin-top:10px;">
+                            <button type="submit">저장</button>
+                            <button type="button" onclick="closePrinterEdit()" style="background:#6c757d;">취소</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 3D Production Manager (MES Lite)</p>
+    </footer>
+
+    <!-- Flatpickr JS -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
