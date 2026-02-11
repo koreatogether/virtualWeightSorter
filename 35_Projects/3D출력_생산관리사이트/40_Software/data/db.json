@@ -60,8 +60,8 @@
       "order_id": "21b84580",
       "printer_id": "2b626f24",
       "planned_quantity": 30,
-      "actual_quantity": 0,
-      "status": "pending",
+      "actual_quantity": 15,
+      "status": "completed",
       "start_time": "2026-02-11T09:00",
       "created_at": "2026-02-11T02:50:56.987918",
       "conflict": false
@@ -91,28 +91,32 @@
   ],
   "inventory": [
     {
-      "material": "PLA",
+      "material": "PLA1",
       "color": "검정",
       "remaining_weight_g": 350,
-      "id": "6a8b06c4"
+      "id": "6a8b06c4",
+      "updated_at": "2026-02-11 09:43:14"
     },
     {
-      "material": "PLA",
+      "material": "PLA2",
       "color": "검정",
-      "remaining_weight_g": 600,
-      "id": "c4bc6861"
+      "remaining_weight_g": 364,
+      "id": "c4bc6861",
+      "updated_at": "2026-02-11 09:44:03"
     },
     {
-      "material": "PLA",
+      "material": "PLA3",
       "color": "검정",
       "remaining_weight_g": 1000,
-      "id": "1453767e"
+      "id": "1453767e",
+      "updated_at": "2026-02-11 09:43:23"
     },
     {
       "material": "PLA",
       "color": "백색",
       "remaining_weight_g": 700,
-      "id": "87cd5912"
+      "id": "87cd5912",
+      "updated_at": "2026-02-11 09:48:58"
     }
   ],
   "printers": [
@@ -126,7 +130,7 @@
   ],
   "orders": [
     {
-      "product_name": "LED점멸기_바디",
+      "product_name": "LED_바디",
       "target_quantity": 200,
       "initial_stock": 122,
       "material": "PLA",
@@ -134,12 +138,12 @@
       "unit_weight_g": 10,
       "deadline": "2026-02-19",
       "id": "21b84580",
-      "completed_quantity": 0,
+      "completed_quantity": 15,
       "status": "in_progress",
       "created_at": "2026-02-11T02:35:19.593935"
     },
     {
-      "product_name": "LED점멸기_커버",
+      "product_name": "LED_커버",
       "target_quantity": 200,
       "initial_stock": 5,
       "material": "PLA",

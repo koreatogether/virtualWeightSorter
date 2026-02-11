@@ -8,6 +8,14 @@ app = Flask(__name__)
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB_FILE = os.path.join(BASE_DIR, 'data', 'db.json')
+ACTION_LOG_FILE = os.path.join(BASE_DIR, 'data', 'user_actions.log')
+
+def log_action(action_type, target, details):
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    ip = request.remote_addr
+    log_entry = f"[{timestamp}] [IP: {ip}] [ACTION: {action_type}] [TARGET: {target}] - {details}\n"
+    with open(ACTION_LOG_FILE, 'a', encoding='utf-8') as f:
+        f.write(log_entry)
 
 def read_db():
     if not os.path.exists(DB_FILE):
@@ -62,6 +70,7 @@ def add_order():
     new_order['created_at'] = datetime.now().isoformat()
     data['orders'].append(new_order)
     write_db(data)
+    log_action("CREATE_ORDER", new_order['id'], f"Product: {new_order['product_name']}, Target: {new_order['target_quantity']}")
     return jsonify({"status": "success", "id": new_order['id']}), 201
 
 @app.route('/api/v1/orders/<id>', methods=['PATCH'])
@@ -87,6 +96,7 @@ def update_order(id):
                 order['status'] = 'in_progress'
             
             write_db(data)
+            log_action("UPDATE_ORDER", id, f"Updated fields: {list(req_data.keys())}")
             return jsonify({"status": "success"})
     return jsonify({"status": "error", "message": "Order not found"}), 404
 
@@ -95,6 +105,7 @@ def delete_order(id):
     data = read_db()
     data['orders'] = [o for o in data['orders'] if o['id'] != id]
     write_db(data)
+    log_action("DELETE_ORDER", id, "Order removed")
     return jsonify({"status": "success"})
 
 # --- 자동 스케줄링 API ---
@@ -144,6 +155,7 @@ def auto_schedule():
         current_date += timedelta(days=1)
         
     write_db(data)
+    log_action("AUTO_SCHEDULE", order_id, f"Created {len(created_schedules)} days for printer {printer_id}")
     msg = f"{len(created_schedules)}일치 생성 완료."
     if conflicts: msg += f" (경고: {len(conflicts)}건 중복)"
     return jsonify({"status": "success", "count": len(created_schedules), "message": msg, "conflicts": conflicts}), 201
@@ -165,6 +177,7 @@ def add_schedule():
         new_task['conflict'] = False
     data['schedules'].append(new_task)
     write_db(data)
+    log_action("ADD_SCHEDULE", new_task['id'], f"Order: {new_task.get('order_id')}, Printer: {new_task.get('printer_id')}")
     return jsonify({"status": "success", "id": new_task['id'], "conflict": new_task['conflict']}), 201
 
 @app.route('/api/v1/schedules/<id>', methods=['PATCH'])
@@ -172,11 +185,46 @@ def update_schedule(id):
     data = read_db()
     req_data = request.json
     target_schedule = None
+    
+    # 1. 대상 스케줄 찾기
     for item in data['schedules']:
         if item['id'] == id:
             target_schedule = item
-            item.update(req_data)
+            # 만약 actual_quantity가 요청에 포함되어 있다면, 기존 값에 더해줌 (누적 처리)
+            if 'actual_quantity' in req_data:
+                added_qty = int(req_data['actual_quantity'])
+                old_actual = int(item.get('actual_quantity', 0))
+                item['actual_quantity'] = old_actual + added_qty
+                
+                # 계획 수량보다 초과해서 생산했는지 확인
+                planned = int(item.get('planned_quantity', 0))
+                excess = item['actual_quantity'] - planned
+                
+                # 만약 초과분이 있다면, 동일 주문의 다음 일정들에서 차감
+                if excess > 0:
+                    order_id = item.get('order_id')
+                    # 동일 주문의 완료되지 않은(pending) 미래 일정들을 시간순으로 가져옴
+                    future_schedules = sorted(
+                        [s for s in data['schedules'] if s.get('order_id') == order_id and s.get('status') == 'pending' and s['id'] != id],
+                        key=lambda x: x.get('start_time', '')
+                    )
+                    
+                    for fs in future_schedules:
+                        if excess <= 0: break
+                        fs_planned = int(fs.get('planned_quantity', 0))
+                        can_reduce = min(fs_planned, excess)
+                        fs['planned_quantity'] = fs_planned - can_reduce
+                        excess -= can_reduce
+                        
+                        # 만약 계획 수량이 0이 되면 해당 일정은 더 이상 필요 없으므로 자동 완료 처리하거나 고민 필요
+                        # 여기서는 일단 0으로 두고 유지 (사용자가 보게 함)
+            
+            # 나머지 필드 업데이트
+            for key, value in req_data.items():
+                if key != 'actual_quantity': # 실적은 위에서 누적처리함
+                    item[key] = value
             break
+
     if target_schedule:
         order_id = target_schedule.get('order_id')
         if order_id:
@@ -190,7 +238,8 @@ def update_schedule(id):
                         order['status'] = 'in_progress'
                     break
         write_db(data)
-        return jsonify({"status": "success"})
+        log_action("UPDATE_SCHEDULE_ACTUAL", id, f"New actual total: {target_schedule.get('actual_quantity')}")
+        return jsonify({"status": "success", "new_actual": target_schedule.get('actual_quantity')})
     return jsonify({"status": "error", "message": "Not found"}), 404
 
 @app.route('/api/v1/schedules/<id>', methods=['DELETE'])
@@ -213,6 +262,7 @@ def delete_schedule(id):
                     order['status'] = 'in_progress'
                 break
         write_db(data)
+        log_action("DELETE_SCHEDULE", id, "Schedule removed")
         return jsonify({"status": "success"})
     return jsonify({"status": "error", "message": "Not found"}), 404
 
@@ -222,8 +272,10 @@ def add_inventory():
     data = read_db()
     new_inv = request.json
     new_inv['id'] = str(uuid.uuid4())[:8]
+    new_inv['updated_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     data['inventory'].append(new_inv)
     write_db(data)
+    log_action("ADD_INVENTORY", new_inv['id'], f"Material: {new_inv['material']}, Weight: {new_inv['remaining_weight_g']}g")
     return jsonify({"status": "success", "id": new_inv['id']}), 201
 
 @app.route('/api/v1/inventory/<id>', methods=['PATCH'])
@@ -235,7 +287,9 @@ def update_inventory(id):
             if 'material' in req_data: item['material'] = req_data['material']
             if 'color' in req_data: item['color'] = req_data['color']
             if 'remaining_weight_g' in req_data: item['remaining_weight_g'] = int(req_data['remaining_weight_g'])
+            item['updated_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             write_db(data)
+            log_action("UPDATE_INVENTORY", id, f"Updated fields: {list(req_data.keys())}")
             return jsonify({"status": "success"})
     return jsonify({"status": "error", "message": "Inventory not found"}), 404
 
@@ -244,6 +298,7 @@ def delete_inventory(id):
     data = read_db()
     data['inventory'] = [i for i in data['inventory'] if i['id'] != id]
     write_db(data)
+    log_action("DELETE_INVENTORY", id, "Inventory removed")
     return jsonify({"status": "success"})
 
 @app.route('/api/v1/printers', methods=['POST'])
@@ -258,6 +313,7 @@ def add_printer():
         new_printer['purchase_date'] = datetime.now().strftime('%Y-%m-%d')
     data['printers'].append(new_printer)
     write_db(data)
+    log_action("ADD_PRINTER", new_printer['id'], f"Model: {new_printer['model']}, AssetID: {new_printer['asset_id']}")
     return jsonify({"status": "success", "id": new_printer['id']}), 201
 
 @app.route('/api/v1/printers/<id>', methods=['PATCH'])
@@ -270,6 +326,7 @@ def update_printer(id):
             if 'asset_id' in req_data: item['asset_id'] = req_data['asset_id']
             if 'purchase_date' in req_data: item['purchase_date'] = req_data['purchase_date']
             write_db(data)
+            log_action("UPDATE_PRINTER", id, f"Updated fields: {list(req_data.keys())}")
             return jsonify({"status": "success"})
     return jsonify({"status": "error", "message": "Printer not found"}), 404
 
@@ -278,6 +335,7 @@ def delete_printer(id):
     data = read_db()
     data['printers'] = [p for p in data['printers'] if p['id'] != id]
     write_db(data)
+    log_action("DELETE_PRINTER", id, "Printer removed")
     return jsonify({"status": "success"})
 
 @app.route('/api/v1/printers/<id>/busy_dates', methods=['GET'])

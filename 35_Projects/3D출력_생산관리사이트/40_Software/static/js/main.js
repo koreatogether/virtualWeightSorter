@@ -225,7 +225,7 @@ function renderOrders(orders, schedules) {
             </div>
             <div style="font-size: 0.85em; color: #555; margin-top: 5px;">
                 사용: ${order.material}/${order.color} (${order.unit_weight_g}g/ea)<br>
-                추가 필요량: <strong>${estimatedUsage.toLocaleString()}g</strong>
+                필요 필라멘트: <strong>${estimatedUsage.toLocaleString()}g</strong>
             </div>
             <div style="text-align: right; margin-top: 5px; font-size: 0.85em; color: #666;">
                 마감: ${order.deadline || '없음'} 
@@ -290,7 +290,7 @@ function renderSchedules(schedules, orders, printers) {
             </td>
             <td>
                 <div style="display: flex; gap: 5px; justify-content: center; align-items: center;">
-                    <button onclick="updateRun('${s.id}', prompt('실제 성공 수량 입력:', ${s.planned_quantity}))" class="btn-sm">실적입력</button>
+                    <button onclick="updateRun('${s.id}', prompt('추가 성공 수량 입력 (누적됨):', '0'))" class="btn-sm">실적입력</button>
                     <button onclick="deleteSchedule('${s.id}')" class="btn-sm btn-danger">삭제</button>
                 </div>
             </td>
@@ -322,19 +322,141 @@ function updateSelects(orders, printers) {
     if (curP) ps.value = curP;
 }
 
+// --- Helper Logic ---
+function getColorStyle(colorName) {
+    const colorMap = {
+        '백색': '#ffffff', '화이트': '#ffffff', 'white': '#ffffff',
+        '검정': '#000000', '블랙': '#000000', 'black': '#000000',
+        '회색': '#808080', '그레이': '#808080', 'grey': '#808080', 'gray': '#808080',
+        '빨강': '#ff0000', '레드': '#ff0000', 'red': '#ff0000',
+        '파랑': '#0000ff', '블루': '#0000ff', 'blue': '#0000ff',
+        '녹색': '#28a745', '그린': '#28a745', 'green': '#28a745',
+        '노랑': '#ffc107', '옐로우': '#ffc107', 'yellow': '#ffc107',
+        '오렌지': '#fd7e14', 'orange': '#fd7e14',
+        '보라': '#6f42c1', 'purple': '#6f42c1',
+        '투명': '#e9ecef', 'clear': '#e9ecef'
+    };
+
+    const bgColor = colorMap[colorName] || '#dee2e6'; // 매핑 안되면 연한 회색
+
+    // 밝기 계산 (Luma: 0.299R + 0.587G + 0.114B)
+    // HEX를 RGB로 변환하여 계산
+    let r, g, b;
+    if (bgColor.startsWith('#')) {
+        const hex = bgColor.slice(1);
+        r = parseInt(hex.slice(0, 2), 16);
+        g = parseInt(hex.slice(2, 4), 16);
+        b = parseInt(hex.slice(4, 6), 16);
+    } else {
+        r = g = b = 200;
+    }
+    
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    const textColor = brightness > 128 ? '#000000' : '#ffffff';
+
+    return `background-color: ${bgColor}; color: ${textColor}; padding: 2px 8px; border-radius: 4px; border: 1px solid #ddd; font-weight: bold;`;
+}
+
 function renderInventory(inv, orders) { 
     const tb = document.getElementById('inventory-body'); tb.innerHTML = '';
+    
+    // 1. 재질/색상별 데이터 집계
+    const stats = {}; 
+
+    const getStats = (m, c) => {
+        const key = `${m}_${c}`;
+        if (!stats[key]) stats[key] = { stock: 0, estimatedCurrentStock: 0, future: 0 };
+        return stats[key];
+    };
+
+    // 재고 기반으로 현재 추정 잔량 계산
     inv.forEach(i => {
-        const requiredWeight = orders.filter(o => o.status !== 'completed' && o.material === i.material && o.color === i.color).reduce((sum, o) => {
-             const actualSum = (currentData.schedules||[]).filter(s => s.order_id === o.id).reduce((s, sch) => s + (parseInt(sch.actual_quantity)||0), 0);
-             const remainingQty = o.target_quantity - o.initial_stock - actualSum;
-             return sum + (Math.max(0, remainingQty) * (o.unit_weight_g || 0));
-        }, 0);
-        const isLow = i.remaining_weight_g < requiredWeight;
+        const s = getStats(i.material, i.color);
+        s.stock += parseInt(i.remaining_weight_g || 0);
+        
+        // 이 특정 스풀(i)의 업데이트 시간
+        const lastUpdate = i.updated_at ? new Date(i.updated_at) : new Date(0);
+        
+        // 이 스풀의 재질/색상을 사용하는 실적 중, 업데이트 시간 이후의 것만 소모량으로 계산
+        const consumedAfterUpdate = (currentData.schedules || [])
+            .filter(sch => {
+                const order = (currentData.orders || []).find(o => o.id === sch.order_id);
+                if (!order || order.material !== i.material || order.color !== i.color) return false;
+                
+                // 실적 입력/생성 시간 (created_at 혹은 별도 필드 없으므로 일단 created_at 기준, 
+                // 더 정확하게는 실적 업데이트 시간을 기록해야 하지만 현재 구조에서 최선책 적용)
+                const actionTime = sch.created_at ? new Date(sch.created_at) : new Date(0);
+                return actionTime > lastUpdate;
+            })
+            .reduce((sum, sch) => sum + (parseInt(sch.actual_quantity) || 0), 0);
+        
+        // 이 스풀에서 추정되는 현재 잔량 = 입력 무게 - 입력 이후의 소모량
+        const itemEstimatedStock = parseInt(i.remaining_weight_g || 0) - (consumedAfterUpdate * (
+            (currentData.orders.find(o => o.material === i.material && o.color === i.color) || {}).unit_weight_g || 0
+        ));
+        s.estimatedCurrentStock += itemEstimatedStock;
+    });
+
+    // 향후 필요량 계산 (이건 시간과 상관없이 전체 잔여량 기준)
+    orders.filter(o => o.status !== 'completed').forEach(o => {
+        const s = getStats(o.material, o.color);
+        const actualSum = (currentData.schedules||[]).filter(sch => sch.order_id === o.id).reduce((sum, sch) => sum + (parseInt(sch.actual_quantity)||0), 0);
+        const remainingQty = Math.max(0, o.target_quantity - o.initial_stock - actualSum);
+        s.future += remainingQty * (o.unit_weight_g || 0);
+    });
+
+    // 2. 렌더링 (재질명, 색상명 순으로 정렬 추가)
+    const sortedInv = inv.slice().sort((a, b) => {
+        // 재질명으로 먼저 비교
+        const matCompare = a.material.localeCompare(b.material, undefined, {numeric: true, sensitivity: 'base'});
+        if (matCompare !== 0) return matCompare;
+        // 재질명이 같으면 색상명으로 비교
+        return a.color.localeCompare(b.color, undefined, {numeric: true, sensitivity: 'base'});
+    });
+
+    sortedInv.forEach(i => {
+        const key = `${i.material}_${i.color}`;
+        const s = stats[key];
+        
+        // 화면 표시용: 개별 아이템의 추정 잔량 다시 계산 (위 로직 반복)
+        const lastUpdate = i.updated_at ? new Date(i.updated_at) : new Date(0);
+        const orderForWeight = currentData.orders.find(o => o.material === i.material && o.color === i.color) || {unit_weight_g:0};
+        const consumedAfter = (currentData.schedules || [])
+            .filter(sch => {
+                const order = (currentData.orders || []).find(o => o.id === sch.order_id);
+                return order && order.material === i.material && order.color === i.color && (sch.created_at ? new Date(sch.created_at) : new Date(0)) > lastUpdate;
+            })
+            .reduce((sum, sch) => sum + (parseInt(sch.actual_quantity) || 0), 0);
+        
+        const itemEstimatedStock = i.remaining_weight_g - (consumedAfter * orderForWeight.unit_weight_g);
+        
+        const isShort = s.estimatedCurrentStock < s.future;
         const tr = document.createElement('tr');
-        if (isLow) tr.className = 'conflict-row';
-        tr.innerHTML = `<td>${i.material}</td><td>${i.color}</td><td>${i.remaining_weight_g}g ${isLow ? `<br><small style="color:red;">(필요: ${requiredWeight}g)</small>` : ''}</td>
-            <td><button onclick="openInventoryEdit('${i.id}')" class="btn-sm">수정</button><button onclick="deleteInventory('${i.id}')" class="btn-sm btn-danger">삭제</button></td>`;
+        
+        if (isShort) tr.className = 'conflict-row';
+        
+        let statusHtml = '';
+        if (s.future > 0) {
+            if (isShort) {
+                statusHtml = `<br><small style="color:red; font-weight:bold;">부족 (전체추정잔량: ${s.estimatedCurrentStock.toLocaleString()}g / 필요: ${s.future.toLocaleString()}g)</small>`;
+            } else {
+                const surplus = s.estimatedCurrentStock - s.future;
+                statusHtml = `<br><small style="color:green; font-weight:bold;">충분 (전체추정잔량: ${s.estimatedCurrentStock.toLocaleString()}g / 여유: ${surplus.toLocaleString()}g)</small>`;
+            }
+        }
+
+        tr.innerHTML = `
+            <td>${i.material}</td>
+            <td><span style="${getColorStyle(i.color)}">${i.color}</span></td>
+            <td>
+                <span title="등록 무게: ${i.remaining_weight_g}g">${itemEstimatedStock.toLocaleString()}g</span>
+                ${statusHtml}
+            </td>
+            <td><small>${i.updated_at || '-'}</small></td>
+            <td>
+                <button onclick="openInventoryEdit('${i.id}')" class="btn-sm">수정</button>
+                <button onclick="deleteInventory('${i.id}')" class="btn-sm btn-danger">삭제</button>
+            </td>`;
         tb.appendChild(tr);
     });
 }
@@ -357,9 +479,71 @@ function renderDashboard(data) {
     document.querySelector('#stat-printers .data-value').textContent = (data.printers||[]).length;
 }
 
-function renderTimeline(data) { /* ... */ }
-function switchView(viewName) { /* ... */ }
-function openInventoryEdit(id) { /* ... */ }
-function closeInventoryEdit() { /* ... */ }
-function openPrinterEdit(id) { /* ... */ }
-function closePrinterEdit() { /* ... */ }
+function renderTimeline(data) {
+    const header = document.getElementById('gantt-header');
+    const body = document.getElementById('gantt-body');
+    if (!header || !body) return;
+    
+    header.innerHTML = '<th>프린터 \\ 시간</th>';
+    body.innerHTML = '';
+
+    // 최근 7일간의 날짜 헤더 생성
+    const dates = [];
+    for (let i = 0; i < 7; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        const dStr = d.toISOString().split('T')[0];
+        dates.push(dStr);
+        header.innerHTML += `<th>${dStr}</th>`;
+    }
+
+    (data.printers || []).forEach(p => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td><strong>${p.model}</strong><br><small>${p.asset_id}</small></td>`;
+        
+        dates.forEach(dStr => {
+            const task = (data.schedules || []).find(s => s.printer_id === p.id && s.start_time.startsWith(dStr));
+            if (task) {
+                const order = (data.orders || []).find(o => o.id === task.order_id);
+                const color = task.status === 'completed' ? '#d4edda' : '#fff3cd';
+                tr.innerHTML += `<td style="background:${color}; font-size:0.8em;">${order ? order.product_name : '작업'}</td>`;
+            } else {
+                tr.innerHTML += `<td></td>`;
+            }
+        });
+        body.appendChild(tr);
+    });
+}
+
+function switchView(viewName) {
+    document.getElementById('list-view').style.display = viewName === 'list' ? 'block' : 'none';
+    document.getElementById('timeline-view').style.display = viewName === 'timeline' ? 'block' : 'none';
+}
+
+function openInventoryEdit(id) {
+    const item = currentData.inventory.find(i => i.id === id);
+    if (!item) return;
+    document.getElementById('edit_inv_id').value = item.id;
+    document.getElementById('edit_inv_material').value = item.material;
+    document.getElementById('edit_inv_color').value = item.color;
+    document.getElementById('edit_inv_weight').value = item.remaining_weight_g;
+    document.getElementById('inventory-edit-overlay').style.display = 'block';
+}
+
+function closeInventoryEdit() {
+    document.getElementById('inventory-edit-overlay').style.display = 'none';
+}
+
+function openPrinterEdit(id) {
+    const item = currentData.printers.find(p => p.id === id);
+    if (!item) return;
+    document.getElementById('edit_printer_id').value = item.id;
+    document.getElementById('edit_printer_model').value = item.model;
+    document.getElementById('edit_printer_asset_id').value = item.asset_id;
+    document.getElementById('edit_printer_purchase').value = item.purchase_date;
+    document.getElementById('printer-edit-overlay').style.display = 'block';
+}
+
+function closePrinterEdit() {
+    document.getElementById('printer-edit-overlay').style.display = 'none';
+}
