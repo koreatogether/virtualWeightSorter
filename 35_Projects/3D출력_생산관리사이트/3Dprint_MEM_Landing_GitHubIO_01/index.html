@@ -1,0 +1,90 @@
+﻿<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>3D 출력 생산관리 | Static Demo</title>
+  <meta name="description" content="3D 출력 생산관리 정적 데모 화면" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
+
+  <header class="wrap topbar">
+    <div>
+      <p class="eyebrow">Static Demo for GitHub Pages</p>
+      <h1>3D 출력 생산관리 데모</h1>
+    </div>
+    <div class="right-tools">
+      <span class="pill">API 연결 없음</span>
+      <a class="btn ghost" href="https://github.com/" target="_blank" rel="noreferrer">GitHub</a>
+    </div>
+  </header>
+
+  <main class="wrap layout">
+    <section class="stats" id="stats"></section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <h2>주문 현황</h2>
+      </div>
+      <div id="order-list" class="order-grid"></div>
+    </section>
+
+    <section class="panel two-col">
+      <div>
+        <div class="panel-head">
+          <h2>생산 일정</h2>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>날짜</th>
+                <th>주문</th>
+                <th>프린터</th>
+                <th>계획/실적</th>
+                <th>상태</th>
+              </tr>
+            </thead>
+            <tbody id="schedule-body"></tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="panel-head">
+          <h2>재고 요약</h2>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>소재</th>
+                <th>색상</th>
+                <th>잔량(g)</th>
+                <th>상태</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="notice">
+      <strong>안내:</strong> 이 페이지는 정적 데모입니다. 실제 저장/수정/삭제 기능은 서버 배포 버전에서만 동작합니다.
+    </section>
+  </main>
+
+  <footer class="wrap footer">
+    <small>© 2026 3D Production Manager Demo</small>
+  </footer>
+
+  <script src="./static-data.js"></script>
+  <script src="./app.js"></script>
+</body>
+</html>
