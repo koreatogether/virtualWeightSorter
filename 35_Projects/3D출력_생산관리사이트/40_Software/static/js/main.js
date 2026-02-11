@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    initOrderFormEvents();
     // 테마 토글
     document.getElementById('theme-toggle').addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
@@ -59,11 +60,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. 주문 생성 및 수정
     document.getElementById('order-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        const matSelect = document.getElementById('order_material');
+        const selectedOption = matSelect.options[matSelect.selectedIndex];
+        // "PLA1 (Black)" 형태에서 재질 이름만 추출하거나, inventory 데이터에서 찾음
+        const invId = matSelect.value;
+        const inv = currentData.inventory.find(i => i.id === invId);
+
         const payload = {
             product_name: document.getElementById('order_product').value,
-            target_quantity: parseInt(document.getElementById('order_target').value),
-            initial_stock: parseInt(document.getElementById('order_initial_stock').value || 0),
-            material: document.getElementById('order_material').value,
+            target_quantity: parseFloat(document.getElementById('order_target').value),
+            initial_stock: parseFloat(document.getElementById('order_initial_stock').value || 0),
+            material: inv ? inv.material : '', 
             color: document.getElementById('order_color').value,
             unit_weight_g: parseFloat(document.getElementById('order_unit_weight').value || 0),
             deadline: document.getElementById('order_deadline').value
@@ -77,8 +84,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const id = document.getElementById('edit_order_id').value;
         const payload = {
             product_name: document.getElementById('edit_order_product').value,
-            target_quantity: parseInt(document.getElementById('edit_order_target').value),
-            initial_stock: parseInt(document.getElementById('edit_order_initial_stock').value || 0),
+            target_quantity: parseFloat(document.getElementById('edit_order_target').value),
+            initial_stock: parseFloat(document.getElementById('edit_order_initial_stock').value || 0),
             material: document.getElementById('edit_order_material').value,
             color: document.getElementById('edit_order_color').value,
             unit_weight_g: parseFloat(document.getElementById('edit_order_unit_weight').value),
@@ -91,8 +98,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // 2. 재고 생성 및 수정
     document.getElementById('inventory-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        const batchVal = document.getElementById('inv_batch').value;
+        
+        // 중복 배치 확인
+        if (batchVal) {
+            const isDuplicate = (currentData.inventory || []).some(i => i.batch === batchVal);
+            if (isDuplicate) {
+                if (!confirm(`'${batchVal}' 배치는 이미 등록된 이름입니다. 동일한 배치를 계속 추가하시겠습니까?`)) {
+                    return; // 사용자가 '아니오'를 선택하면 중단
+                }
+            }
+        }
+
         const payload = {
             material: document.getElementById('material').value, color: document.getElementById('color').value,
+            batch: batchVal,
             remaining_weight_g: parseFloat(document.getElementById('remaining_weight_g').value)
         };
         if ((await postData('/api/v1/inventory', payload)).ok) { await fetchData(); e.target.reset(); }
@@ -104,6 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const payload = {
             material: document.getElementById('edit_inv_material').value,
             color: document.getElementById('edit_inv_color').value,
+            batch: document.getElementById('edit_inv_batch').value,
             remaining_weight_g: parseFloat(document.getElementById('edit_inv_weight').value)
         };
         if ((await postData(`/api/v1/inventory/${id}`, payload, 'PATCH')).ok) { closeInventoryEdit(); await fetchData(); }
@@ -137,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const isAuto = document.getElementById('auto_schedule_mode').checked;
         const orderId = document.getElementById('schedule_order_id').value;
         const printerId = document.getElementById('printer_id').value;
-        const plannedQty = parseInt(document.getElementById('planned_qty').value);
+        const plannedQty = parseFloat(document.getElementById('planned_qty').value);
         const dateValue = document.getElementById('start_date_picker').value;
 
         if (!dateValue) return alert("날짜를 선택해주세요.");
@@ -176,6 +197,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let currentData = null;
 
+function initOrderFormEvents() {
+    const productInput = document.getElementById('order_product');
+    const materialSelect = document.getElementById('order_material');
+    const colorSelect = document.getElementById('order_color');
+    const weightInput = document.getElementById('order_unit_weight');
+
+    if (!productInput || !materialSelect) return;
+
+    // 1. 제품명 입력 시 이전 무게 추천
+    productInput.addEventListener('blur', () => {
+        const val = productInput.value.trim();
+        if (!val) return;
+
+        const pastOrder = (currentData.orders || []).find(o => o.product_name === val);
+        if (pastOrder && pastOrder.unit_weight_g) {
+            if (confirm(`'${val}' 제품의 기존 기록된 개당 무게는 ${pastOrder.unit_weight_g}g 입니다. 이 무게를 사용하시겠습니까?`)) {
+                weightInput.value = pastOrder.unit_weight_g;
+            }
+        }
+    });
+
+    // 2. 재질 선택 시 색상 자동 선택 및 안내
+    materialSelect.addEventListener('change', () => {
+        const selectedId = materialSelect.value;
+        const inv = (currentData.inventory || []).find(i => i.id === selectedId);
+        if (inv) {
+            colorSelect.value = inv.color;
+            alert(`선택하신 [${inv.material} / ${inv.color}]의 현재 시스템 잔량은 ${inv.remaining_weight_g}g 입니다.`);
+        }
+    });
+}
+
 async function fetchData() {
     try {
         const response = await fetch('/api/v1/data');
@@ -198,12 +251,13 @@ function renderOrders(orders, schedules) {
     container.innerHTML = '';
     orders.forEach(order => {
         const relatedSchedules = schedules.filter(s => s.order_id === order.id);
-        const actualSum = relatedSchedules.reduce((sum, s) => sum + (parseInt(s.actual_quantity) || 0), 0);
-        const initialStock = parseInt(order.initial_stock || 0);
+        const actualSum = relatedSchedules.reduce((sum, s) => sum + (parseFloat(s.actual_quantity) || 0), 0);
+        const initialStock = parseFloat(order.initial_stock || 0);
         const totalSecured = initialStock + actualSum;
         const progress = order.target_quantity ? Math.min(100, Math.floor((totalSecured / order.target_quantity) * 100)) : 0;
         const remaining = order.target_quantity - totalSecured;
-        const estimatedUsage = (order.unit_weight_g || 0) * (Math.max(0, remaining));
+        const totalUsage = (order.unit_weight_g || 0) * (order.target_quantity || 0);
+        const remainingUsage = (order.unit_weight_g || 0) * (Math.max(0, remaining));
 
         const card = document.createElement('div');
         card.className = 'order-card';
@@ -225,7 +279,8 @@ function renderOrders(orders, schedules) {
             </div>
             <div style="font-size: 0.85em; color: #555; margin-top: 5px;">
                 사용: ${order.material}/${order.color} (${order.unit_weight_g}g/ea)<br>
-                필요 필라멘트: <strong>${estimatedUsage.toLocaleString()}g</strong>
+                총 소모(예정): <strong>${totalUsage.toLocaleString()}g</strong> 
+                ${remainingUsage > 0 ? ` / <span style="color:red;">잔여 필요: ${remainingUsage.toLocaleString()}g</span>` : ' (완료)'}
             </div>
             <div style="text-align: right; margin-top: 5px; font-size: 0.85em; color: #666;">
                 마감: ${order.deadline || '없음'} 
@@ -255,20 +310,30 @@ function closeOrderEdit() { document.getElementById('order-edit-overlay').style.
 function updateFilamentSelects(inventory) {
     const materialSelects = [document.getElementById('order_material'), document.getElementById('edit_order_material')];
     const colorSelects = [document.getElementById('order_color'), document.getElementById('edit_order_color')];
-    const materials = [...new Set(inventory.map(i => i.material))].sort();
+    
+    // 재질 선택 시 "재질명 (색상)" 형식으로 표시하고, value는 inventory의 ID로 설정
+    const materialOptions = '<option value="">-- 재질 선택 --</option>' + 
+        inventory.map(i => `<option value="${i.id}">${i.material} (${i.color})</option>`).join('');
+    
     const colors = [...new Set(inventory.map(i => i.color))].sort();
-    materialSelects.forEach(sel => { if (!sel) return; const cur = sel.value; sel.innerHTML = '<option value="">-- 재질 선택 --</option>' + materials.map(m => `<option value="${m}">${m}</option>`).join(''); if (cur) sel.value = cur; });
-    colorSelects.forEach(sel => { if (!sel) return; const cur = sel.value; sel.innerHTML = '<option value="">-- 색상 선택 --</option>' + colors.map(c => `<option value="${c}">${c}</option>`).join(''); if (cur) sel.value = cur; });
+    const colorOptions = '<option value="">-- 색상 선택 --</option>' + 
+        colors.map(c => `<option value="${c}">${c}</option>`).join('');
+
+    materialSelects.forEach(sel => { if (!sel) return; const cur = sel.value; sel.innerHTML = materialOptions; if (cur) sel.value = cur; });
+    colorSelects.forEach(sel => { if (!sel) return; const cur = sel.value; sel.innerHTML = colorOptions; if (cur) sel.value = cur; });
 }
 
 function renderSchedules(schedules, orders, printers) {
     const tbody = document.getElementById('schedule-body');
+    if (!tbody) return;
     tbody.innerHTML = '';
     const sortedSchedules = schedules.slice().sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
     let lastOrderId = null;
     sortedSchedules.forEach(s => {
-        const order = orders.find(o => o.id === s.order_id) || { product_name: 'Unknown' };
-        const printer = printers.find(p => p.id === s.printer_id) || { model: 'Unknown', asset_id: 'N/A' };
+        // 주문이 삭제되었을 경우를 대비한 기본값 처리
+        const order = orders.find(o => o.id === s.order_id) || { product_name: '삭제된 주문', material: '?', color: '?' };
+        const printer = printers.find(p => p.id === s.printer_id) || { model: '미지정', asset_id: '-' };
+
         if (lastOrderId !== null && lastOrderId !== s.order_id) {
             const separator = document.createElement('tr');
             separator.className = 'product-separator';
@@ -299,27 +364,167 @@ function renderSchedules(schedules, orders, printers) {
         tbody.appendChild(tr);
         lastOrderId = s.order_id;
     });
+
+    // 최근 생산 품목 리스트 업데이트
+    renderRecentProducts(orders);
+}
+
+function renderRecentProducts(orders) {
+    const container = document.getElementById('recent-products-list');
+    if (!container) return;
+    
+    // 중복 제거 및 최신순 정렬
+    const recent = [];
+    const seen = new Set();
+    
+    // 주문 리스트를 뒤에서부터 훑으며 고유한 제품명 5개 추출
+    [...orders].reverse().forEach(o => {
+        if (!seen.has(o.product_name)) {
+            seen.add(o.product_name);
+            recent.push(o);
+        }
+    });
+
+    container.innerHTML = recent.slice(0, 5).map(o => `
+        <button type="button" class="btn-sm" style="margin-right:5px; margin-bottom:5px; background:#f8f9fa; color:#333; border:1px solid #ddd; border-radius:12px; padding: 2px 10px;" 
+            onclick="quickFillOrder('${o.product_name}', ${o.unit_weight_g})">
+            ${o.product_name} (${o.unit_weight_g}g)
+        </button>
+    `).join('');
+}
+
+function quickFillOrder(name, weight) {
+    document.getElementById('order_product').value = name;
+    document.getElementById('order_unit_weight').value = weight;
+    // 시각적 피드백
+    const input = document.getElementById('order_product');
+    input.style.backgroundColor = '#fff3cd';
+    setTimeout(() => { input.style.backgroundColor = ''; }, 500);
 }
 
 async function updateRun(id, qtyVal) {
     if (qtyVal === null) return;
-    await postData(`/api/v1/schedules/${id}`, { actual_quantity: parseInt(qtyVal), status: 'completed' }, 'PATCH');
+    const res = await postData(`/api/v1/schedules/${id}`, { actual_quantity: parseFloat(qtyVal), status: 'completed' }, 'PATCH');
+    
+    if (res.ok) {
+        const result = await res.json();
+        // 주문이 방금 완료되었는지 확인
+        if (result.order_info && result.order_info.status === 'completed') {
+            await handleOrderCompletion(result.order_info);
+        }
+    }
+    fetchData();
+}
+
+async function handleOrderCompletion(order) {
+    const useConfirm = confirm(`[축하합니다!] '${order.product_name}' 주문의 모든 생산이 완료되었습니다.\n\n사용한 필라멘트(${order.material}/${order.color})들의 현재 잔량을 실측하여 기록하시겠습니까?\n(취소를 누르면 기록 없이 종료됩니다.)`);
+    
+    if (!useConfirm) return;
+
+    // 해당 재질/색상의 인벤토리 목록 가져오기 (유연한 검색)
+    const data = currentData; 
+    const relevantInv = (data.inventory || []).filter(i => {
+        const colorMatch = i.color === order.color;
+        const materialMatch = i.material.includes(order.material) || order.material.includes(i.material);
+        return colorMatch && materialMatch;
+    });
+
+    if (relevantInv.length === 0) {
+        alert("등록된 해당 필라멘트 재고 정보가 없습니다.");
+        return;
+    }
+
+    alert(`총 ${relevantInv.length}개의 관련 필라멘트가 검색되었습니다.\n지금부터 하나씩 무게를 입력받습니다. 변경을 원치 않는 항목은 빈칸으로 두거나 [취소]를 누르세요.`);
+
+    for (const inv of relevantInv) {
+        const currentEst = (inv.remaining_weight_g || 0);
+        const weight = prompt(`[${inv.material} / ${inv.color}] (ID: ${inv.id})\n현재 기록된 잔량: ${currentEst}g\n\n새로운 측정 무게(g)를 입력하세요:`, "");
+        
+        // 빈칸이 아니고 숫자인 경우에만 업데이트
+        if (weight !== null && weight !== "" && !isNaN(weight)) {
+            await postData(`/api/v1/inventory/${inv.id}`, { remaining_weight_g: parseFloat(weight) }, 'PATCH');
+        }
+    }
+    
+    alert("모든 실측 잔량 기록 절차가 완료되었습니다.");
     fetchData();
 }
 
 async function postData(url, data, method='POST') { return fetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); }
-async function deleteOrder(id) { if(confirm('주문을 삭제하시겠습니까?')) { await fetch(`/api/v1/orders/${id}`, { method: 'DELETE' }); fetchData(); } }
+async function deleteOrder(id) {
+    if (confirm('주문을 삭제하시겠습니까?')) {
+        const deleteSchedules = confirm('이 주문과 연결된 모든 생산 계획(일정)도 같이 삭제하시겠습니까?\n\n[확인] : 계획도 삭제\n[취소] : 주문만 삭제 (계획 유지)');
+        await fetch(`/api/v1/orders/${id}?delete_schedules=${deleteSchedules}`, { method: 'DELETE' });
+        fetchData();
+    }
+}
 async function deleteSchedule(id) { if (confirm('계획 삭제?')) { await fetch(`/api/v1/schedules/${id}`, { method: 'DELETE' }); fetchData(); } }
 async function deletePrinter(id) { if(confirm('프린터 삭제?')) { await fetch(`/api/v1/printers/${id}`, { method: 'DELETE' }); fetchData(); } }
 async function deleteInventory(id) { if(confirm('재고 삭제?')) { await fetch(`/api/v1/inventory/${id}`, { method: 'DELETE' }); fetchData(); } }
 
-function updateSelects(orders, printers) {
+// --- Global Events for Order Form ---
+function initOrderFormEvents() {
+    const productInput = document.getElementById('order_product');
+    const materialSelect = document.getElementById('order_material');
+    const colorSelect = document.getElementById('order_color');
+    const weightInput = document.getElementById('order_unit_weight');
+
+    // 1. 제품명 입력 시 이전 무게 추천
+    productInput.addEventListener('blur', () => {
+        const val = productInput.value.trim();
+        if (!val) return;
+
+        // 기존 주문에서 동일 제품명 찾기
+        const pastOrder = (currentData.orders || []).find(o => o.product_name === val);
+        if (pastOrder && pastOrder.unit_weight_g) {
+            if (confirm(`'${val}' 제품의 기존 기록된 개당 무게는 ${pastOrder.unit_weight_g}g 입니다. 이 무게를 사용하시겠습니까?`)) {
+                weightInput.value = pastOrder.unit_weight_g;
+            }
+        }
+    });
+
+    // 2. 재질 선택 시 색상 자동 선택 및 안내
+    materialSelect.addEventListener('change', () => {
+        const selectedId = materialSelect.value;
+        const inv = (currentData.inventory || []).find(i => i.id === selectedId);
+        if (inv) {
+            // 색상 선택 동기화
+            colorSelect.value = inv.color;
+            // 안내 팝업 (잔량 정보)
+            alert(`선택하신 [${inv.material} / ${inv.color}]의 현재 시스템 잔량은 ${inv.remaining_weight_g}g 입니다.`);
+        }
+    });
+}
+
+function updateSelects(orders, printers, inventory) {
     const os = document.getElementById('schedule_order_id');
     const ps = document.getElementById('printer_id');
+    
+    // 주문 등록 폼용 셀렉트박스
+    const om = document.getElementById('order_material');
+    const oc = document.getElementById('order_color');
+    const em = document.getElementById('edit_order_material');
+    const ec = document.getElementById('edit_order_color');
+
     const curP = ps.value;
-    if (orders.length) os.innerHTML = '<option value="">-- 주문 선택 --</option>' + orders.filter(o => o.status !== 'completed').map(o => `<option value="${o.id}">${o.product_name}</option>`).join('');
-    if (printers.length) ps.innerHTML = '<option value="">-- 프린터 선택 --</option>' + printers.map(p => `<option value="${p.id}">${p.model} (${p.asset_id})</option>`).join('');
+    
+    // 작업 할당용 주문 선택
+    if (orders) os.innerHTML = '<option value="">-- 주문 선택 --</option>' + orders.filter(o => o.status !== 'completed').map(o => `<option value="${o.id}">${o.product_name}</option>`).join('');
+    
+    // 프린터 선택
+    if (printers) ps.innerHTML = '<option value="">-- 프린터 선택 --</option>' + printers.map(p => `<option value="${p.id}">${p.model} (${p.asset_id})</option>`).join('');
     if (curP) ps.value = curP;
+
+    // 재고 기반 재질/색상 선택 (주문 등록용)
+    if (inventory) {
+        const materialOptions = '<option value="">-- 재질 선택 --</option>' + inventory.map(i => `<option value="${i.id}">${i.material} (${i.color})</option>`).join('');
+        const colorOptions = '<option value="">-- 색상 선택 --</option>' + [...new Set(inventory.map(i => i.color))].map(c => `<option value="${c}">${c}</option>`).join('');
+        
+        if (om) om.innerHTML = materialOptions;
+        if (em) em.innerHTML = materialOptions;
+        if (oc) oc.innerHTML = colorOptions;
+        if (ec) ec.innerHTML = colorOptions;
+    }
 }
 
 // --- Helper Logic ---
@@ -360,96 +565,113 @@ function getColorStyle(colorName) {
 function renderInventory(inv, orders) { 
     const tb = document.getElementById('inventory-body'); tb.innerHTML = '';
     
-    // 1. 재질/색상별 데이터 집계
+    // 1. 재질/색상별 데이터 집계 (모든 배치 통합)
     const stats = {}; 
 
-    const getStats = (m, c) => {
-        const key = `${m}_${c}`;
-        if (!stats[key]) stats[key] = { stock: 0, estimatedCurrentStock: 0, future: 0 };
+    // 패밀리 키 생성 함수 (재질명과 색상만으로 그룹화)
+    const getFamilyKey = (item) => {
+        const m = item.material.toLowerCase();
+        const c = item.color.toLowerCase();
+        
+        // 주문에서 사용하는 대표 재질명 찾기
+        const matchedOrder = orders.find(o => {
+            const om = o.material.toLowerCase();
+            return (m.includes(om) || om.includes(m)) && o.color.toLowerCase() === c;
+        });
+
+        const baseMat = matchedOrder ? matchedOrder.material.toLowerCase() : m.replace(/[0-9\s]/g, '').toLowerCase();
+        return `${baseMat}_${c}`;
+    };
+
+    const getStats = (item) => {
+        const key = getFamilyKey(item);
+        if (!stats[key]) stats[key] = { stock: 0, estimatedCurrentStock: 0, future: 0, batches: new Set() };
         return stats[key];
     };
 
-    // 재고 기반으로 현재 추정 잔량 계산
+    // 재고 기반으로 현재 추정 잔량 계산 및 '전체 합산'
     inv.forEach(i => {
-        const s = getStats(i.material, i.color);
-        s.stock += parseFloat(i.remaining_weight_g || 0);
+        const s = getStats(i);
+        if (i.batch) s.batches.add(i.batch);
+        else s.batches.add(i.material); // 배치가 없으면 재질명이라도 넣어서 식별
         
-        // 이 특정 스풀(i)의 업데이트 시간
         const lastUpdate = i.updated_at ? new Date(i.updated_at) : new Date(0);
-        
-        // 이 스풀의 재질/색상을 사용하는 실적 중, 업데이트 시간 이후의 것만 소모량으로 계산
         const consumedAfterUpdate = (currentData.schedules || [])
             .filter(sch => {
                 const order = (currentData.orders || []).find(o => o.id === sch.order_id);
-                if (!order || order.material !== i.material || order.color !== i.color) return false;
-                
-                // 실적 입력/생성 시간 (created_at 혹은 별도 필드 없으므로 일단 created_at 기준, 
-                // 더 정확하게는 실적 업데이트 시간을 기록해야 하지만 현재 구조에서 최선책 적용)
+                if (!order || order.color.toLowerCase() !== i.color.toLowerCase()) return false;
+                const m1 = i.material.toLowerCase();
+                const m2 = order.material.toLowerCase();
+                if (!(m1.includes(m2) || m2.includes(m1))) return false;
                 const actionTime = sch.created_at ? new Date(sch.created_at) : new Date(0);
                 return actionTime > lastUpdate;
             })
-            .reduce((sum, sch) => sum + (parseInt(sch.actual_quantity) || 0), 0);
+            .reduce((sum, sch) => sum + (parseFloat(sch.actual_quantity) || 0), 0);
         
-        // 이 스풀에서 추정되는 현재 잔량 = 입력 무게 - 입력 이후의 소모량
-        const itemEstimatedStock = parseFloat(i.remaining_weight_g || 0) - (consumedAfterUpdate * (
-            (currentData.orders.find(o => o.material === i.material && o.color === i.color) || {}).unit_weight_g || 0
-        ));
+        const orderForWeight = currentData.orders.find(o => (i.material.toLowerCase().includes(o.material.toLowerCase()) || o.material.toLowerCase().includes(i.material.toLowerCase())) && o.color.toLowerCase() === i.color.toLowerCase()) || {unit_weight_g:0};
+        const itemEstimatedStock = parseFloat(i.remaining_weight_g || 0) - (consumedAfterUpdate * (orderForWeight.unit_weight_g || 0));
+        
         s.estimatedCurrentStock += itemEstimatedStock;
     });
 
-    // 향후 필요량 계산 (이건 시간과 상관없이 전체 잔여량 기준)
+    // 향후 필요량 계산 (재질 그룹별로 단 한 번만 계산)
     orders.filter(o => o.status !== 'completed').forEach(o => {
-        const s = getStats(o.material, o.color);
-        const actualSum = (currentData.schedules||[]).filter(sch => sch.order_id === o.id).reduce((sum, sch) => sum + (parseInt(sch.actual_quantity)||0), 0);
-        const remainingQty = Math.max(0, o.target_quantity - o.initial_stock - actualSum);
-        s.future += remainingQty * (o.unit_weight_g || 0);
+        const key = `${o.material.toLowerCase()}_${o.color.toLowerCase()}`;
+        if (stats[key]) {
+            const actualSum = (currentData.schedules||[]).filter(sch => sch.order_id === o.id).reduce((sum, sch) => sum + (parseFloat(sch.actual_quantity)||0), 0);
+            const remainingQty = Math.max(0, o.target_quantity - o.initial_stock - actualSum);
+            stats[key].future += remainingQty * (o.unit_weight_g || 0);
+        }
     });
 
-    // 2. 렌더링 (재질명, 색상명 순으로 정렬 추가)
+    // 2. 렌더링
     const sortedInv = inv.slice().sort((a, b) => {
-        // 재질명으로 먼저 비교
         const matCompare = a.material.localeCompare(b.material, undefined, {numeric: true, sensitivity: 'base'});
         if (matCompare !== 0) return matCompare;
-        // 재질명이 같으면 색상명으로 비교
         return a.color.localeCompare(b.color, undefined, {numeric: true, sensitivity: 'base'});
     });
 
     sortedInv.forEach(i => {
-        const key = `${i.material}_${i.color}`;
-        const s = stats[key];
+        const s = getStats(i);
         
-        // 화면 표시용: 개별 아이템의 추정 잔량 다시 계산 (위 로직 반복)
+        // 개별 아이템 표시용 잔량 계산
         const lastUpdate = i.updated_at ? new Date(i.updated_at) : new Date(0);
-        const orderForWeight = currentData.orders.find(o => o.material === i.material && o.color === i.color) || {unit_weight_g:0};
+        const orderForWeight = currentData.orders.find(o => (i.material.toLowerCase().includes(o.material.toLowerCase()) || o.material.toLowerCase().includes(i.material.toLowerCase())) && o.color.toLowerCase() === i.color.toLowerCase()) || {unit_weight_g:0};
         const consumedAfter = (currentData.schedules || [])
             .filter(sch => {
                 const order = (currentData.orders || []).find(o => o.id === sch.order_id);
-                return order && order.material === i.material && order.color === i.color && (sch.created_at ? new Date(sch.created_at) : new Date(0)) > lastUpdate;
+                const isMatch = order && (i.material.toLowerCase().includes(order.material.toLowerCase()) || order.material.toLowerCase().includes(i.material.toLowerCase())) && order.color.toLowerCase() === i.color.toLowerCase();
+                return isMatch && (sch.created_at ? new Date(sch.created_at) : new Date(0)) > lastUpdate;
             })
-            .reduce((sum, sch) => sum + (parseInt(sch.actual_quantity) || 0), 0);
+            .reduce((sum, sch) => sum + (parseFloat(sch.actual_quantity) || 0), 0);
         
         const itemEstimatedStock = i.remaining_weight_g - (consumedAfter * orderForWeight.unit_weight_g);
         
         const isShort = s.estimatedCurrentStock < s.future;
         const tr = document.createElement('tr');
-        
         if (isShort) tr.className = 'conflict-row';
         
         let statusHtml = '';
         if (s.future > 0) {
+            const batchStr = Array.from(s.batches).sort().join('+');
+            const totalStock = s.estimatedCurrentStock.toFixed(1);
+            const needed = s.future.toFixed(1);
+            
             if (isShort) {
-                statusHtml = `<br><small style="color:red; font-weight:bold;">부족 (전체추정잔량: ${s.estimatedCurrentStock.toLocaleString()}g / 필요: ${s.future.toLocaleString()}g)</small>`;
+                statusHtml = `<br><small style="color:red; font-weight:bold;">[부족] 통합(${batchStr}): ${totalStock}g / 필요: ${needed}g</small>`;
             } else {
-                const surplus = s.estimatedCurrentStock - s.future;
-                statusHtml = `<br><small style="color:green; font-weight:bold;">충분 (전체추정잔량: ${s.estimatedCurrentStock.toLocaleString()}g / 여유: ${surplus.toLocaleString()}g)</small>`;
+                const surplus = (s.estimatedCurrentStock - s.future).toFixed(1);
+                statusHtml = `<br><small style="color:green; font-weight:bold;">[충분] 통합(${batchStr}): ${totalStock}g / 여유: ${surplus}g</small>`;
             }
         }
 
+        const batchBadge = i.batch ? `<span style="background:#6f42c1; color:white; padding:2px 6px; border-radius:4px; font-size:0.8em; margin-right:5px;">${i.batch}</span>` : '';
+
         tr.innerHTML = `
-            <td>${i.material}</td>
+            <td>${batchBadge}${i.material}</td>
             <td><span style="${getColorStyle(i.color)}">${i.color}</span></td>
             <td>
-                <span title="등록 무게: ${i.remaining_weight_g}g">${itemEstimatedStock.toLocaleString()}g</span>
+                <span title="등록 무게: ${i.remaining_weight_g}g">${itemEstimatedStock.toFixed(1)}g</span>
                 ${statusHtml}
             </td>
             <td><small>${i.updated_at || '-'}</small></td>
@@ -472,8 +694,8 @@ function renderPrinters(list) {
 }
 
 function renderDashboard(data) {
-    const totalTarget = (data.orders||[]).reduce((sum, o) => sum + parseInt(o.target_quantity), 0);
-    const totalSecured = (data.orders||[]).reduce((sum, o) => sum + parseInt(o.initial_stock) + parseInt(o.completed_quantity), 0);
+    const totalTarget = (data.orders||[]).reduce((sum, o) => sum + parseFloat(o.target_quantity), 0);
+    const totalSecured = (data.orders||[]).reduce((sum, o) => sum + parseFloat(o.initial_stock) + parseFloat(o.completed_quantity), 0);
     const percent = totalTarget ? Math.floor((totalSecured/totalTarget)*100) : 0;
     document.querySelector('#stat-progress .data-value').textContent = `${percent}%`;
     document.querySelector('#stat-printers .data-value').textContent = (data.printers||[]).length;
@@ -526,6 +748,7 @@ function openInventoryEdit(id) {
     document.getElementById('edit_inv_id').value = item.id;
     document.getElementById('edit_inv_material').value = item.material;
     document.getElementById('edit_inv_color').value = item.color;
+    document.getElementById('edit_inv_batch').value = item.batch || '';
     document.getElementById('edit_inv_weight').value = item.remaining_weight_g;
     document.getElementById('inventory-edit-overlay').style.display = 'block';
 }

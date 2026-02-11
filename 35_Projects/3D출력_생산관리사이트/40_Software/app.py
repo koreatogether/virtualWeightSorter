@@ -58,7 +58,7 @@ def add_order():
     data = read_db()
     new_order = request.json
     new_order['id'] = str(uuid.uuid4())[:8]
-    new_order['initial_stock'] = int(new_order.get('initial_stock', 0))
+    new_order['initial_stock'] = float(new_order.get('initial_stock', 0))
     new_order['completed_quantity'] = 0
     new_order['status'] = 'in_progress'
     
@@ -80,8 +80,8 @@ def update_order(id):
     for order in data['orders']:
         if order['id'] == id:
             if 'product_name' in req_data: order['product_name'] = req_data['product_name']
-            if 'target_quantity' in req_data: order['target_quantity'] = int(req_data['target_quantity'])
-            if 'initial_stock' in req_data: order['initial_stock'] = int(req_data['initial_stock'])
+            if 'target_quantity' in req_data: order['target_quantity'] = float(req_data['target_quantity'])
+            if 'initial_stock' in req_data: order['initial_stock'] = float(req_data['initial_stock'])
             if 'deadline' in req_data: order['deadline'] = req_data['deadline']
             
             # 필라멘트 정보 수정
@@ -90,7 +90,7 @@ def update_order(id):
             if 'unit_weight_g' in req_data: order['unit_weight_g'] = float(req_data['unit_weight_g'])
             
             actual_sum = sum(s.get('actual_quantity', 0) for s in data['schedules'] if s.get('order_id') == id)
-            if (actual_sum + order.get('initial_stock', 0)) >= int(order['target_quantity']):
+            if (actual_sum + order.get('initial_stock', 0)) >= float(order['target_quantity']):
                 order['status'] = 'completed'
             else:
                 order['status'] = 'in_progress'
@@ -102,10 +102,18 @@ def update_order(id):
 
 @app.route('/api/v1/orders/<id>', methods=['DELETE'])
 def delete_order(id):
+    delete_schedules = request.args.get('delete_schedules', 'false').lower() == 'true'
     data = read_db()
+    
+    # 주문 삭제
     data['orders'] = [o for o in data['orders'] if o['id'] != id]
+    
+    # 선택 시 연동된 스케줄도 삭제
+    if delete_schedules:
+        data['schedules'] = [s for s in data['schedules'] if s.get('order_id') != id]
+        
     write_db(data)
-    log_action("DELETE_ORDER", id, "Order removed")
+    log_action("DELETE_ORDER", id, f"Order removed (Schedules deleted: {delete_schedules})")
     return jsonify({"status": "success"})
 
 # --- 자동 스케줄링 API ---
@@ -115,13 +123,13 @@ def auto_schedule():
     req = request.json
     order_id = req.get('order_id')
     printer_id = req.get('printer_id')
-    daily_qty = int(req.get('daily_qty'))
+    daily_qty = float(req.get('daily_qty'))
     start_date_str = req.get('start_date')
     
     target_order = next((o for o in data['orders'] if o['id'] == order_id), None)
     if not target_order: return jsonify({"status": "error", "message": "Order not found"}), 404
         
-    remaining_qty = int(target_order['target_quantity']) - int(target_order.get('initial_stock', 0)) - int(target_order.get('completed_quantity', 0))
+    remaining_qty = float(target_order['target_quantity']) - float(target_order.get('initial_stock', 0)) - float(target_order.get('completed_quantity', 0))
     if remaining_qty <= 0: return jsonify({"status": "error", "message": "Order already completed"}), 400
 
     created_schedules = []
@@ -192,29 +200,39 @@ def update_schedule(id):
             target_schedule = item
             # 만약 actual_quantity가 요청에 포함되어 있다면, 기존 값에 더해줌 (누적 처리)
             if 'actual_quantity' in req_data:
-                added_qty = int(req_data['actual_quantity'])
-                old_actual = int(item.get('actual_quantity', 0))
-                item['actual_quantity'] = old_actual + added_qty
+                added_qty = float(req_data['actual_quantity'])
+                old_actual = float(item.get('actual_quantity', 0))
+                new_actual = old_actual + added_qty
+                item['actual_quantity'] = new_actual
                 
-                # 계획 수량보다 초과해서 생산했는지 확인
-                planned = int(item.get('planned_quantity', 0))
-                excess = item['actual_quantity'] - planned
+                # 계획 수량보다 초과해서 생산했는지 확인 (새롭게 발생한 초과분 계산)
+                planned = float(item.get('planned_quantity', 0))
                 
-                # 만약 초과분이 있다면, 동일 주문의 다음 일정들에서 차감
-                if excess > 0:
+                old_excess = max(0.0, old_actual - planned)
+                new_excess = max(0.0, new_actual - planned)
+                delta_excess = new_excess - old_excess
+                
+                # 만약 새롭게 발생한 초과분이 있다면, 동일 주문의 미래 일정들에서 차감
+                if delta_excess > 0:
                     order_id = item.get('order_id')
+                    current_start_time = item.get('start_time', '')
+                    
                     # 동일 주문의 완료되지 않은(pending) 미래 일정들을 시간순으로 가져옴
                     future_schedules = sorted(
-                        [s for s in data['schedules'] if s.get('order_id') == order_id and s.get('status') == 'pending' and s['id'] != id],
+                        [s for s in data['schedules'] 
+                         if s.get('order_id') == order_id 
+                         and s.get('status') == 'pending' 
+                         and s['id'] != id 
+                         and s.get('start_time', '') > current_start_time],
                         key=lambda x: x.get('start_time', '')
                     )
                     
                     for fs in future_schedules:
-                        if excess <= 0: break
-                        fs_planned = int(fs.get('planned_quantity', 0))
-                        can_reduce = min(fs_planned, excess)
+                        if delta_excess <= 0: break
+                        fs_planned = float(fs.get('planned_quantity', 0))
+                        can_reduce = min(fs_planned, delta_excess)
                         fs['planned_quantity'] = fs_planned - can_reduce
-                        excess -= can_reduce
+                        delta_excess -= can_reduce
                         
                         # 만약 계획 수량이 0이 되면 해당 일정은 더 이상 필요 없으므로 자동 완료 처리하거나 고민 필요
                         # 여기서는 일단 0으로 두고 유지 (사용자가 보게 함)
@@ -227,19 +245,31 @@ def update_schedule(id):
 
     if target_schedule:
         order_id = target_schedule.get('order_id')
+        order_info = None
         if order_id:
             total_completed = sum(s.get('actual_quantity', 0) for s in data['schedules'] if s.get('order_id') == order_id)
             for order in data['orders']:
                 if order['id'] == order_id:
                     order['completed_quantity'] = total_completed
-                    if (order['completed_quantity'] + order.get('initial_stock', 0)) >= int(order['target_quantity']):
+                    if (order['completed_quantity'] + order.get('initial_stock', 0)) >= float(order['target_quantity']):
                         order['status'] = 'completed'
                     else:
                         order['status'] = 'in_progress'
+                    order_info = {
+                        "id": order['id'],
+                        "status": order['status'],
+                        "material": order.get('material'),
+                        "color": order.get('color'),
+                        "product_name": order.get('product_name')
+                    }
                     break
         write_db(data)
         log_action("UPDATE_SCHEDULE_ACTUAL", id, f"New actual total: {target_schedule.get('actual_quantity')}")
-        return jsonify({"status": "success", "new_actual": target_schedule.get('actual_quantity')})
+        return jsonify({
+            "status": "success", 
+            "new_actual": target_schedule.get('actual_quantity'),
+            "order_info": order_info
+        })
     return jsonify({"status": "error", "message": "Not found"}), 404
 
 @app.route('/api/v1/schedules/<id>', methods=['DELETE'])
@@ -256,7 +286,7 @@ def delete_schedule(id):
         for order in data['orders']:
             if order['id'] == order_id:
                 order['completed_quantity'] = total_completed
-                if (order['completed_quantity'] + order.get('initial_stock', 0)) >= int(order['target_quantity']):
+                if (order['completed_quantity'] + order.get('initial_stock', 0)) >= float(order['target_quantity']):
                     order['status'] = 'completed'
                 else:
                     order['status'] = 'in_progress'
@@ -272,10 +302,11 @@ def add_inventory():
     data = read_db()
     new_inv = request.json
     new_inv['id'] = str(uuid.uuid4())[:8]
+    new_inv['batch'] = new_inv.get('batch', '')
     new_inv['updated_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     data['inventory'].append(new_inv)
     write_db(data)
-    log_action("ADD_INVENTORY", new_inv['id'], f"Material: {new_inv['material']}, Weight: {new_inv['remaining_weight_g']}g")
+    log_action("ADD_INVENTORY", new_inv['id'], f"Material: {new_inv['material']}, Batch: {new_inv['batch']}, Weight: {new_inv['remaining_weight_g']}g")
     return jsonify({"status": "success", "id": new_inv['id']}), 201
 
 @app.route('/api/v1/inventory/<id>', methods=['PATCH'])
@@ -286,6 +317,7 @@ def update_inventory(id):
         if item['id'] == id:
             if 'material' in req_data: item['material'] = req_data['material']
             if 'color' in req_data: item['color'] = req_data['color']
+            if 'batch' in req_data: item['batch'] = req_data['batch']
             if 'remaining_weight_g' in req_data: item['remaining_weight_g'] = float(req_data['remaining_weight_g'])
             item['updated_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             write_db(data)

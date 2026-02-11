@@ -41,6 +41,10 @@
                 <legend>새 주문 등록</legend>
                 <form id="order-form">
                     <input type="text" id="order_product" placeholder="제품명 (예: LED 바디)" required>
+                    <div id="recent-products-area" style="margin-bottom: 10px;">
+                        <small style="color: #666;">최근 품목: </small>
+                        <span id="recent-products-list"></span>
+                    </div>
                     <input type="number" id="order_target" placeholder="목표 수량" required>
                     <input type="number" id="order_initial_stock" placeholder="기존 재고(개)">
                     <select id="order_material" required>
@@ -182,6 +186,13 @@
                     <form id="inventory-form">
                         <input type="text" id="material" placeholder="재질" required>
                         <input type="text" id="color" placeholder="색상" required>
+                        <select id="inv_batch" style="width: 80px;">
+                            <option value="">배치</option>
+                            <option value="A1">A1</option>
+                            <option value="A2">A2</option>
+                            <option value="A3">A3</option>
+                            <option value="A4">A4</option>
+                        </select>
                         <input type="number" id="remaining_weight_g" step="0.01" placeholder="무게(g)" required>
                         <button type="submit">추가</button>
                     </form>
@@ -217,6 +228,15 @@
                         <input type="hidden" id="edit_inv_id">
                         <label>재질: <input type="text" id="edit_inv_material" required></label>
                         <label>색상: <input type="text" id="edit_inv_color" required></label>
+                        <label>배치: 
+                            <select id="edit_inv_batch">
+                                <option value="">없음</option>
+                                <option value="A1">A1</option>
+                                <option value="A2">A2</option>
+                                <option value="A3">A3</option>
+                                <option value="A4">A4</option>
+                            </select>
+                        </label>
                         <label>잔량(g): <input type="number" id="edit_inv_weight" step="0.01" required></label>
                         <div style="display:flex; gap:10px; margin-top:10px;">
                             <button type="submit">저장</button>
