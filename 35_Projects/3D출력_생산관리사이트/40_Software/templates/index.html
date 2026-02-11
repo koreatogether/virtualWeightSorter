@@ -49,7 +49,7 @@
                     <select id="order_color" required>
                         <option value="">-- 색상 선택 --</option>
                     </select>
-                    <input type="number" id="order_unit_weight" placeholder="개당 무게(g)" required>
+                    <input type="number" id="order_unit_weight" step="0.01" placeholder="개당 무게(g)" required>
                     <input type="date" id="order_deadline">
                     <button type="submit">주문 생성</button>
                 </form>
@@ -74,7 +74,7 @@
                         <label>색상: 
                             <select id="edit_order_color" required></select>
                         </label>
-                        <label>개당 무게(g): <input type="number" id="edit_order_unit_weight" required></label>
+                        <label>개당 무게(g): <input type="number" id="edit_order_unit_weight" step="0.01" required></label>
                         <label>마감 기한: <input type="date" id="edit_order_deadline"></label>
                         <div style="display:flex; gap:10px; margin-top:10px;">
                             <button type="submit">저장</button>
@@ -182,7 +182,7 @@
                     <form id="inventory-form">
                         <input type="text" id="material" placeholder="재질" required>
                         <input type="text" id="color" placeholder="색상" required>
-                        <input type="number" id="remaining_weight_g" placeholder="무게(g)" required>
+                        <input type="number" id="remaining_weight_g" step="0.01" placeholder="무게(g)" required>
                         <button type="submit">추가</button>
                     </form>
                     <table id="inventory-table">
@@ -217,7 +217,7 @@
                         <input type="hidden" id="edit_inv_id">
                         <label>재질: <input type="text" id="edit_inv_material" required></label>
                         <label>색상: <input type="text" id="edit_inv_color" required></label>
-                        <label>잔량(g): <input type="number" id="edit_inv_weight" required></label>
+                        <label>잔량(g): <input type="number" id="edit_inv_weight" step="0.01" required></label>
                         <div style="display:flex; gap:10px; margin-top:10px;">
                             <button type="submit">저장</button>
                             <button type="button" onclick="closeInventoryEdit()" style="background:#6c757d;">취소</button>

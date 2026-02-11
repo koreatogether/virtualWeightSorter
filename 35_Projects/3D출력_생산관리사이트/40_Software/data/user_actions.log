@@ -5,3 +5,6 @@
 [2026-02-11 09:48:45] [IP: 127.0.0.1] [ACTION: ADD_INVENTORY] [TARGET: 2075a4da] - Material: PLA, Weight: 1000g
 [2026-02-11 09:48:50] [IP: 127.0.0.1] [ACTION: DELETE_INVENTORY] [TARGET: 2075a4da] - Inventory removed
 [2026-02-11 09:48:58] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 87cd5912] - Updated fields: ['material', 'color', 'remaining_weight_g']
+[2026-02-11 12:03:05] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: 7cdc80ff] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'unit_weight_g', 'deadline']
+[2026-02-11 12:09:16] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: 7cdc80ff] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'unit_weight_g', 'deadline']
+[2026-02-11 12:10:02] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: 21b84580] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'unit_weight_g', 'deadline']

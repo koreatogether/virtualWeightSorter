@@ -65,7 +65,7 @@ def add_order():
     # 필라멘트 정보 (새로 추가됨)
     new_order['material'] = new_order.get('material', 'PLA')
     new_order['color'] = new_order.get('color', 'Black')
-    new_order['unit_weight_g'] = int(new_order.get('unit_weight_g', 0))
+    new_order['unit_weight_g'] = float(new_order.get('unit_weight_g', 0))
     
     new_order['created_at'] = datetime.now().isoformat()
     data['orders'].append(new_order)
@@ -87,7 +87,7 @@ def update_order(id):
             # 필라멘트 정보 수정
             if 'material' in req_data: order['material'] = req_data['material']
             if 'color' in req_data: order['color'] = req_data['color']
-            if 'unit_weight_g' in req_data: order['unit_weight_g'] = int(req_data['unit_weight_g'])
+            if 'unit_weight_g' in req_data: order['unit_weight_g'] = float(req_data['unit_weight_g'])
             
             actual_sum = sum(s.get('actual_quantity', 0) for s in data['schedules'] if s.get('order_id') == id)
             if (actual_sum + order.get('initial_stock', 0)) >= int(order['target_quantity']):
@@ -286,7 +286,7 @@ def update_inventory(id):
         if item['id'] == id:
             if 'material' in req_data: item['material'] = req_data['material']
             if 'color' in req_data: item['color'] = req_data['color']
-            if 'remaining_weight_g' in req_data: item['remaining_weight_g'] = int(req_data['remaining_weight_g'])
+            if 'remaining_weight_g' in req_data: item['remaining_weight_g'] = float(req_data['remaining_weight_g'])
             item['updated_at'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             write_db(data)
             log_action("UPDATE_INVENTORY", id, f"Updated fields: {list(req_data.keys())}")

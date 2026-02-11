@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
             initial_stock: parseInt(document.getElementById('order_initial_stock').value || 0),
             material: document.getElementById('order_material').value,
             color: document.getElementById('order_color').value,
-            unit_weight_g: parseInt(document.getElementById('order_unit_weight').value || 0),
+            unit_weight_g: parseFloat(document.getElementById('order_unit_weight').value || 0),
             deadline: document.getElementById('order_deadline').value
         };
         const res = await postData('/api/v1/orders', payload);
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
             initial_stock: parseInt(document.getElementById('edit_order_initial_stock').value || 0),
             material: document.getElementById('edit_order_material').value,
             color: document.getElementById('edit_order_color').value,
-            unit_weight_g: parseInt(document.getElementById('edit_order_unit_weight').value),
+            unit_weight_g: parseFloat(document.getElementById('edit_order_unit_weight').value),
             deadline: document.getElementById('edit_order_deadline').value
         };
         const res = await postData(`/api/v1/orders/${id}`, payload, 'PATCH');
@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const payload = {
             material: document.getElementById('material').value, color: document.getElementById('color').value,
-            remaining_weight_g: parseInt(document.getElementById('remaining_weight_g').value)
+            remaining_weight_g: parseFloat(document.getElementById('remaining_weight_g').value)
         };
         if ((await postData('/api/v1/inventory', payload)).ok) { await fetchData(); e.target.reset(); }
     });
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const payload = {
             material: document.getElementById('edit_inv_material').value,
             color: document.getElementById('edit_inv_color').value,
-            remaining_weight_g: parseInt(document.getElementById('edit_inv_weight').value)
+            remaining_weight_g: parseFloat(document.getElementById('edit_inv_weight').value)
         };
         if ((await postData(`/api/v1/inventory/${id}`, payload, 'PATCH')).ok) { closeInventoryEdit(); await fetchData(); }
     });
@@ -372,7 +372,7 @@ function renderInventory(inv, orders) {
     // 재고 기반으로 현재 추정 잔량 계산
     inv.forEach(i => {
         const s = getStats(i.material, i.color);
-        s.stock += parseInt(i.remaining_weight_g || 0);
+        s.stock += parseFloat(i.remaining_weight_g || 0);
         
         // 이 특정 스풀(i)의 업데이트 시간
         const lastUpdate = i.updated_at ? new Date(i.updated_at) : new Date(0);
@@ -391,7 +391,7 @@ function renderInventory(inv, orders) {
             .reduce((sum, sch) => sum + (parseInt(sch.actual_quantity) || 0), 0);
         
         // 이 스풀에서 추정되는 현재 잔량 = 입력 무게 - 입력 이후의 소모량
-        const itemEstimatedStock = parseInt(i.remaining_weight_g || 0) - (consumedAfterUpdate * (
+        const itemEstimatedStock = parseFloat(i.remaining_weight_g || 0) - (consumedAfterUpdate * (
             (currentData.orders.find(o => o.material === i.material && o.color === i.color) || {}).unit_weight_g || 0
         ));
         s.estimatedCurrentStock += itemEstimatedStock;
