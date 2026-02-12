@@ -23,7 +23,7 @@
       "unit_weight_g": 2.97,
       "deadline": "2026-02-19",
       "id": "667108ad",
-      "completed_quantity": 0,
+      "completed_quantity": 15.0,
       "status": "in_progress",
       "created_at": "2026-02-12T22:17:01.339997",
       "batch": "A3"
@@ -33,13 +33,24 @@
     {
       "order_id": "667108ad",
       "printer_id": "419f8dc7",
+      "planned_quantity": 15,
+      "start_time": "2026-02-13T03:00",
+      "id": "b18e6c77",
+      "status": "completed",
+      "actual_quantity": 15.0,
+      "created_at": "2026-02-13T08:18:09.355768",
+      "conflict": false
+    },
+    {
+      "order_id": "667108ad",
+      "printer_id": "419f8dc7",
       "planned_quantity": 45,
-      "start_time": "2026-02-12T22:00",
-      "id": "df55b5bf",
+      "start_time": "2026-02-13T08:00",
+      "id": "e251661a",
       "status": "pending",
       "actual_quantity": 0,
-      "created_at": "2026-02-12T22:18:16.875848",
-      "conflict": false
+      "created_at": "2026-02-13T08:18:31.583368",
+      "conflict": true
     }
   ],
   "inventory": [
