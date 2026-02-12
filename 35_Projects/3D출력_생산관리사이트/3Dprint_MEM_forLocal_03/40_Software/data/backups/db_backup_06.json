@@ -1,0 +1,86 @@
+{
+  "orders": [
+    {
+      "product_name": "LED점멸기_바디",
+      "target_quantity": 200,
+      "initial_stock": 197.0,
+      "material": "PLA",
+      "color": "검정",
+      "unit_weight_g": 9.24,
+      "deadline": "2026-02-19",
+      "id": "f2ce201e",
+      "completed_quantity": 0,
+      "status": "in_progress",
+      "created_at": "2026-02-12T22:16:17.786120"
+    },
+    {
+      "product_name": "LED점멸기_커버",
+      "target_quantity": 200.0,
+      "initial_stock": 5.0,
+      "material": "651f3e98",
+      "color": "검정",
+      "unit_weight_g": 2.97,
+      "deadline": "2026-02-19",
+      "id": "667108ad",
+      "completed_quantity": 0,
+      "status": "in_progress",
+      "created_at": "2026-02-12T22:17:01.339997"
+    }
+  ],
+  "schedules": [
+    {
+      "order_id": "667108ad",
+      "printer_id": "419f8dc7",
+      "planned_quantity": 45,
+      "start_time": "2026-02-12T22:00",
+      "id": "df55b5bf",
+      "status": "pending",
+      "actual_quantity": 0,
+      "created_at": "2026-02-12T22:18:16.875848",
+      "conflict": false
+    }
+  ],
+  "inventory": [
+    {
+      "material": "PLA",
+      "color": "검정",
+      "batch": "A1",
+      "remaining_weight_g": 300,
+      "id": "1cc798c9",
+      "updated_at": "2026-02-12 22:13:37"
+    },
+    {
+      "material": "PLA",
+      "color": "검정",
+      "batch": "A2",
+      "remaining_weight_g": 300,
+      "id": "e8da40eb",
+      "updated_at": "2026-02-12 22:13:46"
+    },
+    {
+      "material": "PLA",
+      "color": "검정",
+      "batch": "A3",
+      "remaining_weight_g": 450,
+      "id": "651f3e98",
+      "updated_at": "2026-02-12 22:13:55"
+    },
+    {
+      "material": "PLA",
+      "color": "백색",
+      "batch": "A4",
+      "remaining_weight_g": 800,
+      "id": "b4cbeb3d",
+      "updated_at": "2026-02-12 22:14:13"
+    }
+  ],
+  "printers": [
+    {
+      "model": "P2SC",
+      "asset_id": "202",
+      "purchase_date": "2026-02-04",
+      "id": "419f8dc7",
+      "status": "idle"
+    }
+  ]
+}
