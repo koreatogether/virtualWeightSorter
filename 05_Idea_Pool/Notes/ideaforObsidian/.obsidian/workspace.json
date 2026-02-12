@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Main_MOC.md",
+                "file": "모니터링/DS18B20_구상_2026-02-06.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Main_MOC"
+              "title": "DS18B20_구상_2026-02-06"
             }
           }
         ]
@@ -185,6 +185,10 @@
   },
   "active": "050a5d94ac3d08e2",
   "lastOpenFiles": [
+    "pet/README.md",
+    "pet/드라이룸/README.MD",
+    "Main_MOC.md",
+    "2026-02-12.md",
     "ai용사이트/ai에게좋은사이트.md",
     "ai용사이트",
     "도로공사차량싸인보드/기존코드/signBoard.ino",
@@ -194,7 +198,6 @@
     "주방/README.md",
     "주방/고무장갑벗기는바람/README.MD",
     "모니터링/README.md",
-    "Main_MOC.md",
     "ai용웹생태계/ai통신방식.md",
     "농사/열사병/구조물.md",
     "농사/노지농사/기계도입농사_recovered.md",
@@ -215,9 +218,6 @@
     "구축아파트_배관/freeThink/정리_온도센서갯수.md",
     "구축아파트_배관/freeThink/정리_고급_분배기.md",
     "구축아파트_배관/freeThink/thinking01.md",
-    "구축아파트_배관/freeThink/naver_cafe.md",
-    "구축아파트_배관/freeThink/longLifeBoard.md",
-    "구축아파트_배관/freeThink/intro.md",
     "구축아파트_배관/freeThink",
     "트럭_경사계/설계",
     "트럭_경사계/test_src/display_11Inch/images/Gemini_Generated_Image_ibtfvibtfvibtfvi.png",
