@@ -699,33 +699,8 @@ function renderInventory(inv, orders) {
         const lastUpdate = i.updated_at ? new Date(i.updated_at) : new Date(0);
 
         // 해당 재고(i)에서 차감되어야 할 무게 계산 (배치 및 재질/색상 일치 여부 확인)
-        const consumedWeight = (currentData.schedules || [])
-            .reduce((sum, sch) => {
-                const order = (currentData.orders || []).find(o => o.id === sch.order_id);
-                if (!order) return sum;
-
-                // 1. 색상 일치 확인
-                if (order.color.toLowerCase() !== i.color.toLowerCase()) return sum;
-
-                // 2. 재질 포함 여부 확인
-                const m1 = i.material.toLowerCase();
-                const m2 = order.material.toLowerCase();
-                if (!(m1.includes(m2) || m2.includes(m1))) return sum;
-
-                // 3. [중요] 배치가 지정된 주문인 경우, 배치까지 일치해야 함
-                if (order.batch && order.batch !== i.batch) return sum;
-                // (주문에 배치가 없으면, 해당 재질/색상의 모든 재고에서 차감될 수 있다는 가정하에 일단 포함하거나, 
-                //  혹은 배치가 없는 재고에서만 빠져야 한다고 볼 수도 있음. 
-                //  여기서는 "주문에 배치가 없으면 -> 배치가 없는 재고 우선" 로직 등을 짤 수도 있으나,
-                //  기존 로직(포괄적 차감)을 따르되, "배치가 있으면 엄격히 그 배치에서만" 차감하도록 함.)
-
-                // 4. 시간 확인 (재고 기록 시점 이후의 생산만 차감)
-                const actionTime = sch.created_at ? new Date(sch.created_at) : new Date(0);
-                if (actionTime <= lastUpdate) return sum;
-
-                // 5. 무게 누적 (개별 주문의 무게 적용)
-                return sum + ((parseFloat(sch.actual_quantity) || 0) * (parseFloat(order.unit_weight_g) || 0));
-            }, 0);
+        // Helper function call
+        const consumedWeight = calculateConsumedWeight(i, currentData.schedules || [], currentData.orders || []);
 
         const itemEstimatedStock = parseFloat(i.remaining_weight_g || 0) - consumedWeight;
 
@@ -757,19 +732,8 @@ function renderInventory(inv, orders) {
 
         // 개별 아이템 표시용 잔량 계산 (위와 동일한 로직 반복 - 함수화 가능하지만 일단 인라인 처리)
         const lastUpdate = i.updated_at ? new Date(i.updated_at) : new Date(0);
-        const consumedWeight = (currentData.schedules || [])
-            .reduce((sum, sch) => {
-                const order = (currentData.orders || []).find(o => o.id === sch.order_id);
-                if (!order) return sum;
-                if (order.color.toLowerCase() !== i.color.toLowerCase()) return sum;
-                const m1 = i.material.toLowerCase();
-                const m2 = order.material.toLowerCase();
-                if (!(m1.includes(m2) || m2.includes(m1))) return sum;
-                if (order.batch && order.batch !== i.batch) return sum;
-                const actionTime = sch.created_at ? new Date(sch.created_at) : new Date(0);
-                if (actionTime <= lastUpdate) return sum;
-                return sum + ((parseFloat(sch.actual_quantity) || 0) * (parseFloat(order.unit_weight_g) || 0));
-            }, 0);
+        // Helper function call
+        const consumedWeight = calculateConsumedWeight(i, currentData.schedules || [], currentData.orders || []);
 
         const itemEstimatedStock = parseFloat(i.remaining_weight_g || 0) - consumedWeight;
 
@@ -926,4 +890,38 @@ function openPrinterEdit(id) {
 
 function closePrinterEdit() {
     document.getElementById('printer-edit-overlay').style.display = 'none';
+}
+
+/**
+ * Calculates the total weight consumed for a specific inventory item based on production schedules.
+ * @param {Object} item - The inventory item (must have id, material, color, updated_at).
+ * @param {Array} schedules - List of all schedule/task objects.
+ * @param {Array} orders - List of all order objects.
+ * @returns {number} - The calculated consumed weight in grams.
+ */
+function calculateConsumedWeight(item, schedules, orders) {
+    const lastUpdate = item.updated_at ? new Date(item.updated_at) : new Date(0);
+
+    return schedules.reduce((sum, sch) => {
+        const order = orders.find(o => o.id === sch.order_id);
+        if (!order) return sum;
+
+        // 1. 색상 일치 확인
+        if (order.color.toLowerCase() !== item.color.toLowerCase()) return sum;
+
+        // 2. 재질 포함 여부 확인
+        const m1 = item.material.toLowerCase();
+        const m2 = order.material.toLowerCase();
+        if (!(m1.includes(m2) || m2.includes(m1))) return sum;
+
+        // 3. 배치 일치 확인
+        if (order.batch && order.batch !== item.batch) return sum;
+
+        // 4. 시간 확인
+        const actionTime = sch.created_at ? new Date(sch.created_at) : new Date(0);
+        if (actionTime <= lastUpdate) return sum;
+
+        // 5. 무게 누적
+        return sum + ((parseFloat(sch.actual_quantity) || 0) * (parseFloat(order.unit_weight_g) || 0));
+    }, 0);
 }

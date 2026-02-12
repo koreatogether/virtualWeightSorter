@@ -1,20 +1,21 @@
 {
   "orders": [
     {
-      "product_name": "LED점멸기_바디",
-      "target_quantity": 200,
+      "product_name": "LED_바디",
+      "target_quantity": 200.0,
       "initial_stock": 197.0,
-      "material": "PLA",
+      "material": "1cc798c9",
       "color": "검정",
       "unit_weight_g": 9.24,
       "deadline": "2026-02-19",
       "id": "f2ce201e",
       "completed_quantity": 0,
       "status": "in_progress",
-      "created_at": "2026-02-12T22:16:17.786120"
+      "created_at": "2026-02-12T22:16:17.786120",
+      "batch": ""
     },
     {
-      "product_name": "LED점멸기_커버",
+      "product_name": "LED_커버",
       "target_quantity": 200.0,
       "initial_stock": 5.0,
       "material": "651f3e98",
@@ -24,7 +25,8 @@
       "id": "667108ad",
       "completed_quantity": 0,
       "status": "in_progress",
-      "created_at": "2026-02-12T22:17:01.339997"
+      "created_at": "2026-02-12T22:17:01.339997",
+      "batch": ""
     }
   ],
   "schedules": [
