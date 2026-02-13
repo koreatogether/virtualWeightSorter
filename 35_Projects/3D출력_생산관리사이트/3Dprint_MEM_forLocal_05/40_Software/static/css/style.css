@@ -168,3 +168,101 @@ body.dark-mode .toggle-expand { color: #fff; }
 
 /* 다크모드 펼쳐짐 대응 */
 body.dark-mode details[open] .toggle-collapse { color: #fff; }
+
+/* Tooltip styles */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+    border-bottom: 1px dotted var(--danger-color);
+}
+
+.tooltip .tooltip-text {
+    visibility: hidden;
+    width: 220px;
+    background-color: #333;
+    color: #fff;
+    text-align: left;
+    border-radius: 8px;
+    padding: 12px;
+    position: absolute;
+    z-index: 1000;
+    bottom: 150%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    font-size: 0.85rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    pointer-events: none;
+}
+
+.tooltip .tooltip-text::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(-50%) translateY(-10px);
+}
+
+/* Defect Recovery Alerts */
+.recovery-alert {
+    background-color: var(--conflict-bg);
+    border: 1px solid var(--warning-color);
+    border-radius: 8px;
+    padding: 12px 18px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.recovery-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.recovery-title {
+    font-weight: bold;
+    color: #856404;
+    font-size: 1rem;
+}
+
+.recovery-msg {
+    font-size: 0.9rem;
+    color: #856404;
+}
+
+.btn-recovery {
+    background: #856404;
+    color: white;
+    font-weight: bold;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-recovery:hover {
+    background: #6d5203;
+}

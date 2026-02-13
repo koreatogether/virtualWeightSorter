@@ -396,9 +396,22 @@ def update_schedule(id):
                         # 만약 계획 수량이 0이 되면 해당 일정은 더 이상 필요 없으므로 자동 완료 처리하거나 고민 필요
                         # 여기서는 일단 0으로 두고 유지 (사용자가 보게 함)
             
+            # --- 불량 실적 처리 (Defects) ---
+            if 'defect_quantity' in req_data:
+                added_defect = float(req_data['defect_quantity'])
+                old_defect = float(item.get('defect_quantity', 0))
+                item['defect_quantity'] = old_defect + added_defect
+                
+                # 불량 사유 추가
+                reason = req_data.get('defect_reason', '미지정')
+                reasons = item.get('defect_reasons', [])
+                if not isinstance(reasons, list): reasons = []
+                reasons.append(f"{added_defect}개: {reason}")
+                item['defect_reasons'] = reasons
+
             # 나머지 필드 업데이트
             for key, value in req_data.items():
-                if key != 'actual_quantity': # 실적은 위에서 누적처리함
+                if key not in ['actual_quantity', 'defect_quantity', 'defect_reason']: # 특수 필드는 제외
                     item[key] = value
             break
 
@@ -407,7 +420,8 @@ def update_schedule(id):
         order_info = None
         if order_id:
             total_completed = sum(s.get('actual_quantity', 0) for s in data['schedules'] if s.get('order_id') == order_id)
-            for order in data['orders']:
+            for order in data['orders']:\
+
                 if order['id'] == order_id:
                     order['completed_quantity'] = total_completed
                     if (order['completed_quantity'] + order.get('initial_stock', 0)) >= float(order['target_quantity']):

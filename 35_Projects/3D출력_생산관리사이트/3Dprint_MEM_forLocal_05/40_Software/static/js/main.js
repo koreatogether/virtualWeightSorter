@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         enableTime: true,
         dateFormat: "Y-m-d H:i",
         time_24hr: true,
-        minDate: "today",
+        // minDate: "today", // 과거 날짜 선택 허용을 위해 주석 처리
         disable: [] // 초기엔 비활성 날짜 없음
     });
 
@@ -227,10 +227,12 @@ let currentData = null;
 
 async function fetchData() {
     try {
+        console.log("Fetching fresh data from server...");
         const response = await fetch('/api/v1/data');
         currentData = await response.json();
         renderOrders(currentData.orders || [], currentData.schedules || []);
         renderSchedules(currentData.schedules || [], currentData.orders || [], currentData.printers || []);
+        renderDefectRecoveryAlerts(currentData.orders || [], currentData.schedules || []);
         renderDashboard(currentData);
         renderInventory(currentData.inventory || [], currentData.orders || []);
         renderPrinters(currentData.printers || []);
@@ -477,10 +479,16 @@ function renderSchedules(schedules, orders, printers) {
             <td>
                 <div style="color:var(--accent-color)">계획: ${s.planned_quantity}</div>
                 <div style="font-weight:bold;">실적: ${s.actual_quantity}</div>
+                ${s.defect_quantity ? `
+                    <div class="tooltip" style="color:var(--danger-color); font-size:0.9em; margin-top:2px;">
+                        불량: ${s.defect_quantity}
+                        <span class="tooltip-text">${(s.defect_reasons || []).join('\n') || '사유 미기재'}</span>
+                    </div>` : ''}
             </td>
             <td>
-                <div style="display: flex; gap: 5px; justify-content: center; align-items: center;">
+                <div style="display: flex; gap: 5px; justify-content: center; align-items: center; flex-wrap: wrap;">
                     <button onclick="updateRun('${s.id}', prompt('추가 성공 수량 입력 (누적됨):', '0'))" class="btn-sm">실적입력</button>
+                    <button onclick="updateRunDefect('${s.id}')" class="btn-sm" style="background:var(--danger-color);">불량입력</button>
                     <button onclick="deleteSchedule('${s.id}')" class="btn-sm btn-danger">삭제</button>
                 </div>
             </td>
@@ -527,8 +535,94 @@ function quickFillOrder(name, weight) {
     setTimeout(() => { input.style.backgroundColor = ''; }, 500);
 }
 
+async function updateRunDefect(id) {
+    const qty = prompt('불량 수량 입력 (누적됨):', '0');
+    if (qty === null || qty === "" || isNaN(qty)) return;
+
+    const reason = prompt('불량 사유 입력:', '노즐 막힘');
+    if (reason === null) return;
+
+    const res = await postData(`/api/v1/schedules/${id}`, {
+        defect_quantity: parseFloat(qty),
+        defect_reason: reason
+    }, 'PATCH');
+
+    if (res.ok) {
+        fetchData();
+    }
+}
+
+/**
+ * 불량으로 인한 수량 부족을 확인하고 경고 알림을 렌더링함
+ */
+function renderDefectRecoveryAlerts(orders, schedules) {
+    console.log("Checking for defect recovery shortages...");
+    const container = document.getElementById('defect-recovery-container');
+    if (!container) {
+        console.error("Alert container not found!");
+        return;
+    }
+    container.innerHTML = '';
+
+    orders.forEach(order => {
+        // 해당 주문의 실적 합계
+        const actualTotal = schedules
+            .filter(s => s.order_id === order.id)
+            .reduce((sum, s) => sum + (parseFloat(s.actual_quantity) || 0), 0);
+
+        // 해당 주문의 미래 계획 합계 (status가 pending인 것)
+        const plannedFutureTotal = schedules
+            .filter(s => s.order_id === order.id && s.status === 'pending')
+            .reduce((sum, s) => sum + (parseFloat(s.planned_quantity) || 0), 0);
+
+        // 부족 수량 계산 = 목표 - (기존 재고 + 실적 + 미래 계획)
+        const target = parseFloat(order.target_quantity) || 0;
+        const initial = parseFloat(order.initial_stock) || 0;
+        const shortage = target - (initial + actualTotal + plannedFutureTotal);
+
+        // 불량이 발생했었고(중요), 부족분이 있다면 알림 표시
+        const ordersWithDefects = schedules.some(s => s.order_id === order.id && (parseFloat(s.defect_quantity) || 0) > 0);
+
+        if (shortage > 0 && ordersWithDefects) {
+            console.log(`Shortage found for ${order.product_name}: ${shortage} units`);
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'recovery-alert';
+            alertDiv.innerHTML = `
+                <div class="recovery-info">
+                    <div class="recovery-title">⚠️ 생산 수량 부족 알림: ${order.product_name}</div>
+                    <div class="recovery-msg">불량 발생 등으로 인해 목표 대비 <strong>${shortage}개</strong>가 부족합니다. (재고/계획 포함)</div>
+                    <div style="color: var(--danger-color); font-weight: bold; margin-top: 5px;">※ 필라멘트 잔량을 다시 확인하세요!</div>
+                </div>
+                <button class="btn-recovery" onclick="quickScheduleReplacement('${order.id}', ${shortage})">복구 일정 추가</button>
+            `;
+            container.appendChild(alertDiv);
+        }
+    });
+}
+
+/**
+ * 알림 클릭 시 입력 폼을 부족 수량으로 자동 세팅
+ */
+function quickScheduleReplacement(orderId, qty) {
+    const orderSelect = document.getElementById('schedule_order_id');
+    const qtyInput = document.getElementById('planned_qty');
+    const form = document.getElementById('schedule-form');
+
+    if (orderSelect && qtyInput) {
+        orderSelect.value = orderId;
+        qtyInput.value = qty;
+
+        // 시각적 피드백: 입력창 강조
+        qtyInput.style.boxShadow = '0 0 10px var(--warning-color)';
+        setTimeout(() => { qtyInput.style.boxShadow = ''; }, 2000);
+
+        // 폼으로 스크롤
+        form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+}
+
 async function updateRun(id, qtyVal) {
-    if (qtyVal === null) return;
+    if (qtyVal === null || qtyVal === "" || isNaN(qtyVal)) return;
     const res = await postData(`/api/v1/schedules/${id}`, { actual_quantity: parseFloat(qtyVal), status: 'completed' }, 'PATCH');
 
     if (res.ok) {
@@ -917,11 +1011,14 @@ function calculateConsumedWeight(item, schedules, orders) {
         // 3. 배치 일치 확인
         if (order.batch && order.batch !== item.batch) return sum;
 
-        // 4. 시간 확인
-        const actionTime = sch.created_at ? new Date(sch.created_at) : new Date(0);
+        // 4. 시간 확인 (생산 시작 시간 기준)
+        // db에 저장된 start_time은 "YYYY-MM-DDTHH:mm" 형식임
+        const actionTime = sch.start_time ? new Date(sch.start_time) : new Date(0);
         if (actionTime <= lastUpdate) return sum;
 
-        // 5. 무게 누적
-        return sum + ((parseFloat(sch.actual_quantity) || 0) * (parseFloat(order.unit_weight_g) || 0));
+        // 5. 무게 누적 (성공 실적 + 불량 실적 모두 합산 소모)
+        const actualQty = parseFloat(sch.actual_quantity) || 0;
+        const defectQty = parseFloat(sch.defect_quantity) || 0;
+        return sum + ((actualQty + defectQty) * (parseFloat(order.unit_weight_g) || 0));
     }, 0);
 }

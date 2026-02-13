@@ -109,3 +109,29 @@
 [2026-02-13 11:04:14] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: e251661a] - New actual total: 15.0
 [2026-02-13 11:36:33] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: b18e6c77] - New actual total: 12.0
 [2026-02-13 11:36:39] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: e251661a] - New actual total: 12.0
+[2026-02-13 11:58:55] [IP: 127.0.0.1] [ACTION: DELETE_SCHEDULE] [TARGET: b18e6c77] - Schedule removed
+[2026-02-13 11:58:59] [IP: 127.0.0.1] [ACTION: DELETE_SCHEDULE] [TARGET: e251661a] - Schedule removed
+[2026-02-13 12:01:20] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: 667108ad] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'batch', 'unit_weight_g', 'deadline']
+[2026-02-13 12:02:13] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: 667108ad] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'batch', 'unit_weight_g', 'deadline']
+[2026-02-13 12:03:39] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: 667108ad] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'batch', 'unit_weight_g', 'deadline']
+[2026-02-13 12:07:22] [IP: 127.0.0.1] [ACTION: AUTO_SCHEDULE] [TARGET: f2ce201e] - Created 1 days for printer 419f8dc7
+[2026-02-13 12:07:39] [IP: 127.0.0.1] [ACTION: DELETE_SCHEDULE] [TARGET: cc8c1379] - Schedule removed
+[2026-02-13 12:07:55] [IP: 127.0.0.1] [ACTION: AUTO_SCHEDULE] [TARGET: f2ce201e] - Created 1 days for printer 419f8dc7
+[2026-02-13 12:08:42] [IP: 127.0.0.1] [ACTION: DELETE_SCHEDULE] [TARGET: 4d28faca] - Schedule removed
+[2026-02-13 12:08:51] [IP: 127.0.0.1] [ACTION: DELETE_ORDER] [TARGET: f2ce201e] - Order removed (Schedules deleted: True)
+[2026-02-13 12:10:19] [IP: 127.0.0.1] [ACTION: CREATE_ORDER] [TARGET: fbf4fd86] - Product: LED_바디, Target: 200, Mat: PLA, Color: 검정, Batch: A1
+[2026-02-13 12:10:53] [IP: 127.0.0.1] [ACTION: AUTO_SCHEDULE] [TARGET: fbf4fd86] - Created 7 days for printer 419f8dc7
+[2026-02-13 12:11:08] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: e6e093b0] - New actual total: 30.0
+[2026-02-13 12:11:12] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 8c6b138b] - New actual total: 30.0
+[2026-02-13 12:11:17] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 0c6d20dd] - New actual total: 30.0
+[2026-02-13 12:11:22] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 158395f6] - New actual total: 30.0
+[2026-02-13 12:11:27] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: c392c216] - New actual total: 30.0
+[2026-02-13 12:11:32] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 44865bc2] - New actual total: 30.0
+[2026-02-13 12:11:43] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: e982b74e] - New actual total: 17.0
+[2026-02-13 12:23:38] [IP: 127.0.0.1] [ACTION: ADD_SCHEDULE] [TARGET: 6ed08f51] - Order: 667108ad, Printer: 419f8dc7
+[2026-02-13 12:23:55] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 6ed08f51] - New actual total: 12.0
+[2026-02-13 12:23:59] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 6ed08f51] - New actual total: 24.0
+[2026-02-13 12:24:13] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 6ed08f51] - New actual total: 24.0
+[2026-02-13 12:24:22] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 6ed08f51] - New actual total: 24.0
+[2026-02-13 12:37:18] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: 667108ad] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'batch', 'unit_weight_g', 'deadline']
+[2026-02-13 12:54:05] [IP: 127.0.0.1] [ACTION: AUTO_SCHEDULE] [TARGET: 667108ad] - Created 4 days for printer 419f8dc7

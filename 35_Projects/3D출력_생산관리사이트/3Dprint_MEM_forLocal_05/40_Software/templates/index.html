@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,15 +11,19 @@
     <style>
         /* Flatpickr 커스텀 스타일 (가능한 날짜 녹색 표시 등) */
         .flatpickr-day:not(.flatpickr-disabled) {
-            background: #e8f5e9; /* 연한 녹색 배경 */
+            background: #e8f5e9;
+            /* 연한 녹색 배경 */
             border-color: #e8f5e9;
         }
+
         .flatpickr-day.selected {
-            background: #28a745 !important; /* 선택시 진한 녹색 */
+            background: #28a745 !important;
+            /* 선택시 진한 녹색 */
             border-color: #28a745 !important;
         }
     </style>
 </head>
+
 <body class="light-mode">
     <header>
         <h1>3D 출력 생산 관리 시스템 (MES Lite)</h1>
@@ -68,22 +73,25 @@
             </div>
 
             <!-- 주문 수정용 숨겨진 폼 -->
-            <div id="order-edit-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
-                <div style="background:var(--bg-color); max-width:500px; margin:100px auto; padding:20px; border-radius:8px;">
+            <div id="order-edit-overlay"
+                style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1000;">
+                <div
+                    style="background:var(--bg-color); max-width:500px; margin:100px auto; padding:20px; border-radius:8px;">
                     <h3>주문 정보 수정</h3>
                     <form id="order-edit-form" style="display:flex; flex-direction:column; gap:10px;">
                         <input type="hidden" id="edit_order_id">
                         <label>제품명: <input type="text" id="edit_order_product" required></label>
                         <label>목표 수량: <input type="number" id="edit_order_target" required></label>
                         <label>기존 재고: <input type="number" id="edit_order_initial_stock" placeholder="기존 재고(개)"></label>
-                        <label>재질: 
+                        <label>재질:
                             <select id="edit_order_material" required></select>
                         </label>
-                        <label>색상: 
+                        <label>색상:
                             <select id="edit_order_color" required></select>
                         </label>
-                        <label>배치: 
-                            <input type="text" id="edit_order_batch" placeholder="배치 (예: A1)" readonly style="background:#eee;">
+                        <label>배치:
+                            <input type="text" id="edit_order_batch" placeholder="배치 (예: A1)" readonly
+                                style="background:#eee;">
                         </label>
                         <label>개당 무게(g): <input type="number" id="edit_order_unit_weight" step="0.01" required></label>
                         <label>마감 기한: <input type="date" id="edit_order_deadline"></label>
@@ -99,17 +107,20 @@
         <!-- 2. 생산 계획 및 실적 -->
         <section id="schedule">
             <h2>일일 생산 계획 및 실적 (Daily Runs)</h2>
-            
+
+            <!-- 불량 회복 알림 영역 -->
+            <div id="defect-recovery-container" style="min-height: 5px;"></div>
+
             <fieldset>
                 <legend>생산 작업 할당 (Run Schedule)</legend>
                 <form id="schedule-form">
                     <div style="width: 100%; margin-bottom: 10px;">
                         <label>
-                            <input type="checkbox" id="auto_schedule_mode"> 
+                            <input type="checkbox" id="auto_schedule_mode">
                             <strong>자동 계획 생성 모드</strong> (잔여 수량 채울 때까지 일별 계획 자동 생성)
                         </label>
                     </div>
-                    
+
                     <select id="schedule_order_id" required>
                         <option value="">-- 주문 선택 --</option>
                         <!-- JS로 채워짐 -->
@@ -121,7 +132,7 @@
                     <!-- Flatpickr가 적용될 입력창 -->
                     <input type="text" id="start_date_picker" placeholder="시작 날짜/시간 선택" required>
                     <!-- 기존 input들은 hidden으로 처리하거나 제거 -->
-                    <input type="hidden" id="start_date_only"> 
+                    <input type="hidden" id="start_date_only">
                     <input type="hidden" id="start_time">
                     <button type="submit" id="schedule-btn">작업 할당</button>
                 </form>
@@ -180,14 +191,25 @@
                         <div class="flex-half">
                             <h3>재질별 총 소모량 (누적 실적)</h3>
                             <table id="report-filament-table">
-                                <thead><tr><th>재질/색상</th><th>총 소모량(g)</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>재질/색상</th>
+                                        <th>총 소모량(g)</th>
+                                    </tr>
+                                </thead>
                                 <tbody id="report-filament-body"></tbody>
                             </table>
                         </div>
                         <div class="flex-half">
                             <h3>프린터별 작업 횟수</h3>
                             <table id="report-printer-table">
-                                <thead><tr><th>프린터</th><th>완료 작업</th><th>총 생산량</th></tr></thead>
+                                <thead>
+                                    <tr>
+                                        <th>프린터</th>
+                                        <th>완료 작업</th>
+                                        <th>총 생산량</th>
+                                    </tr>
+                                </thead>
                                 <tbody id="report-printer-body"></tbody>
                             </table>
                         </div>
@@ -242,7 +264,13 @@
                     </form>
                     <table id="inventory-table">
                         <thead>
-                            <tr><th>재질</th><th>색상</th><th>잔량</th><th>기록 시간</th><th>관리</th></tr>
+                            <tr>
+                                <th>재질</th>
+                                <th>색상</th>
+                                <th>잔량</th>
+                                <th>기록 시간</th>
+                                <th>관리</th>
+                            </tr>
                         </thead>
                         <tbody id="inventory-body"></tbody>
                     </table>
@@ -257,7 +285,12 @@
                     </form>
                     <table id="printer-table">
                         <thead>
-                            <tr><th>모델</th><th>식별번호</th><th>구입일</th><th>관리</th></tr>
+                            <tr>
+                                <th>모델</th>
+                                <th>식별번호</th>
+                                <th>구입일</th>
+                                <th>관리</th>
+                            </tr>
                         </thead>
                         <tbody id="printer-body"></tbody>
                     </table>
@@ -265,14 +298,16 @@
             </div>
 
             <!-- 재고 수정용 숨겨진 폼 -->
-            <div id="inventory-edit-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1001;">
-                <div style="background:var(--bg-color); max-width:400px; margin:150px auto; padding:20px; border-radius:8px;">
+            <div id="inventory-edit-overlay"
+                style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1001;">
+                <div
+                    style="background:var(--bg-color); max-width:400px; margin:150px auto; padding:20px; border-radius:8px;">
                     <h3>재고 정보 수정</h3>
                     <form id="inventory-edit-form" style="display:flex; flex-direction:column; gap:10px;">
                         <input type="hidden" id="edit_inv_id">
                         <label>재질: <input type="text" id="edit_inv_material" required></label>
                         <label>색상: <input type="text" id="edit_inv_color" required></label>
-                        <label>배치: 
+                        <label>배치:
                             <select id="edit_inv_batch">
                                 <option value="">없음</option>
                                 <option value="A1">A1</option>
@@ -291,8 +326,10 @@
             </div>
 
             <!-- 프린터 수정용 숨겨진 폼 -->
-            <div id="printer-edit-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1002;">
-                <div style="background:var(--bg-color); max-width:400px; margin:150px auto; padding:20px; border-radius:8px;">
+            <div id="printer-edit-overlay"
+                style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:1002;">
+                <div
+                    style="background:var(--bg-color); max-width:400px; margin:150px auto; padding:20px; border-radius:8px;">
                     <h3>프린터 정보 수정</h3>
                     <form id="printer-edit-form" style="display:flex; flex-direction:column; gap:10px;">
                         <input type="hidden" id="edit_printer_id">
@@ -317,4 +354,5 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
+
 </html>
