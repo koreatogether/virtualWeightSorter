@@ -9,7 +9,7 @@
       "unit_weight_g": 4.16,
       "deadline": "2026-02-19",
       "id": "667108ad",
-      "completed_quantity": 24.0,
+      "completed_quantity": 43.0,
       "status": "in_progress",
       "created_at": "2026-02-12T22:17:01.339997",
       "batch": "A2"
@@ -114,13 +114,14 @@
       "start_time": "2026-02-13T03:00",
       "id": "6ed08f51",
       "status": "completed",
-      "actual_quantity": 24.0,
+      "actual_quantity": 43.0,
       "created_at": "2026-02-13T12:23:38.918195",
       "conflict": false,
-      "defect_quantity": 6.0,
+      "defect_quantity": 2.0,
       "defect_reasons": [
         "3.0개: 들뜸",
-        "3.0개: 드"
+        "3.0개: 드",
+        "-4.0개: 최종허가자의 허가하에 4개 살림"
       ]
     },
     {

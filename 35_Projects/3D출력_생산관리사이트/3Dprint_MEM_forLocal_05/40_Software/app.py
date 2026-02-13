@@ -402,6 +402,11 @@ def update_schedule(id):
                 old_defect = float(item.get('defect_quantity', 0))
                 item['defect_quantity'] = old_defect + added_defect
                 
+                # [보완] 만약 불량을 음수(-)로 입력하면, 그만큼 성공(actual) 수량으로 복구된 것으로 간주
+                if added_defect < 0:
+                    recovery_qty = abs(added_defect)
+                    item['actual_quantity'] = float(item.get('actual_quantity', 0)) + recovery_qty
+                
                 # 불량 사유 추가
                 reason = req_data.get('defect_reason', '미지정')
                 reasons = item.get('defect_reasons', [])
