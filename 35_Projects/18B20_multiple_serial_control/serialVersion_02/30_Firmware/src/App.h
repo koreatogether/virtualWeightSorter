@@ -30,7 +30,10 @@ enum AppState
     RESET_ALL_IDS,
     THRESHOLD_MENU,
     SET_INDIVIDUAL_THRESHOLD,
-    SET_GLOBAL_THRESHOLD
+    SET_GLOBAL_THRESHOLD,
+    RESOLUTION_MENU,
+    SET_INDIVIDUAL_RESOLUTION,
+    SET_GLOBAL_RESOLUTION
 };
 
 // ID 변경 메뉴의 세부 상태를 나타내는 열거형
@@ -53,6 +56,15 @@ enum ThresholdSubState
     THRESHOLD_ENTER_LOW,
     THRESHOLD_CONFIRM,
     THRESHOLD_CLEAR_CONFIRM
+};
+
+// 해상도 설정 메뉴의 세부 상태를 나타내는 열거형
+enum ResolutionSubState
+{
+    RES_NONE,
+    RES_SELECT_SENSOR,
+    RES_SELECT_BITS,
+    RES_CONFIRM
 };
 
 // ID 변경 대상 센서의 정보를 담는 구조체
@@ -103,6 +115,10 @@ private:
     void processGlobalThreshold();
     void viewCurrentThresholds();
     void clearAllThresholds();
+    void displayResolutionMenu();
+    void processResolutionMenuInput();
+    void processIndividualResolution();
+    void processGlobalResolution();
     void handleUserCommands();
 
     // .ino 파일에 있던 전역 변수들을 클래스의 private 멤버 변수로 이동
@@ -114,6 +130,7 @@ private:
 
     EditIdSubState currentEditIdSubState;
     ThresholdSubState currentThresholdSubState;
+    ResolutionSubState currentResSubState;
 
 public: // For testing
     AppState currentAppState;
@@ -121,6 +138,7 @@ public: // For testing
     SensorInfoToChange sensorsToChangeArray[8]; // SENSOR_COUNT 대신 상수 사용
     int sensorsToChangeCount;
     int selectedSensorIndex;
+    int selectedResolution; // 추가
     unsigned long editIdTimeoutMillis;
 
     int selectedSensorIndices[8]; // SENSOR_COUNT 대신 상수 사용
@@ -129,6 +147,7 @@ public: // For testing
 
     unsigned long previousMillis;
     unsigned long menuDisplayMillis;
+    unsigned long lastMenuPrintMillis;
     bool forceMenuPrint;
 
     // 센서 검색 모드 관련 변수

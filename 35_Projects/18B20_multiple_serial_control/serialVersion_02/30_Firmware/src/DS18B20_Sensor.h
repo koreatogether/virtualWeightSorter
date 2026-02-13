@@ -24,6 +24,9 @@ public:
     virtual void setUserData(DeviceAddress address, int userData);
     virtual int getUserDataByIndex(uint8_t index);
     virtual bool isIdUsed(int id);
+    virtual uint8_t getResolution(DeviceAddress address);
+    virtual void setResolution(DeviceAddress address, uint8_t resolution);
+    virtual void setResolution(uint8_t resolution); // Set for all devices
 
 private:
     DallasTemperature _sensors;

@@ -14,11 +14,17 @@ public:
     void displayMainMenu();
     void displayThresholdMenu();
     void displayIdChangeMenu();
+    void displayResolutionMenu();
     void displaySensorTable();
     void displayCurrentThresholds();
     void displayTroubleshootingGuide();
     void displayMemoryAnalysisHelp();
     void displayGeneralHelp();
+    
+    // UI Helper Methods
+    void printSensorListWithCurrentSettings();
+    void printResolutionSettings();
+    void printThresholdSettings();
     
     void printCommandHelp();
     void printSensorReport(int deviceCount);

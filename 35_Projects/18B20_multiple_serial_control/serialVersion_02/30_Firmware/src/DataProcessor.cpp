@@ -2,10 +2,10 @@
 #include "Utils.h"
 
 // PROGMEM에 저장할 상수 문자열들
-const char PROGMEM TABLE_BORDER[] = "---------------------------------------------------------------------------------------------";
-const char PROGMEM TABLE_HEADER[] = "|  No |   Device ID   |        ADDRESS      |  Temp(℃) |    th    | 초과온도 |    tl    | 초과온도 | 상태         |";
-const char PROGMEM SENSOR_NONE_ROW[] = "| %3d |     NONE      |        NONE         |   NONE   |   NONE  |   NONE  |   NONE  |   NONE  | 센서없음     |";
-const char PROGMEM SENSOR_DATA_ROW[] = "| %3d | %13d | %s | %8.2f | %8d | %7s | %8d | %7s | %-10s |";
+const char PROGMEM TABLE_BORDER[] = "----------------------------------------------------------------------------------------------------";
+const char PROGMEM TABLE_HEADER[] = "|  No |   Device ID   |        ADDRESS      | Res |  Temp(℃) |    th    | 초과온도 |    tl    | 초과온도 | 상태         |";
+const char PROGMEM SENSOR_NONE_ROW[] = "| %3d |     NONE      |        NONE         | --- |   NONE   |   NONE  |   NONE  |   NONE  |   NONE  | 센서없음     |";
+const char PROGMEM SENSOR_DATA_ROW[] = "| %3d | %13d | %s | %3d | %8.2f | %8d | %7s | %8d | %7s | %-10s |";
 const char PROGMEM STATUS_OK[] = "이상없음";
 const char PROGMEM STATUS_CHECK[] = "점검 필요";
 const char PROGMEM OVER_MARK[] = "초과";
@@ -49,12 +49,14 @@ void DataProcessor::printSensorTable()
         }
         int deviceId = _sensorManager->getUserDataByIndex(i);
         float temp = _sensorManager->getTempC(addr);
+        uint8_t res = _sensorManager->getResolution(addr); // 해상도 읽기
         if (deviceId >= 1 && deviceId <= SENSOR_COUNT)
         {
             int slotIndex = deviceId - 1;
             memcpy(sensorsTable[slotIndex].addr, addr, 8);
             sensorsTable[slotIndex].deviceId = deviceId;
             sensorsTable[slotIndex].temp = temp;
+            sensorsTable[slotIndex].resolution = res; // 저장
             sensorsTable[slotIndex].valid = true;
         }
     }
@@ -83,6 +85,7 @@ void DataProcessor::printSensorTable()
                    i + 1,
                    sensorsTable[i].deviceId,
                    formattedAddr,
+                   sensorsTable[i].resolution, // 해상도 인자 추가
                    temp,
                    (int)th[i + 1],
                    overTh ? OVER_MARK : PLUS_MARK,

@@ -120,12 +120,9 @@ const char* Communicator::readNonBlockingLine()
         char c = Serial.read();
         if (c == '\n' || c == '\r')
         {
-            if (_nonBlockingPos > 0)
-            {
-                _nonBlockingLineBuffer[_nonBlockingPos] = '\0';
-                _nonBlockingPos = 0; // Reset for next line
-                return _nonBlockingLineBuffer;
-            }
+            _nonBlockingLineBuffer[_nonBlockingPos] = '\0';
+            _nonBlockingPos = 0; // Reset for next line
+            return _nonBlockingLineBuffer;
         }
         else if (_nonBlockingPos < sizeof(_nonBlockingLineBuffer) - 1)
         {

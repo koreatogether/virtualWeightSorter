@@ -96,3 +96,18 @@ bool DS18B20_Sensor::isIdUsed(int id)
     }
     return false;
 }
+
+uint8_t DS18B20_Sensor::getResolution(DeviceAddress address)
+{
+    return _sensors.getResolution(address);
+}
+
+void DS18B20_Sensor::setResolution(DeviceAddress address, uint8_t resolution)
+{
+    _sensors.setResolution(address, resolution);
+}
+
+void DS18B20_Sensor::setResolution(uint8_t resolution)
+{
+    _sensors.setResolution(resolution);
+}

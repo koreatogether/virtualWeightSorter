@@ -13,10 +13,11 @@ void SerialUI::displayMainMenu()
     _comm->println(F("2. Change Sensor Internal IDs (Dallas User Data)"));
     _comm->println(F("3. Temperature Threshold Settings"));
     _comm->println(F("4. Re-search Sensors"));
-    _comm->println(F("5. System Information"));
-    _comm->println(F("6. Normal Operation Mode"));
+    _comm->println(F("5. Resolution Management"));
+    _comm->println(F("6. System Information"));
+    _comm->println(F("7. Normal Operation Mode"));
     _comm->println(F("----------------------------------------"));
-    _comm->println(F("Enter your choice (1-6):"));
+    _comm->println(F("Enter your choice (1-7):"));
 }
 
 void SerialUI::displayIdChangeMenu()
@@ -43,6 +44,17 @@ void SerialUI::displayThresholdMenu()
     _comm->println(F("5. Back to Main Menu"));
     _comm->println(F("----------------------------------"));
     _comm->println(F("Enter choice (1-5):"));
+}
+
+void SerialUI::displayResolutionMenu()
+{
+    _comm->println();
+    _comm->println(F("--- Sensor Resolution Management Menu ---"));
+    _comm->println(F("1. Edit Individual Sensor Resolution"));
+    _comm->println(F("2. Set Global Resolution (All Sensors)"));
+    _comm->println(F("3. Back to Main Menu"));
+    _comm->println(F("-----------------------------------------"));
+    _comm->println(F("Enter choice (1-3):"));
 }
 
 void SerialUI::displaySensorTable()
@@ -115,6 +127,54 @@ void SerialUI::displayGeneralHelp()
     _comm->println(F("  memtoggle  - Toggle periodic memory checks"));
 #endif
     _comm->println(F("============================"));
+}
+
+void SerialUI::printSensorListWithCurrentSettings()
+{
+    int found = _sm->getDeviceCount();
+    _comm->println(F("Current sensors status:"));
+    for (int i = 0; i < found; i++)
+    {
+        int id = _sm->getUserDataByIndex(i);
+        DeviceAddress addr;
+        _sm->getAddress(addr, i);
+        _comm->print(F("Sensor "));
+        _comm->print(i + 1);
+        _comm->print(F(" (ID: "));
+        _comm->print(id);
+        _comm->print(F(", Res: "));
+        _comm->print(_sm->getResolution(addr));
+        _comm->println(F(" bits)"));
+    }
+}
+
+void SerialUI::printResolutionSettings()
+{
+    _comm->println(F("Enter resolution (9, 10, 11, or 12 bits) or 'c' to cancel:"));
+}
+
+void SerialUI::printThresholdSettings()
+{
+    int found = _sm->getDeviceCount();
+    _comm->println(F("Current sensors threshold settings:"));
+    for (int i = 0; i < found; i++)
+    {
+        int id = _sm->getUserDataByIndex(i);
+        if (id > 0)
+        {
+            int8_t highTemp = _dp->getTh(id);
+            int8_t lowTemp = _dp->getTl(id);
+            _comm->print(F("Sensor "));
+            _comm->print(i + 1);
+            _comm->print(F(" (ID: "));
+            _comm->print(id);
+            _comm->print(F(") - High: "));
+            _comm->print(highTemp);
+            _comm->print(F("°C, Low: "));
+            _comm->print(lowTemp);
+            _comm->println(F("°C"));
+        }
+    }
 }
 
 void SerialUI::printSensorReport(int deviceCount)

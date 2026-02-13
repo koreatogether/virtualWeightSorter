@@ -11,6 +11,7 @@ struct SensorInfo
     int deviceId;
     DeviceAddress addr;
     float temp;
+    uint8_t resolution; // 추가
     bool valid;
 };
 
