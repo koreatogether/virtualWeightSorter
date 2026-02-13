@@ -23,7 +23,7 @@
       "unit_weight_g": 2.97,
       "deadline": "2026-02-19",
       "id": "667108ad",
-      "completed_quantity": 15.0,
+      "completed_quantity": 24.0,
       "status": "in_progress",
       "created_at": "2026-02-12T22:17:01.339997",
       "batch": "A3"
@@ -37,7 +37,7 @@
       "start_time": "2026-02-13T03:00",
       "id": "b18e6c77",
       "status": "completed",
-      "actual_quantity": 15.0,
+      "actual_quantity": 12.0,
       "created_at": "2026-02-13T08:18:09.355768",
       "conflict": false
     },
@@ -47,8 +47,8 @@
       "planned_quantity": 45,
       "start_time": "2026-02-13T08:00",
       "id": "e251661a",
-      "status": "pending",
-      "actual_quantity": 0,
+      "status": "completed",
+      "actual_quantity": 12.0,
       "created_at": "2026-02-13T08:18:31.583368",
       "conflict": true
     }
