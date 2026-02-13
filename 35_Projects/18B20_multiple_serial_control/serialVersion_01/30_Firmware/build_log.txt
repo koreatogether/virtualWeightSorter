@@ -1,0 +1,113 @@
+﻿Processing seeed_xiao_esp32c3 (platform: espressif32; board: seeed_xiao_esp32c3; framework: arduino)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/seeed_xiao_esp32c3.html
+PLATFORM: Espressif 32 (6.12.0) > Seeed Studio XIAO ESP32C3
+HARDWARE: ESP32C3 160MHz, 320KB RAM, 4MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20017.241212+sha.dcc1105b 
+ - tool-esptoolpy @ 2.40900.250804 (4.9.0) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Warning! Ignoring broken library manifest in C:\Users\h\Documents\Arduino\libraries\MQ7Sensor
+Found 133 compatible libraries
+Scanning dependencies...
+Library Manager: Could not parse manifest -> Extra data: line 1 column 7 (char 6)
+Library Manager: Could not parse manifest -> Extra data: line 1 column 7 (char 6)
+Dependency Graph
+|-- OneWire @ 2.3.8
+|-- DallasTemperature @ 4.0.5
+Building in release mode
+Compiling .pio\build\seeed_xiao_esp32c3\src\App.cpp.o
+Compiling .pio\build\seeed_xiao_esp32c3\src\Communicator.cpp.o
+Compiling .pio\build\seeed_xiao_esp32c3\src\DS18B20_Sensor.cpp.o
+Compiling .pio\build\seeed_xiao_esp32c3\src\DataProcessor.cpp.o
+Compiling .pio\build\seeed_xiao_esp32c3\src\Utils.cpp.o
+Compiling .pio\build\seeed_xiao_esp32c3\src\main.cpp.o
+pio : *** [.pio\build\seeed_xiao_esp32c3\bootloader.
+bin] Source `C:\Users\h\.platformio\packages\framewo
+rk-arduinoespressif32\tools\sdk\esp32c3\bin\bootload
+er_qio_80m.elf' not found, needed by target `.pio\bu
+ild\seeed_xiao_esp32c3\bootloader.bin'.
+위치 줄:1 문자:1
++ pio run 2>&1 | Out-File -FilePath "build_log.txt" 
+-Encoding utf8; Get ...
++ ~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (*** [. 
+   pio\build...ootloader.bin'.:String) [], RemoteE  
+  xception
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+In file included from src/Communicator.h:7,
+                 from src/Communicator.cpp:1:
+C:/Users/h/.platformio/packages/framework-arduinoesp
+ressif32/cores/esp32/Arduino.h:33:10: fatal error: f
+reertos/FreeRTOS.h: No such file or directory
+ #include "freertos/FreeRTOS.h"
+          ^~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+In file included from src/App.h:7,
+                 from src/App.cpp:2:
+C:/Users/h/.platformio/packages/framework-arduinoesp
+ressif32/cores/esp32/Arduino.h:33:10: fatal error: f
+reertos/FreeRTOS.h: No such file or directory
+ #include "freertos/FreeRTOS.h"
+          ^~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+*** [.pio\build\seeed_xiao_esp32c3\src\App.cpp.o] Er
+ror 1
+*** [.pio\build\seeed_xiao_esp32c3\src\Communicator.
+cpp.o] Error 1
+In file included from C:/Users/h/Documents/Arduino/l
+ibraries/OneWire/OneWire.h:13,
+                 from src/DS18B20_Sensor.h:4,
+                 from src/DS18B20_Sensor.cpp:1:
+C:/Users/h/.platformio/packages/framework-arduinoesp
+ressif32/cores/esp32/Arduino.h:33:10: fatal error: f
+reertos/FreeRTOS.h: No such file or directory
+ #include "freertos/FreeRTOS.h"
+          ^~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+*** [.pio\build\seeed_xiao_esp32c3\src\DS18B20_Senso
+r.cpp.o] Error 1
+In file included from C:/Users/h/Documents/Arduino/l
+ibraries/OneWire/OneWire.h:13,
+                 from src/DS18B20_Sensor.h:4,
+                 from src/DataProcessor.h:4,
+                 from src/DataProcessor.cpp:1:
+C:/Users/h/.platformio/packages/framework-arduinoesp
+ressif32/cores/esp32/Arduino.h:33:10: fatal error: f
+reertos/FreeRTOS.h: No such file or directory
+ #include "freertos/FreeRTOS.h"
+          ^~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+In file included from C:/Users/h/Documents/Arduino/l
+ibraries/DallasTemperature/DallasTemperature.h:17,
+                 from src/Utils.h:7,
+                 from src/Utils.cpp:1:
+C:/Users/h/.platformio/packages/framework-arduinoesp
+ressif32/cores/esp32/Arduino.h:33:10: fatal error: f
+reertos/FreeRTOS.h: No such file or directory
+ #include "freertos/FreeRTOS.h"
+          ^~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+*** [.pio\build\seeed_xiao_esp32c3\src\DataProcessor
+.cpp.o] Error 1
+*** [.pio\build\seeed_xiao_esp32c3\src\Utils.cpp.o] 
+Error 1
+In file included from C:/Users/h/Documents/Arduino/l
+ibraries/OneWire/OneWire.h:13,
+                 from src/DS18B20_Sensor.h:4,
+                 from src/main.cpp:12:
+C:/Users/h/.platformio/packages/framework-arduinoesp
+ressif32/cores/esp32/Arduino.h:33:10: fatal error: f
+reertos/FreeRTOS.h: No such file or directory
+ #include "freertos/FreeRTOS.h"
+          ^~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+*** [.pio\build\seeed_xiao_esp32c3\src\main.cpp.o] E
+rror 1
+========================== [FAILED] Took 1.95 second
+s ==========================
