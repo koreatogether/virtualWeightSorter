@@ -9,7 +9,7 @@
       "unit_weight_g": 4.16,
       "deadline": "2026-02-19",
       "id": "667108ad",
-      "completed_quantity": 43.0,
+      "completed_quantity": 89.0,
       "status": "in_progress",
       "created_at": "2026-02-12T22:17:01.339997",
       "batch": "A2"
@@ -129,8 +129,8 @@
       "order_id": "667108ad",
       "printer_id": "419f8dc7",
       "planned_quantity": 45.0,
-      "actual_quantity": 0,
-      "status": "pending",
+      "actual_quantity": 46.0,
+      "status": "completed",
       "start_time": "2026-02-14T09:00",
       "created_at": "2026-02-13T12:54:05.710820",
       "conflict": false
@@ -139,7 +139,7 @@
       "id": "1bdbe7ec",
       "order_id": "667108ad",
       "printer_id": "419f8dc7",
-      "planned_quantity": 45.0,
+      "planned_quantity": 44.0,
       "actual_quantity": 0,
       "status": "pending",
       "start_time": "2026-02-15T09:00",
