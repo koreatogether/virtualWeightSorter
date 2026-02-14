@@ -1,4 +1,0 @@
-combination,success_rate,avg_error,max_error,avg_time_ms,max_time_ms,p50_time_ms,p95_time_ms,p99_time_ms,memory_peak_kb,timeout_count,stack_overflow_count,total_tests,combination,arduino_compatible
-Arduino_Random_Random_Sampling,100.0,25.0,25,150,150,150,150,150,1.171875,0,0,100,Arduino_Random_Random_Sampling,True
-XorShift32_Greedy_LocalSearch,100.0,25.0,25,150,150,150,150,150,1.171875,0,0,100,XorShift32_Greedy_LocalSearch,True
-Hybrid_Dynamic_Programming,100.0,25.0,25,150,150,150,150,150,1.171875,0,0,100,Hybrid_Dynamic_Programming,True
