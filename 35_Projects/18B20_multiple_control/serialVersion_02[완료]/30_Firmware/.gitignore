@@ -1,8 +1,0 @@
-.pio
-.vscode
-*.bin
-*.elf
-*.map
-build_log*.txt
-.DS_Store
-Thumbs.db

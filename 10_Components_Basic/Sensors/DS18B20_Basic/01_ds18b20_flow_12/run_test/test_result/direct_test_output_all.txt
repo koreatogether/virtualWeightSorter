@@ -1,3 +1,0 @@
-Test direct file output start
-Test start time: 2025-07-28 14:03:55
-Running app_menu tests...

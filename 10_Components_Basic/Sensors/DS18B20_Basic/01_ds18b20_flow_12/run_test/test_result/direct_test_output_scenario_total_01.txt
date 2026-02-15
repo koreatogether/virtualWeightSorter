@@ -1,2 +1,0 @@
-Test direct file output start
-Test start time: 2025-07-28 16:02:36
