@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+  <testsuite name="ScenarioTotal01Tests">
+    <testcase name="test_total_system_initialization" time="0.000" />
+    <testcase name="test_total_memory_usage" time="0.000" />
+    <testcase name="test_total_id_management" time="0.000" />
+    <testcase name="test_total_error_handling" time="0.000" />
+    <testcase name="test_total_performance" time="0.000" />
+    <testcase name="test_total_menu_cancel" time="0.000" />
+  </testsuite>
+</testsuites>

@@ -1,0 +1,24 @@
+A subdirectory or file -p already exists.
+Error occurred while processing: -p.
+A subdirectory or file test_result already exists.
+Error occurred while processing: test_result.
+Error opening unity output file: test_result/test_result_scenario1.txt
+===== 테스트 시작 =====
+테스트 시작
+Running scenario1 tests...
+Running scenario1 tests...
+===== 테스트 시작 =====
+이 메시지가 테스트 결과 파일에 표시되는지 확인
+Unity 테스트 프레임워크 실행 전 출력
+테스트 케이스 시작
+Running test: test_sensor_table_display
+[SCENARIO01] 테스트 시작
+[SCENARIO01] 테스트 성공
+테스트 케이스 종료: test_sensor_table_display (PASS)
+테스트 'test_sensor_table_display' 결과: PASS
+..\test\test_scenario1.cpp:222:test_sensor_table_display:PASS
+===== 테스트 종료 =====
+
+-----------------------
+1 Tests 0 Failures 0 Ignored 
+OK

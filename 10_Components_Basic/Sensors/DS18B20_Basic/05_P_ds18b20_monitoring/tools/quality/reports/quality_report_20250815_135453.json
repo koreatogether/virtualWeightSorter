@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-08-15T13:54:53.681058",
+  "summary": {
+    "total_checks": 5,
+    "passed": 2,
+    "failed": 3,
+    "success_rate": 40.0
+  },
+  "results": {
+    "Import Check": {
+      "passed": true,
+      "output": "All imports successful"
+    },
+    "Ruff Linting": {
+      "passed": false,
+      "output": ""
+    },
+    "Ruff Formatting": {
+      "passed": false,
+      "output": ""
+    },
+    "MyPy Type Check": {
+      "passed": true,
+      "output": "Success: no issues found in 4 source files\n"
+    },
+    "Unit Tests": {
+      "passed": false,
+      "output": ""
+    }
+  }
+}

@@ -1,0 +1,27 @@
+# PlatformIO
+.pio/
+.pio-index
+.piolibdeps
+
+# VS Code
+.vscode/
+
+# GitHub
+.github/
+
+# Python
+__pycache__/
+*.pyc
+.env
+
+# OS & Editors
+.DS_Store
+.idea/
+
+# Data & Logs
+docs/logs/20*/*.json
+data/
+logs/
+
+# Credentials (Security)
+src/**/wifiCredentials.h

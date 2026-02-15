@@ -1,0 +1,21 @@
+A subdirectory or file -p already exists.
+Error occurred while processing: -p.
+A subdirectory or file test_result already exists.
+Error occurred while processing: test_result.
+===== 테스트 시작 =====
+테스트 시작
+Running scenario6 tests...
+Running scenario6 tests...
+Running scenario6 tests...
+Running scenario6 tests...
+테스트 케이스 시작
+Running test: test_reset_all_ids_functionality
+[SCENARIO06] 전체 초기화 테스트 시작
+[SCENARIO06] 전체 초기화 테스트 성공
+테스트 케이스 종료: test_reset_all_ids_functionality (PASS)
+테스트 'test_reset_all_ids_functionality' 결과: PASS
+..\test\test_scenario6.cpp:23:test_reset_all_ids_functionality:PASS
+
+-----------------------
+1 Tests 0 Failures 0 Ignored 
+OK

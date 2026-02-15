@@ -1,0 +1,24 @@
+{
+    "nextion_model": "NX4832T035_011",
+    "waveform": {
+        "type": "Waveform",
+        "id": 11,
+        "objname": "s0",
+        "vscope": "local",
+        "ch_count": 4,
+        "dir": "right to left",
+        "bco": 0,
+        "gdc": 34800,
+        "gdw": 20,
+        "gdh": 20,
+        "pco0": 2047,
+        "pco1": 65519,
+        "pco2": 63488,
+        "pco3": 34800,
+        "dis": 100,
+        "x": 8,
+        "y": 172,
+        "w": 421,
+        "h": 141
+    }
+}

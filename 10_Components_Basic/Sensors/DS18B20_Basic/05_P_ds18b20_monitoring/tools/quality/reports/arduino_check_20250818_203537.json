@@ -1,0 +1,13 @@
+{
+  "timestamp": "2025-08-18T20:35:37.581799",
+  "summary": {
+    "total_issues": 0,
+    "severity_breakdown": {
+      "HIGH": 0,
+      "MEDIUM": 0,
+      "LOW": 0
+    },
+    "passed": true
+  },
+  "issues": []
+}

@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-08-18T09:32:45.264567",
+  "summary": {
+    "total_checks": 5,
+    "passed": 1,
+    "failed": 4,
+    "success_rate": 20.0
+  },
+  "results": {
+    "Import Check": {
+      "passed": true,
+      "output": "Core imports successful (dashboard optional import skipped: cannot import name 'Input' from 'dash' (unknown location))"
+    },
+    "Ruff Linting": {
+      "passed": false,
+      "output": ""
+    },
+    "Ruff Formatting": {
+      "passed": false,
+      "output": ""
+    },
+    "MyPy Type Check": {
+      "passed": false,
+      "output": ""
+    },
+    "Unit Tests": {
+      "passed": false,
+      "output": ""
+    }
+  }
+}

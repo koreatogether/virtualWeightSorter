@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-08-18T00:21:43.118184",
+  "summary": {
+    "total_checks": 5,
+    "passed": 1,
+    "failed": 4,
+    "success_rate": 20.0
+  },
+  "results": {
+    "Import Check": {
+      "passed": false,
+      "output": "attempted relative import beyond top-level package"
+    },
+    "Ruff Linting": {
+      "passed": false,
+      "output": ""
+    },
+    "Ruff Formatting": {
+      "passed": false,
+      "output": ""
+    },
+    "MyPy Type Check": {
+      "passed": false,
+      "output": ""
+    },
+    "Unit Tests": {
+      "passed": true,
+      "output": "........                                                                 [100%]\n8 passed in 0.03s\n"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+A subdirectory or file -p already exists.
+Error occurred while processing: -p.
+A subdirectory or file test_result already exists.
+Error occurred while processing: test_result.
+===== 테스트 시작 =====
+테스트 시작
+Running scenario5 tests...
+Running scenario5 tests...
+Running scenario5 tests...
+Running scenario5 tests...
+테스트 케이스 시작
+Running test: test_auto_assign_functionality
+[SCENARIO05] 자동 할당 테스트 시작
+[SCENARIO05] 자동 할당 테스트 성공
+테스트 케이스 종료: test_auto_assign_functionality (PASS)
+테스트 'test_auto_assign_functionality' 결과: PASS
+..\test\test_scenario5.cpp:23:test_auto_assign_functionality:PASS
+
+-----------------------
+1 Tests 0 Failures 0 Ignored 
+OK

@@ -1,0 +1,855 @@
+/* assets/custom.css */
+
+/* CSS 변수: 중앙에서 카드 크기/간격/색상 관리 */
+:root {
+    --card-height: 100px;
+    --temp-card-width: 100px;
+    --graph-card-width: 300px;
+    --control-button-width: 100px;
+    --control-button-height: 30px;
+    --card-gap: 12px;
+    --card-padding: 12px;
+    --card-border-color: #bbb;
+    --graph-border-color: #666;
+    --log-border-color: #999;
+}
+
+/* 카드 그룹: 카드 + 컨트롤 버튼 컬럼을 가로로 배치 */
+.card-group {
+    display: flex;
+    gap: var(--card-gap);
+    padding: var(--card-padding);
+    border: 1px solid var(--card-border-color);
+    border-radius: 8px;
+    align-items: flex-start;
+}
+
+/* 공통 카드 스타일 */
+.card {
+    background-color: #fff;
+    border: 1px solid var(--card-border-color);
+    border-radius: 12px;
+    padding: 8px;
+    box-sizing: border-box;
+    /* make height include padding and border */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 온도 카드(명시적 크기) */
+.temperature-card {
+    width: var(--temp-card-width);
+    height: var(--card-height);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px;
+    font-size: 14px;
+}
+
+/* Temperature card internals */
+
+.sensor-id-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3em;
+    line-height: 1;
+}
+
+.sensor-id-label {
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.sensor-id-value {
+    font-family: monospace;
+    font-size: 0.9em;
+}
+
+.sensor-id-value.id-error {
+    color: #c00;
+    /* red for invalid id */
+}
+
+.temp-value {
+    font-weight: 700;
+    /* slightly larger than id, but constrained to fit */
+    font-size: 2.0rem;
+    line-height: 1;
+    display: block;
+    text-align: center;
+    padding: 0 2px;
+    max-width: 100%;
+}
+
+/* Shrink font when content width would overflow (very small screens) */
+.temperature-card .temp-value {
+    /* allow the full temperature text (e.g. 125.0°C) to show;
+       use a responsive font-size clamp so it scales down slightly on narrow layouts */
+    white-space: nowrap;
+    overflow: visible;
+    /* avoid ellipsis */
+    text-overflow: clip;
+    font-size: clamp(1rem, 2.5vw, 1.1rem);
+}
+
+.addr-block {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    font-family: monospace;
+    font-size: 0.8em;
+    /* slightly larger for 8-digit groups */
+    text-align: center;
+}
+
+.addr-line {
+    height: 1em;
+    line-height: 1;
+}
+
+/* 그래프 카드: 가로 300px, 세로는 온도 카드와 동일 (100px), 솔리드 외곽선 */
+.graph-card {
+    width: var(--graph-card-width);
+    height: var(--card-height);
+    /* match temperature-card */
+    border: 1px solid var(--graph-border-color);
+    border-radius: 8px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 센서 로그 카드 컨테이너: 그래프 카드 오른쪽의 남는 공간을 채움 */
+.log-card {
+    flex: 1 1 auto;
+    /* grow to fill remaining space */
+    height: var(--card-height);
+    /* match temperature-card */
+    margin-left: 30px;
+    /* allow flex items to shrink below content width when necessary */
+    min-width: 0;
+    /* 기존 빈 카드 스타일 제거 - 새로운 센서 로그 카드가 자체 스타일을 가짐 */
+}
+
+/* 컨트롤 버튼 컬럼 */
+.control-column {
+    display: flex;
+    flex-direction: column;
+    height: var(--card-height);
+    /* match .temperature-card height */
+    align-items: center;
+    justify-content: space-between;
+    /* distribute three buttons evenly within 100px */
+    box-sizing: border-box;
+}
+
+/* 버튼: 고정 폭 100px */
+.control-button {
+    width: var(--control-button-width);
+    height: var(--control-button-height);
+    border-radius: 6px;
+    border: 1px solid #888;
+    background-color: #f7f7f7;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+/* 반응형: 작은 화면에서는 세로 스택 */
+@media (max-width: 600px) {
+    .card-group {
+        flex-direction: column;
+    }
+
+    .temperature-card {
+        width: 100%;
+        height: auto;
+    }
+
+    /* on very small screens, restore normal spacing (no left shift) */
+    .log-card {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
+/* 앱 레벨 스타일 (루트) */
+.app-root {
+    background-color: white;
+    min-height: 100vh;
+    padding: 20px;
+    /* font stack with Korean-capable fonts */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Helvetica', 'Arial', sans-serif;
+}
+
+/* 헤더 컨테이너: 제목과 컨트롤을 가로로 배치 */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0 20px;
+}
+
+.app-title {
+    color: #000;
+    margin: 10px 0;
+    flex: 1;
+}
+
+/* 연결 컨트롤 컨테이너 */
+.connection-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* COM 포트 드롭다운 */
+.com-dropdown {
+    width: 120px;
+}
+
+/* 헤더 버튼들 */
+.header-btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #f8f8f8;
+    cursor: pointer;
+    font-size: 12px;
+    min-width: 50px;
+}
+
+.header-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.header-btn.connect {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #45a049;
+}
+
+.header-btn.disconnect {
+    background-color: #f44336;
+    color: white;
+    border-color: #da190b;
+}
+
+.header-btn.diagnose {
+    background-color: #2196F3;
+    color: white;
+    border-color: #1976D2;
+}
+
+/* 연결 상태 표시 */
+.connection-status {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    min-width: 120px;
+    text-align: center;
+}
+
+.connection-status.connected {
+    background-color: #e8f5e8;
+    color: #2e7d2e;
+}
+
+.connection-status.connecting {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.connection-status.disconnected {
+    background-color: #f8f9fa;
+    color: #6c757d;
+}
+
+.connection-status.error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.content {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+/* ===== 단일 센서 로그 창 스타일 ===== */
+
+/* 센서 로그 카드 */
+.card.sensor-log-card {
+    background-color: #fff;
+    border: 1px solid var(--log-border-color);
+    border-radius: 8px;
+    padding: 2px;
+    box-sizing: border-box;
+    height: var(--card-height);
+    display: flex;
+    flex-direction: column;
+}
+
+/* 로그 컨텐츠 컨테이너 */
+.log-content-container {
+    display: flex;
+    height: 100%;
+    gap: 2px;
+    flex: 1;
+}
+
+/* 로그 스크롤 영역 */
+.log-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2px;
+    background-color: #f8f9fa;
+    border-radius: 3px;
+    border: 1px solid #e9ecef;
+    min-height: 0;
+    margin-right: 0;
+}
+
+/* 오른쪽 제목 */
+.log-title-right {
+    font-size: 8px;
+    font-weight: 600;
+    color: #333;
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    background-color: #f8f9fa;
+    border-radius: 3px;
+    border: 1px solid #e9ecef;
+    flex-shrink: 0;
+    margin-left: 0;
+}
+
+/* 개별 로그 엔트리 */
+.log-entry {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 3px;
+    margin-bottom: 1px;
+    background-color: #fff;
+    border-radius: 2px;
+    font-size: 8px;
+    border-left: 2px solid #28a745;
+}
+
+/* 로그 엔트리 요소들 */
+.log-timestamp {
+    color: #666;
+    font-family: monospace;
+    font-size: 7px;
+    min-width: 35px;
+}
+
+.log-status-icon {
+    font-size: 9px;
+}
+
+.log-sensor-label {
+    font-weight: 600;
+    color: #333;
+    min-width: 30px;
+    font-size: 7px;
+}
+
+.log-temp {
+    color: #e74c3c;
+    font-weight: 600;
+    min-width: 28px;
+    font-size: 8px;
+}
+
+.log-humidity {
+    color: #3498db;
+    font-weight: 600;
+    min-width: 28px;
+    font-size: 8px;
+}
+
+.log-success {
+    color: #28a745;
+    font-size: 7px;
+}
+
+/* 대기 상태 */
+.log-waiting {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 25px 8px;
+    font-size: 9px;
+}
+
+/* 데이터 없음 상태 */
+.log-no-data {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 8px;
+    font-size: 8px;
+}
+
+/* 스크롤바 스타일 (웹킷 기반 브라우저) */
+.log-scroll-area::-webkit-scrollbar {
+    width: 3px;
+}
+
+.log-scroll-area::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 2px;
+}
+
+.log-scroll-area::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 2px;
+}
+
+.log-scroll-area::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+/* 반응형: 작은 화면에서 로그 카드 조정 */
+@media (max-width: 600px) {
+    .log-content-container {
+        gap: 2px;
+    }
+    
+    .log-title-right {
+        width: 16px;
+        font-size: 8px;
+    }
+    
+    .log-entry {
+        font-size: 8px;
+    }
+}
+
+/* ===== 센서 ID 변경 팝업 스타일 ===== */
+
+/* 팝업 오버레이 - 배경 없이 */
+.sensor-id-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1050;
+    pointer-events: none; /* 배경 클릭 방지 */
+}
+
+.sensor-id-popup-overlay[style*="display: block"] {
+    pointer-events: auto;
+}
+
+/* 팝업 내용 */
+.sensor-id-popup-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 180px;
+    background: white;
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    padding: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    pointer-events: auto;
+}
+
+/* 센서 정보 표시 */
+.popup-sensor-info {
+    font-size: 0.7rem;
+    color: #666;
+    font-weight: 500;
+}
+
+/* ID 버튼 그리드 */
+.popup-btn-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin: 8px 0;
+}
+
+.popup-btn-row {
+    display: flex;
+    gap: 3px;
+    justify-content: center;
+}
+
+/* ID 선택 버튼 */
+.popup-id-btn {
+    width: 35px;
+    height: 28px;
+    border: 1px solid #007bff;
+    background: white;
+    color: #007bff;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.popup-id-btn:hover {
+    background: #e7f3ff;
+    transform: scale(1.05);
+}
+
+.popup-id-btn.selected {
+    background: #007bff;
+    color: white;
+}
+
+.popup-id-btn.disabled {
+    background: #dc3545;
+    border-color: #dc3545;
+    color: white;
+    cursor: not-allowed;
+}
+
+.popup-id-btn.disabled:hover {
+    transform: none;
+}
+
+/* 유효성 검사 메시지 */
+.popup-validation {
+    font-size: 0.65rem;
+    text-align: center;
+    height: 14px;
+    line-height: 14px;
+    margin: 2px 0;
+}
+
+.popup-validation.success {
+    color: #28a745;
+}
+
+.popup-validation.error {
+    color: #dc3545;
+}
+
+/* 액션 버튼 영역 */
+.popup-actions {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+/* 액션 버튼 */
+.popup-action-btn {
+    width: 30px;
+    height: 24px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    cursor: pointer;
+    border: 1px solid;
+    transition: all 0.15s ease;
+}
+
+.popup-cancel-btn {
+    background: #f8f9fa;
+    border-color: #6c757d;
+    color: #6c757d;
+}
+
+.popup-cancel-btn:hover {
+    background: #e9ecef;
+    transform: scale(1.05);
+}
+
+.popup-confirm-btn {
+    background: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+.popup-confirm-btn:hover:not(:disabled) {
+    background: #0056b3;
+    transform: scale(1.05);
+}
+
+.popup-confirm-btn:disabled {
+    background: #6c757d;
+    border-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* 팝업 애니메이션 */
+.sensor-id-popup-overlay[style*="display: block"] .sensor-id-popup-content {
+    animation: popupSlideIn 0.2s ease-out;
+}
+
+@keyframes popupSlideIn {
+    from {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+/* 모바일 최적화 */
+@media (max-width: 576px) {
+    .sensor-id-popup-content {
+        width: 180px;
+        height: 160px;
+        padding: 6px;
+    }
+    
+    .popup-id-btn {
+        width: 32px;
+        height: 26px;
+        font-size: 0.65rem;
+    }
+    
+    .popup-action-btn {
+        width: 28px;
+        height: 22px;
+        font-size: 0.75rem;
+    }
+}
+
+/* ==================== 임계값 설정 모달 스타일 ==================== */
+
+.threshold-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1050;
+    pointer-events: none;
+}
+
+.threshold-modal-overlay[style*="display: block"] {
+    pointer-events: auto;
+}
+
+.threshold-modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    min-width: 450px;
+    max-width: 500px;
+    width: 90vw;
+}
+
+.threshold-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 12px;
+}
+
+.threshold-modal-title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.threshold-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #95a5a6;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.threshold-close-btn:hover {
+    background-color: #f8f9fa;
+    color: #e74c3c;
+}
+
+.threshold-sensor-info {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.threshold-sensor-info-row {
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.threshold-sensor-info-row:last-child {
+    margin-bottom: 0;
+}
+
+.threshold-sensor-info-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-right: 8px;
+}
+
+.threshold-sensor-info-value {
+    color: #3498db;
+    font-family: 'Courier New', monospace;
+}
+
+.threshold-inputs {
+    margin-bottom: 20px;
+}
+
+.threshold-field {
+    margin-bottom: 16px;
+}
+
+.threshold-field:last-child {
+    margin-bottom: 0;
+}
+
+.threshold-label {
+    display: block;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 6px;
+}
+
+.threshold-input-group {
+    margin-bottom: 4px;
+}
+
+.threshold-input {
+    border-radius: 6px;
+    border: 2px solid #e9ecef;
+    transition: border-color 0.2s ease;
+}
+
+.threshold-input:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.threshold-hint {
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+.threshold-validation {
+    margin-bottom: 20px;
+    min-height: 24px;
+}
+
+.validation-success {
+    color: #27ae60;
+    font-weight: 500;
+}
+
+.validation-error {
+    color: #e74c3c;
+    font-weight: 500;
+}
+
+.threshold-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    border-top: 1px solid #eee;
+    padding-top: 16px;
+}
+
+.threshold-modal-btn {
+    min-width: 80px;
+    height: 38px;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.threshold-cancel-btn {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.threshold-cancel-btn:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+}
+
+.threshold-confirm-btn {
+    background-color: #3498db;
+    border-color: #3498db;
+}
+
+.threshold-confirm-btn:hover:not(:disabled) {
+    background-color: #2980b9;
+    border-color: #2471a3;
+}
+
+.threshold-confirm-btn:disabled {
+    background-color: #bdc3c7;
+    border-color: #bdc3c7;
+    cursor: not-allowed;
+}
+
+/* 애니메이션 */
+.threshold-modal-overlay[style*="display: block"] .threshold-modal-content {
+    animation: thresholdSlideIn 0.3s ease-out;
+}
+
+@keyframes thresholdSlideIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -55%);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%);
+    }
+}
+
+/* 반응형 */
+@media (max-width: 576px) {
+    .threshold-modal-content {
+        min-width: auto;
+        width: 95vw;
+        padding: 20px;
+    }
+    
+    .threshold-modal-btn {
+        min-width: 70px;
+        height: 36px;
+    }
+}

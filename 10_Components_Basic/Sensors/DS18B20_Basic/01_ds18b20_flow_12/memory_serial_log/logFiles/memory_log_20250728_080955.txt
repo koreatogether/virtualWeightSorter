@@ -1,0 +1,105 @@
+Memory allocation 100 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 100 ints: SUCCESS
+Memory allocation 200 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 200 ints: SUCCESS
+Memory allocation 500 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 500 ints: SUCCESS
+=== Test Cycle 2 ===
+Memory allocation 10 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 10 ints: SUCCESS
+Memory allocation 50 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 50 ints: SUCCESS
+Memory allocation 100 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 100 ints: SUCCESS
+Memory allocation 200 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 200 ints: SUCCESS
+Memory allocation 500 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 500 ints: SUCCESS
+=== Test Cycle 3 ===
+Memory allocation 10 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 10 ints: SUCCESS
+Memory allocation 50 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 50 ints: SUCCESS
+Memory allocation 100 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 100 ints: SUCCESS
+Memory allocation 200 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 200 ints: SUCCESS
+Memory allocation 500 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 500 ints: SUCCESS
+=== Test Cycle 4 ===
+Memory allocation 10 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 10 ints: SUCCESS
+Memory allocation 50 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 50 ints: SUCCESS
+Memory allocation 100 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 100 ints: SUCCESS
+Memory allocation 200 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 200 ints: SUCCESS
+Memory allocation 500 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 500 ints: SUCCESS
+=== Test Cycle 5 ===
+Memory allocation 10 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 10 ints: SUCCESS
+Memory allocation 50 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 50 ints: SUCCESS
+Memory allocation 100 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 100 ints: SUCCESS
+Memory allocation 200 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 200 ints: SUCCESS
+Memory allocation 500 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 500 ints: SUCCESS
+=== Test Cycle 6 ===
+Memory allocation 10 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 10 ints: SUCCESS
+Memory allocation 50 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 50 ints: SUCCESS
+Memory allocation 100 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 100 ints: SUCCESS
+Memory allocation 200 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 200 ints: SUCCESS
+Memory allocation 500 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 500 ints: SUCCESS
+=== Test Cycle 7 ===
+Memory allocation 10 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 10 ints: SUCCESS
+Memory allocation 50 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 50 ints: SUCCESS
+Memory allocation 100 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 100 ints: SUCCESS
+Memory allocation 200 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 200 ints: SUCCESS
+Memory allocation 500 ints: SUCCESS
+Memory usage test: SUCCESS
+Memory deallocation 500 ints: SUCCESS

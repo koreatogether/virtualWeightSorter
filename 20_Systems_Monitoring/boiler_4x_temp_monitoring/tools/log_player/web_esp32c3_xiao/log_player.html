@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boiler Log Player (ESP32-C3 Xiao Edition)</title>
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.1.0"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f1c40f;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: var(--primary);
+            color: white;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+        }
+
+        .sidebar h1 {
+            font-size: 1.2rem;
+            margin: 0;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+            color: #ecf0f1;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .control-group label {
+            font-size: 0.85rem;
+            color: #bdc3c7;
+            font-weight: 600;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background: #2980b9;
+        }
+
+        .btn.secondary {
+            background: #7f8c8d;
+        }
+
+        .btn.secondary:hover {
+            background: #95a5a6;
+        }
+
+        input[type="number"],
+        input[type="text"] {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 8px;
+            color: white;
+            outline: none;
+        }
+
+        /* Statistics Card */
+        .stats-panel {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            font-size: 0.9rem;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-val {
+            font-family: 'Consolas', monospace;
+            font-weight: bold;
+            color: var(--warning);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 20px;
+            overflow-y: auto;
+        }
+
+        .chart-container {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            min-height: 400px;
+            position: relative;
+        }
+
+        .footer-controls {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.03);
+        }
+
+        .timeline-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .time-display {
+            font-family: 'Consolas', monospace;
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1rem;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        #file-info {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* Info Display overlay */
+        .data-overlay {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(44, 62, 80, 0.9);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            pointer-events: none;
+            display: none;
+            line-height: 1.6;
+            z-index: 10;
+        }
+
+        .data-overlay b {
+            color: var(--warning);
+            font-size: 1.1rem;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <h1>Boiler Log Player<br><small style="font-weight: normal; opacity: 0.7;">ESP32-C3 Xiao Edition</small></h1>
+
+        <div class="control-group">
+            <label>1. 데이터 로드</label>
+            <input type="file" id="file-input" multiple webkitdirectory class="hidden">
+            <button class="btn" onclick="document.getElementById('file-input').click()">로그 폴더 선택</button>
+            <div id="file-info">로드된 파일: 0개</div>
+        </div>
+
+        <div class="control-group">
+            <label>2. 임계치 설정 (℃)</label>
+            <div style="display: flex; gap: 5px;">
+                <input type="number" id="limit-upper" placeholder="상한" style="width: 50%;">
+                <input type="number" id="limit-lower" placeholder="하한" style="width: 50%;">
+            </div>
+            <button class="btn secondary" onclick="applyThresholds()">적용</button>
+        </div>
+
+        <div class="control-group">
+            <label>3. 채널 표시 설정</label>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+                <button id="btn-s1" class="btn active-toggle" onclick="toggleDataset(0)"
+                    style="background:var(--danger)">S1 On</button>
+                <button id="btn-s2" class="btn active-toggle" onclick="toggleDataset(1)"
+                    style="background:var(--accent)">S2 On</button>
+                <button id="btn-s3" class="btn active-toggle" onclick="toggleDataset(2)"
+                    style="background:var(--success)">S3 On</button>
+                <button id="btn-s4" class="btn active-toggle" onclick="toggleDataset(3)"
+                    style="background:var(--warning); color:var(--primary)">S4 On</button>
+            </div>
+            <button class="btn secondary" style="margin-top:5px;" onclick="showAllDatasets()">모든 채널 켜기</button>
+        </div>
+
+        <div class="control-group">
+            <label>4. 구간 분석 (현재 뷰)</label>
+            <div class="stats-panel">
+                <div class="stat-row">
+                    <span>G1 (S1-S2) Max Δ:</span>
+                    <span id="stat-g1-max" class="stat-val">-</span>
+                </div>
+                <div class="stat-row">
+                    <span>G1 (S1-S2) Avg Δ:</span>
+                    <span id="stat-g1-avg" class="stat-val">-</span>
+                </div>
+                <div style="height: 1px; background: rgba(255,255,255,0.1);"></div>
+                <div class="stat-row">
+                    <span>G2 (S3-S4) Max Δ:</span>
+                    <span id="stat-g2-max" class="stat-val">-</span>
+                </div>
+                <div class="stat-row">
+                    <span>G2 (S3-S4) Avg Δ:</span>
+                    <span id="stat-g2-avg" class="stat-val">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="control-group" style="margin-top: auto;">
+            <button class="btn secondary" onclick="resetCharts()">뷰 초기화 (Reset Zoom)</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="chart-container">
+            <div id="data-overlay" class="data-overlay"></div>
+            <canvas id="mainChart"></canvas>
+        </div>
+
+        <div class="footer-controls">
+            <div class="timeline-container">
+                <div
+                    style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-light);">
+                    <span id="time-start">--:--:--</span>
+                    <span id="time-end">--:--:--</span>
+                </div>
+                <input type="range" id="timeline" min="0" max="100" value="0" disabled>
+            </div>
+            <div class="time-display" id="current-time">SELECT LOG FOLDER</div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn secondary" style="padding: 5px 10px;" onclick="stepTime(-1)">◀</button>
+                <button class="btn secondary" style="padding: 5px 10px;" onclick="stepTime(1)">▶</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let fullData = [];
+        let mainChart;
+        let currentIndex = 0;
+
+        const chartColors = {
+            s1: '#e74c3c', s2: '#3498db',
+            s3: '#2ecc71', s4: '#f1c40f',
+            diff1: 'rgba(142, 68, 173, 0.4)',
+            diff2: 'rgba(230, 126, 34, 0.4)'
+        };
+
+        // Initialize Chart
+        function initChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            mainChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        { label: 'S1', data: [], borderColor: chartColors.s1, borderWidth: 2, pointRadius: 0, fill: false, tension: 0.1 },
+                        { label: 'S2', data: [], borderColor: chartColors.s2, borderWidth: 2, pointRadius: 0, fill: false, tension: 0.1 },
+                        { label: 'S3', data: [], borderColor: chartColors.s3, borderWidth: 2, pointRadius: 0, fill: false, tension: 0.1 },
+                        { label: 'S4', data: [], borderColor: chartColors.s4, borderWidth: 2, pointRadius: 0, fill: false, tension: 0.1 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    scales: {
+                        x: { display: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        y: { display: true, beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }
+                    },
+                    plugins: {
+                        legend: { position: 'top', align: 'end' },
+                        zoom: {
+                            zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x', onZoomComplete: updateRangeStats },
+                            pan: { enabled: true, mode: 'x', onPanComplete: updateRangeStats }
+                        },
+                        annotation: { annotations: {} }
+                    },
+                    onHover: (e, elements) => {
+                        if (elements.length > 0) {
+                            showOverlay(elements[0].index);
+                        }
+                    }
+                }
+            });
+        }
+
+        // File Loading
+        document.getElementById('file-input').addEventListener('change', async (e) => {
+            const files = Array.from(e.target.files).filter(f => f.name.endsWith('.json'));
+            if (files.length === 0) return;
+
+            document.getElementById('file-info').innerText = `로드 중... (${files.length}개)`;
+
+            const tempResults = [];
+            for (const file of files) {
+                try {
+                    const text = await file.text();
+                    const json = JSON.parse(text);
+                    // Extract Date from filename: YYYY-MM-DD_HH-MM-SS.json
+                    const timePart = file.name.replace('.json', '');
+                    const [date, time] = timePart.split('_');
+                    const cleanTime = time.replace(/-/g, ':');
+
+                    tempResults.push({
+                        id: timePart,
+                        label: `${date} ${cleanTime}`,
+                        ts: new Date(date + 'T' + cleanTime).getTime(),
+                        ...json
+                    });
+                } catch (err) { console.warn("Failed to parse", file.name); }
+            }
+
+            // Sort by time
+            fullData = tempResults.sort((a, b) => a.ts - b.ts);
+
+            if (fullData.length > 0) {
+                renderAllData();
+                setupTimeline();
+            }
+
+            document.getElementById('file-info').innerText = `로드 완료: ${fullData.length}개 파일`;
+        });
+
+        function renderAllData() {
+            mainChart.data.labels = fullData.map(d => d.label.split(' ')[1]); // Only show time part for labels
+            mainChart.data.datasets[0].data = fullData.map(d => d.s1);
+            mainChart.data.datasets[1].data = fullData.map(d => d.s2);
+            mainChart.data.datasets[2].data = fullData.map(d => d.s3);
+            mainChart.data.datasets[3].data = fullData.map(d => d.s4);
+
+            // Set Axis
+            document.getElementById('time-start').innerText = fullData[0].label;
+            document.getElementById('time-end').innerText = fullData[fullData.length - 1].label;
+
+            mainChart.update();
+            updateRangeStats();
+        }
+
+        function setupTimeline() {
+            const slider = document.getElementById('timeline');
+            slider.disabled = false;
+            slider.max = fullData.length - 1;
+            slider.value = slider.max;
+            currentIndex = fullData.length - 1;
+            updateCurrentDisplay();
+        }
+
+        document.getElementById('timeline').addEventListener('input', (e) => {
+            currentIndex = parseInt(e.target.value);
+            updateCurrentDisplay();
+        });
+
+        function updateCurrentDisplay() {
+            if (!fullData[currentIndex]) return;
+            const d = fullData[currentIndex];
+            document.getElementById('current-time').innerText = d.label;
+
+            // Vertical seeker line
+            mainChart.options.plugins.annotation.annotations['seeker'] = {
+                type: 'line',
+                scaleID: 'x',
+                value: currentIndex,
+                borderColor: 'rgba(0,0,0,0.8)',
+                borderWidth: 2,
+                label: { content: 'NOW', display: true, position: 'start' }
+            };
+            mainChart.update('none');
+            showOverlay(currentIndex);
+        }
+
+        function stepTime(steps) {
+            currentIndex = Math.max(0, Math.min(fullData.length - 1, currentIndex + steps));
+            document.getElementById('timeline').value = currentIndex;
+            updateCurrentDisplay();
+        }
+
+        function applyThresholds() {
+            const upper = parseFloat(document.getElementById('limit-upper').value);
+            const lower = parseFloat(document.getElementById('limit-lower').value);
+            const annotations = mainChart.options.plugins.annotation.annotations;
+
+            if (!isNaN(upper)) {
+                annotations['limit-up'] = {
+                    type: 'line',
+                    yMin: upper,
+                    yMax: upper,
+                    borderColor: 'red',
+                    borderWidth: 2,
+                    borderDash: [6, 6],
+                    label: {
+                        content: '상한 (' + upper + '℃)',
+                        display: true,
+                        position: 'end',
+                        backgroundColor: 'rgba(231, 76, 60, 0.8)',
+                        color: 'white',
+                        font: { size: 11, weight: 'bold' }
+                    }
+                };
+            } else delete annotations['limit-up'];
+
+            if (!isNaN(lower)) {
+                annotations['limit-low'] = {
+                    type: 'line',
+                    yMin: lower,
+                    yMax: lower,
+                    borderColor: 'blue',
+                    borderWidth: 2,
+                    borderDash: [6, 6],
+                    label: {
+                        content: '하한 (' + lower + '℃)',
+                        display: true,
+                        position: 'end',
+                        backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                        color: 'white',
+                        font: { size: 11, weight: 'bold' }
+                    }
+                };
+            } else delete annotations['limit-low'];
+
+            // Y축 범위 자동 조절 (임계치가 보이도록)
+            if (fullData.length > 0) {
+                let allValues = fullData.flatMap(d => [d.s1, d.s2, d.s3, d.s4]);
+                let dataMin = Math.min(...allValues);
+                let dataMax = Math.max(...allValues);
+
+                let viewMin = dataMin - 5;
+                let viewMax = dataMax + 5;
+
+                if (!isNaN(upper)) viewMax = Math.max(viewMax, upper + 5);
+                if (!isNaN(lower)) viewMin = Math.min(viewMin, lower - 5);
+
+                mainChart.options.scales.y.min = Math.max(0, Math.floor(viewMin / 5) * 5);
+                mainChart.options.scales.y.max = Math.ceil(viewMax / 5) * 5;
+            }
+
+            mainChart.update();
+        }
+
+        function updateRangeStats() {
+            if (fullData.length === 0) return;
+
+            const scale = mainChart.scales.x;
+            const startIdx = Math.max(0, Math.floor(scale.min || 0));
+            const endIdx = Math.min(fullData.length - 1, Math.ceil(scale.max || fullData.length - 1));
+
+            const subset = fullData.slice(startIdx, endIdx + 1);
+            if (subset.length === 0) return;
+
+            const calc = (dataArr) => {
+                const max = Math.max(...dataArr);
+                const avg = dataArr.reduce((a, b) => a + b, 0) / dataArr.length;
+                return { max: max.toFixed(1), avg: avg.toFixed(1) };
+            };
+
+            const diff1 = subset.map(d => Math.abs(d.s1 - d.s2));
+            const xdiff2 = subset.map(d => Math.abs(d.s3 - d.s4));
+
+            const s1 = calc(diff1);
+            const s2 = calc(xdiff2);
+
+            document.getElementById('stat-g1-max').innerText = s1.max + '℃';
+            document.getElementById('stat-g1-avg').innerText = s1.avg + '℃';
+            document.getElementById('stat-g2-max').innerText = s2.max + '℃';
+            document.getElementById('stat-g2-avg').innerText = s2.avg + '℃';
+        }
+
+        function showOverlay(idx) {
+            const d = fullData[idx];
+            if (!d) return;
+            const overlay = document.getElementById('data-overlay');
+            overlay.style.display = 'block';
+            overlay.innerHTML = `
+                <b>${d.label.split(' ')[1]}</b><br>
+                S1: ${d.s1.toFixed(1)}℃ | S2: ${d.s2.toFixed(1)}℃<br>
+                ΔT1: <span style="color:var(--warning)">${Math.abs(d.s1 - d.s2).toFixed(1)}℃</span><br>
+                <hr style="border:0; border-top:1px solid rgba(255,255,255,0.1); margin:10px 0;">
+                S3: ${d.s3.toFixed(1)}℃ | S4: ${d.s4.toFixed(1)}℃<br>
+                ΔT2: <span style="color:var(--warning)">${Math.abs(d.s3 - d.s4).toFixed(1)}℃</span>
+            `;
+        }
+
+        function resetCharts() {
+            mainChart.resetZoom();
+            updateRangeStats();
+        }
+
+        // --- Channel Toggle Functions ---
+        function toggleDataset(index) {
+            const isVisible = mainChart.isDatasetVisible(index);
+            const btn = document.getElementById('btn-s' + (index + 1));
+
+            if (isVisible) {
+                mainChart.hide(index);
+                btn.classList.remove('active-toggle');
+                btn.style.opacity = '0.4';
+                btn.innerText = 'S' + (index + 1) + ' Off';
+            } else {
+                mainChart.show(index);
+                btn.classList.add('active-toggle');
+                btn.style.opacity = '1.0';
+                btn.innerText = 'S' + (index + 1) + ' On';
+            }
+        }
+
+        function showAllDatasets() {
+            for (let i = 0; i < 4; i++) {
+                mainChart.show(i);
+                const btn = document.getElementById('btn-s' + (i + 1));
+                btn.classList.add('active-toggle');
+                btn.style.opacity = '1.0';
+                btn.innerText = 'S' + (i + 1) + ' On';
+            }
+        }
+
+        window.onload = initChart;
+    </script>
+</body>
+
+</html>
