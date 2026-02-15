@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weigher Sorter Virtual Simulator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="page">
+    <header class="topbar">
+      <h1>Weigher Sorter Virtual Simulator</h1>
+      <div class="controls">
+        <button id="runBtn" class="btn btn-primary">포도 배치</button>
+        <button id="startBtn" class="btn btn-secondary" disabled>조합 시작</button>
+      </div>
+    </header>
+
+    <section class="config-panel" aria-label="시뮬레이션 조건 설정">
+      <div class="config-item">
+        <label for="targetKgInput">한 박스 목표 중량 (kg)</label>
+        <input id="targetKgInput" type="number" step="0.01" min="0.1" placeholder="기본값 2.00" />
+      </div>
+      <div class="config-item">
+        <label for="itemCountInput">한 박스 개수 (개)</label>
+        <input id="itemCountInput" type="number" step="1" min="1" max="12" placeholder="기본값 제한 없음" />
+      </div>
+      <div class="config-item">
+        <label for="toleranceInput">허용 오차 (g)</label>
+        <input id="toleranceInput" type="number" step="1" min="0" placeholder="기본값 90" />
+      </div>
+      <div class="config-item">
+        <label for="weightMinInput">포도 최소 무게 (g)</label>
+        <input id="weightMinInput" type="number" step="1" min="1" placeholder="기본값 600" />
+      </div>
+      <div class="config-item">
+        <label for="weightMaxInput">포도 최대 무게 (g)</label>
+        <input id="weightMaxInput" type="number" step="1" min="1" placeholder="기본값 700" />
+      </div>
+    </section>
+
+    <section class="legend" aria-label="조합 색상 범례">
+      <span><i class="dot box-1"></i> Box 1</span>
+      <span><i class="dot box-2"></i> Box 2</span>
+      <span><i class="dot box-3"></i> Box 3</span>
+      <span><i class="dot box-4"></i> Box 4</span>
+      <span><i class="dot idle"></i> 미선택</span>
+    </section>
+
+    <section id="trayGrid" class="tray-grid" aria-label="12개 저울 접시"></section>
+
+    <section class="result-panel">
+      <h2>결과</h2>
+      <div id="resultList" class="result-list">
+        포도 배치 버튼을 눌러 12개 포도 무게를 생성하세요.
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
