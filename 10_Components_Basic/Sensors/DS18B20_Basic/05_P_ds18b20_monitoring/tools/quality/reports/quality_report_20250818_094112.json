@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-08-18T09:41:12.265238",
+  "summary": {
+    "total_checks": 5,
+    "passed": 0,
+    "failed": 5,
+    "success_rate": 0.0
+  },
+  "results": {
+    "Import Check": {
+      "passed": false,
+      "output": "Core imports failed: simulator.ds18b20_simulator: module 'serial' has no attribute 'Serial'; simulator.simulator_manager: module 'serial' has no attribute 'Serial' (dashboard optional import skipped: expected an indented block after 'if' statement on line 1186 (app.py, line 1187))"
+    },
+    "Ruff Linting": {
+      "passed": false,
+      "output": "error: Failed to parse src\\python\\dashboard\\app.py:1187:5: Expected 'Indent', but got 'return'\n"
+    },
+    "Ruff Formatting": {
+      "passed": false,
+      "output": "error: Failed to format src\\python\\dashboard\\app.py: source contains syntax errors: ParseError { error: UnrecognizedToken(Return, Some(\"Indent\")), offset: 46808, source_path: \"<filename>\" }\n"
+    },
+    "MyPy Type Check": {
+      "passed": false,
+      "output": ""
+    },
+    "Unit Tests": {
+      "passed": false,
+      "output": ""
+    }
+  }
+}

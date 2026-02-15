@@ -1,0 +1,4 @@
+===== 테스트 시작 =====
+Running scenario_total_01 (full regression) tests...
+테스트 케이스 시작
+Running test: test_total_system_initialization

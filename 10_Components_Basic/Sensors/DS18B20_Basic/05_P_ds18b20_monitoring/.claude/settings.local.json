@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv run:*)",
+      "Bash(git push:*)",
+      "Bash(git add:*)",
+      "Bash(set PYTHONIOENCODING=utf-8)",
+      "Bash(python:*)",
+      "Bash(git checkout:*)",
+      "Bash(mv:*)",
+      "Bash(powershell:*)",
+      "Bash(time:*)",
+      "Bash(Get-Date -Format \"yyyy년 MM월 dd일 HH시 mm분\")",
+      "Bash(pio run:*)",
+      "Bash(find:*)",
+      "Bash(mkdir:*)",
+      "Bash(if exist nul del nul)",
+      "Bash(rm:*)",
+      "Bash(ruff check:*)",
+      "Bash(ruff format:*)",
+      "Bash(/dev/null)",
+      "Bash(git commit:*)",
+      "Bash(grep:*)"
+    ],
+    "deny": [],
+    "ask": [],
+    "additionalDirectories": [
+      "E:\\mnt\\e\\project\\05_P_ds18b20_monitoring\\src"
+    ]
+  }
+}

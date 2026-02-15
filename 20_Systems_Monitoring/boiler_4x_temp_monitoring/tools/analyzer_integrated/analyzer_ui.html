@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boiler Analyzer - Professional Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.1.0"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a1c23;
+            --accent: #4c6ef5;
+            --success: #40c057;
+            --danger: #fa5252;
+            --warning: #fab005;
+            --bg: #f1f3f5;
+            --card-bg: #ffffff;
+            --text: #1a1c23;
+            --text-light: #868e96;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            width: 340px;
+            background: var(--primary);
+            color: white;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h1 {
+            font-size: 1.4rem;
+            margin: 0;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--text-light);
+        }
+
+        .dot.online {
+            background: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+
+        .control-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .card h3 {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .temp-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .temp-box {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .temp-box:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .temp-box.hidden {
+            opacity: 0.3;
+            filter: grayscale(1);
+        }
+
+        .temp-label {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .temp-val {
+            font-size: 1.2rem;
+            font-weight: bold;
+            font-family: 'Consolas', monospace;
+            color: var(--warning);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn.active {
+            background: #ffffff;
+            color: #1a1c23;
+        }
+
+        .btn:hover {
+            filter: brightness(1.2);
+        }
+
+        .btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            gap: 20px;
+        }
+
+        .chart-wrapper {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .analyzer-overlay {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            z-index: 10;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-light);
+            background: rgba(255, 255, 255, 0.85);
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        /* Gray-out background pattern for empty data */
+        #mainChart {
+            background-image: linear-gradient(45deg, #f9f9f9 25%, transparent 25%, transparent 50%, #f9f9f9 50%, #f9f9f9 75%, transparent 75%, transparent);
+            background-size: 10px 10px;
+        }
+
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 300px;
+                padding: 18px;
+            }
+
+            .main-content {
+                padding: 16px;
+            }
+
+            .chart-wrapper {
+                padding: 16px;
+            }
+
+            .analyzer-overlay {
+                top: 18px;
+                left: 18px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <h1>Boiler Analyzer</h1>
+        <div class="status-badge">
+            <div id="status-dot" class="dot"></div>
+            <span id="status-text">Initializing v1.1...</span>
+        </div>
+
+        <div class="control-panel">
+            <!-- New History Selection UI -->
+            <div class="card" style="border: 1px solid var(--accent);">
+                <h3>📂 History Browser</h3>
+                <select id="date-selector" onchange="changeDate()"
+                    style="width: 100%; padding: 10px; border-radius: 8px; background: rgba(0,0,0,0.3); color: white; border: 1px solid rgba(255,255,255,0.2); margin-bottom: 5px;">
+                    <option value="live">⚡ Live Monitoring</option>
+                </select>
+                <div style="font-size: 0.75rem; color: #868e96; margin-top:5px;">Select a date to view past logs.</div>
+            </div>
+
+            <div class="card">
+                <h3>Current Temperatures</h3>
+                <div class="temp-grid">
+                    <div id="box-s1" class="temp-box" onclick="toggleDataset(0)">
+                        <div class="temp-label">S1</div>
+                        <div id="val-s1" class="temp-val">--.-℃</div>
+                    </div>
+                    <div id="box-s2" class="temp-box" onclick="toggleDataset(1)">
+                        <div class="temp-label">S2</div>
+                        <div id="val-s2" class="temp-val">--.-℃</div>
+                    </div>
+                    <div id="box-s3" class="temp-box" onclick="toggleDataset(2)">
+                        <div class="temp-label">S3</div>
+                        <div id="val-s3" class="temp-val">--.-℃</div>
+                    </div>
+                    <div id="box-s4" class="temp-box" onclick="toggleDataset(3)">
+                        <div class="temp-label">S4</div>
+                        <div id="val-s4" class="temp-val">--.-℃</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>View Controls</h3>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <button id="btn-6h" class="btn active" onclick="setViewRange(6)">Current 6 Hours</button>
+                    <button id="btn-1h" class="btn secondary" onclick="setViewRange(1)">1 Hour</button>
+                </div>
+
+                <div style="margin-bottom: 10px;">
+                    <div style="font-size: 0.75rem; color: var(--text-light); margin-bottom: 5px;">Custom Range
+                        (HHMM-HHMM)</div>
+                    <div style="display: flex; gap: 5px;">
+                        <input type="text" id="custom-time-range" placeholder="e.g. 2230-2245"
+                            style="flex: 1; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:8px; border-radius:8px; color:white; font-size: 0.8rem;">
+                        <button class="btn" style="width: 60px; padding: 8px;"
+                            onclick="applyCustomTimeRange()">Go</button>
+                    </div>
+                </div>
+
+                <button class="btn secondary" onclick="resetZoom()">Reset Zoom/Pan</button>
+            </div>
+
+            <div class="card">
+                <h3>Thresholds</h3>
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px;">
+                    <div style="font-size: 0.75rem; color: var(--text-light);">Upper</div>
+                    <input type="number" id="upper-limit" value="80"
+                        style="width: 100%; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:10px; border-radius:8px; color:white;">
+                    <div style="font-size: 0.75rem; color: var(--text-light);">Lower</div>
+                    <input type="number" id="lower-limit" value="40"
+                        style="width: 100%; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); padding:10px; border-radius:8px; color:white;">
+                </div>
+                <button class="btn" onclick="applyThreshold()">Apply Limits</button>
+            </div>
+
+            <div class="card">
+                <h3>Analysis (Current View)</h3>
+                <div id="analysis-text" style="font-size: 0.85rem; line-height: 1.6; color: #bdc3c7;">
+                    Data range: <span id="ana-range" style="color: white">--</span><br>
+                    Max Delta G1: <span id="ana-g1" style="color: var(--danger)">--</span><br>
+                    Max Delta G2: <span id="ana-g2" style="color: var(--danger)">--</span>
+                </div>
+            </div>
+        </div>
+        <div style="font-size: 0.7rem; color: rgba(255,255,255,0.3); text-align: center;">Integrated Analyzer v1.0</div>
+    </div>
+
+    <div class="main-content">
+        <div class="chart-wrapper">
+            <div class="analyzer-overlay">LIVE MONITORING: LAST 6 HOURS</div>
+            <canvas id="mainChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let chart;
+        let sensorData = [[], [], [], []]; // s1, s2, s3, s4
+        let viewHours = 6;
+        let isLiveMode = true;
+        let selectedDate = null; // YYYY-MM-DD
+
+        const crosshairPlugin = {
+            id: 'crosshairLine',
+            afterDraw(chart) {
+                const tooltip = chart.tooltip;
+                if (!tooltip || !tooltip.getActiveElements().length) return;
+
+                const ctx = chart.ctx;
+                const x = tooltip.getActiveElements()[0].element.x;
+                const top = chart.chartArea.top;
+                const bottom = chart.chartArea.bottom;
+
+                ctx.save();
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.25)';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(x, top);
+                ctx.lineTo(x, bottom);
+                ctx.stroke();
+                ctx.restore();
+            }
+        };
+
+        function initChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            chart = new Chart(ctx, {
+                plugins: [crosshairPlugin],
+                type: 'line',
+                data: {
+                    datasets: [
+                        { label: 'S1 (Burner/In)', data: [], borderColor: '#fa5252', borderWidth: 3, pointRadius: 1, tension: 0.2 },
+                        { label: 'S2 (Burner/Out)', data: [], borderColor: '#4c6ef5', borderWidth: 3, pointRadius: 1, tension: 0.2 },
+                        { label: 'S3 (Buffer/Top)', data: [], borderColor: '#40c057', borderWidth: 3, pointRadius: 1, tension: 0.2 },
+                        { label: 'S4 (Buffer/Bottom)', data: [], borderColor: '#fab005', borderWidth: 3, pointRadius: 1, tension: 0.2 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    resizeDelay: 0,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'minute',
+                                displayFormats: { minute: 'HH:mm' },
+                                tooltipFormat: 'HH:mm:ss'
+                            },
+                            grid: { color: 'rgba(0,0,0,0.03)' },
+                            ticks: {
+                                autoSkip: true,
+                                maxRotation: 0
+                            }
+                        },
+                        y: {
+                            beginAtZero: false,
+                            grace: '10%',
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            title: { display: true, text: 'Temperature (℃)' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: {
+                                boxWidth: 12,
+                                font: { size: 11 }
+                            }
+                        },
+                        tooltip: {
+                            enabled: true,
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}℃`,
+                                afterBody: (items) => {
+                                    if (!items || items.length < 4) return [];
+                                    const s1 = items[0].parsed.y;
+                                    const s2 = items[1].parsed.y;
+                                    const s3 = items[2].parsed.y;
+                                    const s4 = items[3].parsed.y;
+                                    const d12 = (s1 - s2).toFixed(1);
+                                    const d34 = (s3 - s4).toFixed(1);
+                                    return [
+                                        `S1 - S2 ΔT: ${d12}℃`,
+                                        `S3 - S4 ΔT: ${d34}℃`
+                                    ];
+                                }
+                            }
+                        },
+                        zoom: {
+                            zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'xy' },
+                            pan: { enabled: true, mode: 'xy' }
+                        },
+                        annotation: { annotations: {} }
+                    }
+                }
+            });
+        }
+
+        async function loadDates() {
+            try {
+                const res = await fetch('/api/dates');
+                const dates = await res.json();
+                const sel = document.getElementById('date-selector');
+                while (sel.options.length > 1) { sel.remove(1); }
+
+                dates.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d;
+                    opt.innerText = '📅 ' + d;
+                    sel.appendChild(opt);
+                });
+
+                if (document.getElementById('status-text').innerText.includes('Analysis Mode')) {
+                    if (dates.length > 0) {
+                        sel.value = dates[0];
+                        changeDate();
+                    }
+                }
+            } catch (e) { console.error('Date list error', e); }
+        }
+
+        async function changeDate() {
+            const val = document.getElementById('date-selector').value;
+            if (val === 'live') {
+                isLiveMode = true;
+                selectedDate = null;
+                viewHours = 6;
+                resetZoom();
+                loadHistory();
+            } else {
+                isLiveMode = false;
+                selectedDate = val;
+                loadHistory(val);
+            }
+        }
+
+        async function loadHistory(dateStr = null) {
+            try {
+                let url = '/api/history';
+                if (dateStr) url += '?date=' + dateStr;
+                else url += '?hours=' + viewHours;
+
+                const res = await fetch(url);
+                const data = await res.json();
+                const overlay = document.querySelector('.analyzer-overlay');
+
+                sensorData = [[], [], [], []];
+
+                if (data.length > 0) {
+                    data.forEach(d => {
+                        const ts = d.ts || 0;
+                        if (ts === 0) return;
+                        sensorData[0].push({ x: ts, y: d.s1 });
+                        sensorData[1].push({ x: ts, y: d.s2 });
+                        sensorData[2].push({ x: ts, y: d.s3 });
+                        sensorData[3].push({ x: ts, y: d.s4 });
+                    });
+
+                    // Update datasets before setting limits
+                    chart.data.datasets[0].data = sensorData[0];
+                    chart.data.datasets[1].data = sensorData[1];
+                    chart.data.datasets[2].data = sensorData[2];
+                    chart.data.datasets[3].data = sensorData[3];
+
+                    if (dateStr) {
+                        // For archives, default to full day but respect current viewHours zoom
+                        overlay.innerText = 'ARCHIVE: ' + dateStr + ' (' + data.length + ' records)';
+                        resetZoom();
+                    } else {
+                        const now = Date.now();
+                        chart.options.scales.x.max = now;
+                        chart.options.scales.x.min = now - viewHours * 60 * 60 * 1000;
+                        overlay.innerText = 'LIVE MONITORING: LAST ' + viewHours + ' HOURS (' + data.length + ' records)';
+                    }
+
+                    updateChart();
+                } else {
+                    overlay.innerText = dateStr ? 'NO DATA: ' + dateStr : 'NO DATA IN LAST ' + viewHours + ' HOURS';
+                    updateChart();
+                }
+            } catch (e) { console.error('History load failed', e); }
+        }
+
+        async function pollNow() {
+            try {
+                const res = await fetch('/api/now');
+                const root = await res.json();
+
+                const d = root.latest || root;
+                const status = root.status || { connected: true, mode: 'COLLECT', error_count: 0 };
+
+                const dot = document.getElementById('status-dot');
+                const txt = document.getElementById('status-text');
+
+                if (!isLiveMode) {
+                    dot.className = 'dot';
+                    txt.innerText = 'Archive Mode: ' + selectedDate;
+                    txt.style.color = '#fab005';
+                } else if (status.mode === 'ANALYSIS') {
+                    dot.className = 'dot';
+                    txt.innerText = 'Offline Analysis (No Connection)';
+                    txt.style.color = '#fa5252';
+
+                    if (document.getElementById('date-selector').options.length <= 1) {
+                        loadDates();
+                    }
+                } else if (status.connected) {
+                    dot.className = 'dot online';
+                    txt.innerText = 'System Live - Up-to-date';
+                    txt.style.color = '';
+                } else {
+                    dot.className = 'dot';
+                    txt.innerText = `Connecting... (${status.error_count}/7)`;
+                }
+
+                if (isLiveMode && d.ts > 0) {
+                    document.getElementById('val-s1').innerText = d.s1.toFixed(1) + '℃';
+                    document.getElementById('val-s2').innerText = d.s2.toFixed(1) + '℃';
+                    document.getElementById('val-s3').innerText = d.s3.toFixed(1) + '℃';
+                    document.getElementById('val-s4').innerText = d.s4.toFixed(1) + '℃';
+
+                    const ts = d.ts;
+                    const latestStored = sensorData[0].length > 0 ? sensorData[0][sensorData[0].length - 1].x : 0;
+
+                    if (ts > latestStored) {
+                        sensorData[0].push({ x: ts, y: d.s1 });
+                        sensorData[1].push({ x: ts, y: d.s2 });
+                        sensorData[2].push({ x: ts, y: d.s3 });
+                        sensorData[3].push({ x: ts, y: d.s4 });
+
+                        const cutoff = Date.now() - 6.5 * 60 * 60 * 1000;
+                        while (sensorData[0].length > 0 && sensorData[0][0].x < cutoff) {
+                            for (let i = 0; i < 4; i++) sensorData[i].shift();
+                        }
+
+                        updateChart(true);
+                    }
+                }
+            } catch (e) {
+                if (isLiveMode) {
+                    document.getElementById('status-dot').className = 'dot';
+                    document.getElementById('status-text').innerText = 'Server Connect Error';
+                }
+            }
+        }
+
+        function updateChart(isLive = false) {
+            chart.data.datasets[0].data = sensorData[0];
+            chart.data.datasets[1].data = sensorData[1];
+            chart.data.datasets[2].data = sensorData[2];
+            chart.data.datasets[3].data = sensorData[3];
+
+            if (isLive && isLiveMode) {
+                const now = Date.now();
+                const firstDataTs = sensorData[0].length > 0 ? sensorData[0][0].x : now;
+                const windowSize = viewHours * 60 * 60 * 1000;
+                const effectiveWindow = Math.min(now - firstDataTs + (60 * 1000), windowSize);
+
+                chart.options.scales.x.max = now;
+                chart.options.scales.x.min = now - effectiveWindow;
+            }
+
+            chart.update('none');
+            updateAnalysis();
+        }
+
+        function updateAnalysis() {
+            const scale = chart.scales.x;
+            const minTs = scale.min;
+            const maxTs = scale.max;
+
+            const getSubset = (data) => data.filter(pt => pt.x >= minTs && pt.x <= maxTs);
+            const subset1 = getSubset(sensorData[0]);
+            const subset2 = getSubset(sensorData[1]);
+            const subset3 = getSubset(sensorData[2]);
+            const subset4 = getSubset(sensorData[3]);
+
+            if (subset1.length > 0) {
+                document.getElementById('ana-range').innerText = Math.round((maxTs - minTs) / 60000) + ' min';
+
+                let maxD1 = 0, maxD2 = 0;
+                for (let i = 0; i < Math.min(subset1.length, subset2.length); i++) {
+                    maxD1 = Math.max(maxD1, Math.abs(subset1[i].y - subset2[i].y));
+                }
+                for (let i = 0; i < Math.min(subset3.length, subset4.length); i++) {
+                    maxD2 = Math.max(maxD2, Math.abs(subset3[i].y - subset4[i].y));
+                }
+                document.getElementById('ana-g1').innerText = maxD1.toFixed(1) + '℃';
+                document.getElementById('ana-g2').innerText = maxD2.toFixed(1) + '℃';
+            }
+        }
+
+        function setViewRange(h) {
+            viewHours = h;
+            const btn6 = document.getElementById('btn-6h');
+            const btn1 = document.getElementById('btn-1h');
+            if (btn6 && btn1) {
+                btn6.classList.toggle('active', h === 6);
+                btn1.classList.toggle('active', h === 1);
+                btn6.classList.toggle('secondary', h !== 6);
+                btn1.classList.toggle('secondary', h !== 1);
+            }
+            resetZoom();
+        }
+
+        function toggleDataset(index) {
+            const isHidden = !chart.isDatasetVisible(index);
+            if (isHidden) {
+                chart.show(index);
+                document.getElementById(`box-s${index + 1}`).classList.remove('hidden');
+            } else {
+                chart.hide(index);
+                document.getElementById(`box-s${index + 1}`).classList.add('hidden');
+            }
+        }
+
+        function applyCustomTimeRange() {
+            const rangeStr = document.getElementById('custom-time-range').value.trim();
+            if (!rangeStr) return;
+
+            // Handle formats like "2230-2245" or "630-830"
+            const parts = rangeStr.split('-');
+            if (parts.length !== 2) {
+                alert('Invalid format. Use HHMM-HHMM (e.g. 2230-2245)');
+                return;
+            }
+
+            const parseTime = (str) => {
+                str = str.replace(/[^0-9]/g, '');
+                if (str.length === 3) str = '0' + str; // Pad 630 -> 0630
+                if (str.length !== 4) return null;
+
+                const hh = parseInt(str.substring(0, 2));
+                const mm = parseInt(str.substring(2, 4));
+                if (hh < 0 || hh > 23 || mm < 0 || mm > 59) return null;
+                return { hh, mm };
+            };
+
+            const startTime = parseTime(parts[0]);
+            const endTime = parseTime(parts[1]);
+
+            if (!startTime || !endTime) {
+                alert('Invalid time. Ensure HH is 00-23 and MM is 00-59.');
+                return;
+            }
+
+            // Determine base date
+            let baseDateStr;
+            if (isLiveMode) {
+                baseDateStr = new Date().toISOString().split('T')[0];
+            } else {
+                baseDateStr = selectedDate; // YYYY-MM-DD
+            }
+
+            const startTs = new Date(`${baseDateStr}T${String(startTime.hh).padStart(2, '0')}:${String(startTime.mm).padStart(2, '0')}:00`).getTime();
+            const endTs = new Date(`${baseDateStr}T${String(endTime.hh).padStart(2, '0')}:${String(endTime.mm).padStart(2, '0')}:00`).getTime();
+
+            if (startTs >= endTs) {
+                alert('Start time must be before end time.');
+                return;
+            }
+
+            chart.options.scales.x.min = startTs;
+            chart.options.scales.x.max = endTs;
+
+            // Deactivate quick view buttons
+            document.getElementById('btn-6h').classList.remove('active');
+            document.getElementById('btn-6h').classList.add('secondary');
+            document.getElementById('btn-1h').classList.remove('active');
+            document.getElementById('btn-1h').classList.add('secondary');
+
+            const overlay = document.querySelector('.analyzer-overlay');
+            if (overlay) {
+                overlay.innerText = `CUSTOM RANGE: ${baseDateStr} ${parts[0]} - ${parts[1]}`;
+            }
+
+            chart.update();
+        }
+
+        function resetZoom() {
+            chart.resetZoom();
+            chart.options.scales.y.min = undefined;
+            chart.options.scales.y.max = undefined;
+
+            let endTs;
+            if (isLiveMode) {
+                endTs = Date.now();
+            } else if (sensorData[0].length > 0) {
+                // For historical data, use the last data point's timestamp as the end reference
+                endTs = sensorData[0][sensorData[0].length - 1].x;
+            }
+
+            if (endTs) {
+                const windowSize = viewHours * 60 * 60 * 1000;
+                let minTs = endTs - windowSize;
+
+                // Adjust zoom to crop excessive empty space at the beginning
+                if (sensorData[0].length > 0) {
+                    const firstDataTs = sensorData[0][0].x;
+                    const paddedFirstTs = firstDataTs - (1 * 60 * 60 * 1000); // Give 1 hour padding before first data
+                    // We want to show more data if available (minTs), but if data starts late, crop to (first - 1h)
+                    minTs = Math.max(minTs, paddedFirstTs);
+                }
+
+                chart.options.scales.x.max = endTs;
+                chart.options.scales.x.min = minTs;
+
+                // Update overlay text to reflect the actual zoom window
+                const overlay = document.querySelector('.analyzer-overlay');
+                if (overlay) {
+                    if (isLiveMode) {
+                        overlay.innerText = `LIVE MONITORING: LAST ${viewHours} HOURS (${sensorData[0].length} records)`;
+                    } else {
+                        const count = sensorData[0].filter(pt => pt.x >= chart.options.scales.x.min).length;
+                        overlay.innerText = `ARCHIVE: ${selectedDate} - LAST ${viewHours} HOURS (${count}/${sensorData[0].length} records)`;
+                    }
+                }
+            }
+            chart.update();
+        }
+
+        function applyThreshold() {
+            const upper = parseFloat(document.getElementById('upper-limit').value);
+            const lower = parseFloat(document.getElementById('lower-limit').value);
+            const annotations = {};
+
+            if (!Number.isNaN(upper)) {
+                annotations.upper = {
+                    type: 'line',
+                    yMin: upper,
+                    yMax: upper,
+                    borderColor: 'rgba(250, 82, 82, 0.8)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    label: {
+                        content: 'UPPER ' + upper + '℃',
+                        display: true,
+                        position: 'end',
+                        backgroundColor: 'rgba(250, 82, 82, 0.9)',
+                        color: 'white'
+                    }
+                };
+            }
+
+            if (!Number.isNaN(lower)) {
+                annotations.lower = {
+                    type: 'line',
+                    yMin: lower,
+                    yMax: lower,
+                    borderColor: 'rgba(64, 192, 87, 0.8)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    label: {
+                        content: 'LOWER ' + lower + '℃',
+                        display: true,
+                        position: 'end',
+                        backgroundColor: 'rgba(64, 192, 87, 0.9)',
+                        color: 'white'
+                    }
+                };
+            }
+
+            chart.options.plugins.annotation.annotations = annotations;
+            chart.update();
+        }
+
+        function updateLayoutForViewport() {
+            if (!chart) return;
+            const width = window.innerWidth || 0;
+            const legendPosition = width <= 1200 ? 'bottom' : 'top';
+            const fontSize = width <= 1200 ? 10 : 11;
+            const boxWidth = width <= 1200 ? 10 : 12;
+
+            chart.options.plugins.legend.position = legendPosition;
+            chart.options.plugins.legend.labels.font.size = fontSize;
+            chart.options.plugins.legend.labels.boxWidth = boxWidth;
+            chart.update('none');
+        }
+
+        window.addEventListener('resize', () => {
+            if (chart) {
+                chart.resize();
+                updateLayoutForViewport();
+            }
+        });
+
+        window.onload = () => {
+            initChart();
+            updateLayoutForViewport();
+            loadHistory();
+            loadDates();
+            setInterval(pollNow, 2000);
+            applyThreshold();
+        };
+    </script>
+</body>
+
+</html>

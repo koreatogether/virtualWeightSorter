@@ -1,0 +1,143 @@
+[2026-02-11 09:43:14] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 6a8b06c4] - Updated fields: ['material', 'color', 'remaining_weight_g']
+[2026-02-11 09:43:18] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: c4bc6861] - Updated fields: ['material', 'color', 'remaining_weight_g']
+[2026-02-11 09:43:23] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 1453767e] - Updated fields: ['material', 'color', 'remaining_weight_g']
+[2026-02-11 09:44:03] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: c4bc6861] - Updated fields: ['material', 'color', 'remaining_weight_g']
+[2026-02-11 09:48:45] [IP: 127.0.0.1] [ACTION: ADD_INVENTORY] [TARGET: 2075a4da] - Material: PLA, Weight: 1000g
+[2026-02-11 09:48:50] [IP: 127.0.0.1] [ACTION: DELETE_INVENTORY] [TARGET: 2075a4da] - Inventory removed
+[2026-02-11 09:48:58] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 87cd5912] - Updated fields: ['material', 'color', 'remaining_weight_g']
+[2026-02-11 12:03:05] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: 7cdc80ff] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'unit_weight_g', 'deadline']
+[2026-02-11 12:09:16] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: 7cdc80ff] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'unit_weight_g', 'deadline']
+[2026-02-11 12:10:02] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: 21b84580] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'unit_weight_g', 'deadline']
+[2026-02-11 14:26:25] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: c110d708] - New actual total: 30
+[2026-02-11 14:42:59] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 3279fc2f] - New actual total: 30.0
+[2026-02-11 14:43:03] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 56c27ffb] - New actual total: 18.0
+[2026-02-11 14:47:38] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 56c27ffb] - New actual total: 0.0
+[2026-02-11 14:47:42] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 3279fc2f] - New actual total: 0.0
+[2026-02-11 14:47:46] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 3279fc2f] - New actual total: 30.0
+[2026-02-11 14:47:48] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 56c27ffb] - New actual total: 18.0
+[2026-02-11 14:48:09] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 6a8b06c4] - Updated fields: ['remaining_weight_g']
+[2026-02-11 14:49:53] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 56c27ffb] - New actual total: 36.0
+[2026-02-11 14:49:58] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 56c27ffb] - New actual total: 0.0
+[2026-02-11 14:50:01] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 56c27ffb] - New actual total: 18.0
+[2026-02-11 14:50:12] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 6a8b06c4] - Updated fields: ['remaining_weight_g']
+[2026-02-11 14:50:17] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: c4bc6861] - Updated fields: ['remaining_weight_g']
+[2026-02-11 14:50:21] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 1453767e] - Updated fields: ['remaining_weight_g']
+[2026-02-11 14:50:38] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 5e8d5198] - New actual total: 45.0
+[2026-02-11 14:50:41] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 68f0aa58] - New actual total: 45.0
+[2026-02-11 14:50:43] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: a706fe67] - New actual total: 45.0
+[2026-02-11 14:50:46] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 80048b84] - New actual total: 45.0
+[2026-02-11 14:50:49] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 7d8ae7b4] - New actual total: 15.0
+[2026-02-11 14:50:57] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 6a8b06c4] - Updated fields: ['remaining_weight_g']
+[2026-02-11 14:50:59] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: c4bc6861] - Updated fields: ['remaining_weight_g']
+[2026-02-11 14:51:01] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 1453767e] - Updated fields: ['remaining_weight_g']
+[2026-02-11 14:58:46] [IP: 127.0.0.1] [ACTION: CREATE_ORDER] [TARGET: 3fc42055] - Product: LED점멸기_바디, Target: 100
+[2026-02-11 14:59:51] [IP: 127.0.0.1] [ACTION: AUTO_SCHEDULE] [TARGET: 3fc42055] - Created 4 days for printer 2b626f24
+[2026-02-11 15:00:02] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: fb4287ef] - New actual total: 30.0
+[2026-02-11 15:00:04] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 8f6c3d0a] - New actual total: 30.0
+[2026-02-11 15:00:06] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 19cc29d6] - New actual total: 30.0
+[2026-02-11 15:00:09] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 37028507] - New actual total: 10.0
+[2026-02-11 15:00:21] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 6a8b06c4] - Updated fields: ['remaining_weight_g']
+[2026-02-11 15:00:47] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: 3fc42055] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'unit_weight_g', 'deadline']
+[2026-02-11 15:05:18] [IP: 127.0.0.1] [ACTION: DELETE_ORDER] [TARGET: 3fc42055] - Order removed
+[2026-02-11 15:10:13] [IP: 127.0.0.1] [ACTION: DELETE_ORDER] [TARGET: 7cdc80ff] - Order removed (Schedules deleted: True)
+[2026-02-11 15:11:14] [IP: 127.0.0.1] [ACTION: DELETE_SCHEDULE] [TARGET: fb4287ef] - Schedule removed
+[2026-02-11 15:11:17] [IP: 127.0.0.1] [ACTION: DELETE_SCHEDULE] [TARGET: 8f6c3d0a] - Schedule removed
+[2026-02-11 15:11:18] [IP: 127.0.0.1] [ACTION: DELETE_SCHEDULE] [TARGET: 19cc29d6] - Schedule removed
+[2026-02-11 15:11:20] [IP: 127.0.0.1] [ACTION: DELETE_SCHEDULE] [TARGET: 37028507] - Schedule removed
+[2026-02-11 15:11:25] [IP: 127.0.0.1] [ACTION: DELETE_ORDER] [TARGET: 21b84580] - Order removed (Schedules deleted: True)
+[2026-02-11 15:11:35] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 6a8b06c4] - Updated fields: ['material', 'color', 'remaining_weight_g']
+[2026-02-11 15:11:39] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: c4bc6861] - Updated fields: ['material', 'color', 'remaining_weight_g']
+[2026-02-11 15:14:31] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 1453767e] - Updated fields: ['material', 'color', 'remaining_weight_g']
+[2026-02-11 15:19:56] [IP: 127.0.0.1] [ACTION: CREATE_ORDER] [TARGET: eb2761bc] - Product: LED점멸기_바디, Target: 200
+[2026-02-11 15:20:09] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: eb2761bc] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'unit_weight_g', 'deadline']
+[2026-02-11 15:20:30] [IP: 127.0.0.1] [ACTION: AUTO_SCHEDULE] [TARGET: eb2761bc] - Created 6 days for printer 2b626f24
+[2026-02-11 15:21:52] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 19aa283c] - New actual total: 15.0
+[2026-02-11 15:27:27] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 19aa283c] - New actual total: 0.0
+[2026-02-11 15:27:32] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 19aa283c] - New actual total: 15.0
+[2026-02-11 15:28:03] [IP: 127.0.0.1] [ACTION: DELETE_INVENTORY] [TARGET: 6a8b06c4] - Inventory removed
+[2026-02-11 15:28:05] [IP: 127.0.0.1] [ACTION: DELETE_INVENTORY] [TARGET: c4bc6861] - Inventory removed
+[2026-02-11 15:28:07] [IP: 127.0.0.1] [ACTION: DELETE_INVENTORY] [TARGET: 1453767e] - Inventory removed
+[2026-02-11 15:28:27] [IP: 127.0.0.1] [ACTION: ADD_INVENTORY] [TARGET: 38b3e857] - Material: PLA, Weight: 450g
+[2026-02-11 15:28:33] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 38b3e857] - Updated fields: ['material', 'color', 'remaining_weight_g']
+[2026-02-11 15:28:42] [IP: 127.0.0.1] [ACTION: DELETE_ORDER] [TARGET: eb2761bc] - Order removed (Schedules deleted: True)
+[2026-02-11 15:29:06] [IP: 127.0.0.1] [ACTION: CREATE_ORDER] [TARGET: 3d099085] - Product: LED점멸기_바디, Target: 200
+[2026-02-11 15:29:22] [IP: 127.0.0.1] [ACTION: AUTO_SCHEDULE] [TARGET: 3d099085] - Created 6 days for printer 2b626f24
+[2026-02-11 15:29:36] [IP: 127.0.0.1] [ACTION: ADD_INVENTORY] [TARGET: 1cace0c0] - Material: PLA, Weight: 450g
+[2026-02-11 15:29:51] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 1cace0c0] - Updated fields: ['material', 'color', 'remaining_weight_g']
+[2026-02-11 15:33:29] [IP: 127.0.0.1] [ACTION: DELETE_INVENTORY] [TARGET: 1cace0c0] - Inventory removed
+[2026-02-11 15:33:38] [IP: 127.0.0.1] [ACTION: ADD_INVENTORY] [TARGET: f4ed5eed] - Material: PLA2, Weight: 450g
+[2026-02-11 15:52:40] [IP: 127.0.0.1] [ACTION: DELETE_INVENTORY] [TARGET: f4ed5eed] - Inventory removed
+[2026-02-11 15:52:50] [IP: 127.0.0.1] [ACTION: ADD_INVENTORY] [TARGET: d70a2c88] - Material: pla2, Weight: 450g
+[2026-02-11 15:53:14] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: d70a2c88] - Updated fields: ['material', 'color', 'remaining_weight_g']
+[2026-02-11 15:56:50] [IP: 127.0.0.1] [ACTION: DELETE_INVENTORY] [TARGET: d70a2c88] - Inventory removed
+[2026-02-11 15:56:52] [IP: 127.0.0.1] [ACTION: DELETE_INVENTORY] [TARGET: 38b3e857] - Inventory removed
+[2026-02-11 15:56:59] [IP: 127.0.0.1] [ACTION: DELETE_ORDER] [TARGET: 3d099085] - Order removed (Schedules deleted: True)
+[2026-02-11 16:04:38] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 87cd5912] - Updated fields: ['material', 'color', 'batch', 'remaining_weight_g']
+[2026-02-11 16:04:45] [IP: 127.0.0.1] [ACTION: ADD_INVENTORY] [TARGET: fb5a5636] - Material: PLA, Batch: A1, Weight: 450g
+[2026-02-11 16:05:11] [IP: 127.0.0.1] [ACTION: CREATE_ORDER] [TARGET: 7fb3cec0] - Product: LED점멸기_바디, Target: 200
+[2026-02-11 16:06:53] [IP: 127.0.0.1] [ACTION: ADD_INVENTORY] [TARGET: 271630a2] - Material: PLA, Batch: A2, Weight: 450g
+[2026-02-11 16:07:16] [IP: 127.0.0.1] [ACTION: ADD_INVENTORY] [TARGET: 4b79582d] - Material: PLA, Batch: A3, Weight: 800g
+[2026-02-11 16:19:32] [IP: 127.0.0.1] [ACTION: DELETE_INVENTORY] [TARGET: 4b79582d] - Inventory removed
+[2026-02-11 16:19:40] [IP: 127.0.0.1] [ACTION: DELETE_INVENTORY] [TARGET: 271630a2] - Inventory removed
+[2026-02-11 16:19:58] [IP: 127.0.0.1] [ACTION: ADD_INVENTORY] [TARGET: 7b1d1957] - Material: PLA, Batch: A1, Weight: 450g
+[2026-02-11 16:20:12] [IP: 127.0.0.1] [ACTION: DELETE_INVENTORY] [TARGET: 7b1d1957] - Inventory removed
+[2026-02-11 16:22:33] [IP: 127.0.0.1] [ACTION: ADD_INVENTORY] [TARGET: e31b8677] - Material: PLA, Batch: A2, Weight: 450g
+[2026-02-11 16:22:42] [IP: 127.0.0.1] [ACTION: ADD_INVENTORY] [TARGET: de9df08a] - Material: PLA, Batch: A3, Weight: 800g
+[2026-02-11 16:23:44] [IP: 127.0.0.1] [ACTION: AUTO_SCHEDULE] [TARGET: 7fb3cec0] - Created 4 days for printer 2b626f24
+[2026-02-12 22:12:04] [IP: 127.0.0.1] [ACTION: FACTORY_RESET] [TARGET: SYSTEM] - All data cleared by user
+[2026-02-12 22:12:57] [IP: 127.0.0.1] [ACTION: ADD_PRINTER] [TARGET: 419f8dc7] - Model: P2SC, AssetID: 202
+[2026-02-12 22:13:37] [IP: 127.0.0.1] [ACTION: ADD_INVENTORY] [TARGET: 1cc798c9] - Material: PLA, Batch: A1, Weight: 300g
+[2026-02-12 22:13:46] [IP: 127.0.0.1] [ACTION: ADD_INVENTORY] [TARGET: e8da40eb] - Material: PLA, Batch: A2, Weight: 300g
+[2026-02-12 22:13:55] [IP: 127.0.0.1] [ACTION: ADD_INVENTORY] [TARGET: 651f3e98] - Material: PLA, Batch: A3, Weight: 450g
+[2026-02-12 22:14:13] [IP: 127.0.0.1] [ACTION: ADD_INVENTORY] [TARGET: b4cbeb3d] - Material: PLA, Batch: A4, Weight: 800g
+[2026-02-12 22:16:17] [IP: 127.0.0.1] [ACTION: CREATE_ORDER] [TARGET: f2ce201e] - Product: LED점멸기_바디, Target: 200
+[2026-02-12 22:17:01] [IP: 127.0.0.1] [ACTION: CREATE_ORDER] [TARGET: 667108ad] - Product: LED점멸기_바디, Target: 200
+[2026-02-12 22:17:39] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: 667108ad] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'unit_weight_g', 'deadline']
+[2026-02-12 22:18:16] [IP: 127.0.0.1] [ACTION: ADD_SCHEDULE] [TARGET: df55b5bf] - Order: 667108ad, Printer: 419f8dc7
+[2026-02-12 23:03:58] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: f2ce201e] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'batch', 'unit_weight_g', 'deadline']
+[2026-02-12 23:04:07] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: 667108ad] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'batch', 'unit_weight_g', 'deadline']
+[2026-02-13 08:11:58] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: df55b5bf] - New actual total: 15.0
+[2026-02-13 08:15:47] [IP: 127.0.0.1] [ACTION: ADD_SCHEDULE] [TARGET: 913e668e] - Order: 667108ad, Printer: 419f8dc7
+[2026-02-13 08:16:14] [IP: 127.0.0.1] [ACTION: DELETE_SCHEDULE] [TARGET: df55b5bf] - Schedule removed
+[2026-02-13 08:16:38] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 913e668e] - New actual total: 15.0
+[2026-02-13 08:16:55] [IP: 127.0.0.1] [ACTION: DELETE_SCHEDULE] [TARGET: 913e668e] - Schedule removed
+[2026-02-13 08:17:26] [IP: 127.0.0.1] [ACTION: ADD_SCHEDULE] [TARGET: 8bb452c8] - Order: 667108ad, Printer: 419f8dc7
+[2026-02-13 08:17:30] [IP: 127.0.0.1] [ACTION: DELETE_SCHEDULE] [TARGET: 8bb452c8] - Schedule removed
+[2026-02-13 08:18:09] [IP: 127.0.0.1] [ACTION: ADD_SCHEDULE] [TARGET: b18e6c77] - Order: 667108ad, Printer: 419f8dc7
+[2026-02-13 08:18:15] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: b18e6c77] - New actual total: 15.0
+[2026-02-13 08:18:31] [IP: 127.0.0.1] [ACTION: ADD_SCHEDULE] [TARGET: e251661a] - Order: 667108ad, Printer: 419f8dc7
+[2026-02-13 11:04:14] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: e251661a] - New actual total: 15.0
+[2026-02-13 11:36:33] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: b18e6c77] - New actual total: 12.0
+[2026-02-13 11:36:39] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: e251661a] - New actual total: 12.0
+[2026-02-13 11:58:55] [IP: 127.0.0.1] [ACTION: DELETE_SCHEDULE] [TARGET: b18e6c77] - Schedule removed
+[2026-02-13 11:58:59] [IP: 127.0.0.1] [ACTION: DELETE_SCHEDULE] [TARGET: e251661a] - Schedule removed
+[2026-02-13 12:01:20] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: 667108ad] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'batch', 'unit_weight_g', 'deadline']
+[2026-02-13 12:02:13] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: 667108ad] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'batch', 'unit_weight_g', 'deadline']
+[2026-02-13 12:03:39] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: 667108ad] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'batch', 'unit_weight_g', 'deadline']
+[2026-02-13 12:07:22] [IP: 127.0.0.1] [ACTION: AUTO_SCHEDULE] [TARGET: f2ce201e] - Created 1 days for printer 419f8dc7
+[2026-02-13 12:07:39] [IP: 127.0.0.1] [ACTION: DELETE_SCHEDULE] [TARGET: cc8c1379] - Schedule removed
+[2026-02-13 12:07:55] [IP: 127.0.0.1] [ACTION: AUTO_SCHEDULE] [TARGET: f2ce201e] - Created 1 days for printer 419f8dc7
+[2026-02-13 12:08:42] [IP: 127.0.0.1] [ACTION: DELETE_SCHEDULE] [TARGET: 4d28faca] - Schedule removed
+[2026-02-13 12:08:51] [IP: 127.0.0.1] [ACTION: DELETE_ORDER] [TARGET: f2ce201e] - Order removed (Schedules deleted: True)
+[2026-02-13 12:10:19] [IP: 127.0.0.1] [ACTION: CREATE_ORDER] [TARGET: fbf4fd86] - Product: LED_바디, Target: 200, Mat: PLA, Color: 검정, Batch: A1
+[2026-02-13 12:10:53] [IP: 127.0.0.1] [ACTION: AUTO_SCHEDULE] [TARGET: fbf4fd86] - Created 7 days for printer 419f8dc7
+[2026-02-13 12:11:08] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: e6e093b0] - New actual total: 30.0
+[2026-02-13 12:11:12] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 8c6b138b] - New actual total: 30.0
+[2026-02-13 12:11:17] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 0c6d20dd] - New actual total: 30.0
+[2026-02-13 12:11:22] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 158395f6] - New actual total: 30.0
+[2026-02-13 12:11:27] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: c392c216] - New actual total: 30.0
+[2026-02-13 12:11:32] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 44865bc2] - New actual total: 30.0
+[2026-02-13 12:11:43] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: e982b74e] - New actual total: 17.0
+[2026-02-13 12:23:38] [IP: 127.0.0.1] [ACTION: ADD_SCHEDULE] [TARGET: 6ed08f51] - Order: 667108ad, Printer: 419f8dc7
+[2026-02-13 12:23:55] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 6ed08f51] - New actual total: 12.0
+[2026-02-13 12:23:59] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 6ed08f51] - New actual total: 24.0
+[2026-02-13 12:24:13] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 6ed08f51] - New actual total: 24.0
+[2026-02-13 12:24:22] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 6ed08f51] - New actual total: 24.0
+[2026-02-13 12:37:18] [IP: 127.0.0.1] [ACTION: UPDATE_ORDER] [TARGET: 667108ad] - Updated fields: ['product_name', 'target_quantity', 'initial_stock', 'material', 'color', 'batch', 'unit_weight_g', 'deadline']
+[2026-02-13 12:54:05] [IP: 127.0.0.1] [ACTION: AUTO_SCHEDULE] [TARGET: 667108ad] - Created 4 days for printer 419f8dc7
+[2026-02-13 14:33:20] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 6ed08f51] - New actual total: 39.0
+[2026-02-13 14:36:12] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 6ed08f51] - New actual total: 39.0
+[2026-02-14 09:54:03] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 143a2be9] - New actual total: 44.0
+[2026-02-14 09:55:28] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 143a2be9] - New actual total: 46.0
+[2026-02-14 20:42:36] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 143a2be9] - New actual total: 61.0
+[2026-02-14 20:42:40] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 143a2be9] - New actual total: 76.0

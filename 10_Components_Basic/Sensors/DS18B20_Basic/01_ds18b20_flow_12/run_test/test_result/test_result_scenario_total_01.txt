@@ -1,0 +1,71 @@
+A subdirectory or file -p already exists.
+Error occurred while processing: -p.
+A subdirectory or file test_result already exists.
+Error occurred while processing: test_result.
+Error opening unity output file: test_result/test_result_scenario_total_01.txt
+===== TEST START =====
+Test Start
+Running scenario_total_01 (full regression) tests...
+Running scenario_total_01 (full regression) tests...
+
+==================================================
+  DS18B20 Firmware v6.12 Full Regression Test
+  Total 6 test cases (4-Phase + Integration)
+==================================================
+
+▶ Phase 1: System Initialization and Basic Function Validation
+Test case start
+Running test: test_total_system_initialization
+Test case end: test_total_system_initialization (PASS)
+Test 'test_total_system_initialization' result: PASS
+..\test\test_scenario_total_01.cpp:203:test_total_system_initialization:PASS
+Test case start
+Running test: test_total_memory_usage
+Test case end: test_total_memory_usage (PASS)
+Test 'test_total_memory_usage' result: PASS
+..\test\test_scenario_total_01.cpp:204:test_total_memory_usage:PASS
+
+▶ Phase 2: ID Management Feature Validation
+Test case start
+Running test: test_total_id_management
+Calling ID change menu...
+[LOG] State before: 1
+[LOG] State after: 2
+Test case end: test_total_id_management (PASS)
+Test 'test_total_id_management' result: PASS
+..\test\test_scenario_total_01.cpp:207:test_total_id_management:PASS
+
+▶ Phase 3: Error Handling Validation
+Test case start
+Running test: test_total_error_handling
+Test case end: test_total_error_handling (PASS)
+Test 'test_total_error_handling' result: PASS
+..\test\test_scenario_total_01.cpp:210:test_total_error_handling:PASS
+
+▶ Phase 4: Performance Validation
+Test case start
+Running test: test_total_performance
+Test case end: test_total_performance (PASS)
+Test 'test_total_performance' result: PASS
+..\test\test_scenario_total_01.cpp:213:test_total_performance:PASS
+
+▶ Integrated Feature Validation
+Test case start
+Running test: test_total_menu_cancel
+Calling ID change menu...
+[LOG] State before: 1
+
+
+==================== NEW REPORT ====================
+[LOG] State after: 0
+Test case end: test_total_menu_cancel (PASS)
+Test 'test_total_menu_cancel' result: PASS
+..\test\test_scenario_total_01.cpp:216:test_total_menu_cancel:PASS
+
+-----------------------
+6 Tests 0 Failures 0 Ignored 
+OK
+
+==================================================
+   Full Regression Test Complete - 6/6 Tests Run
+==================================================

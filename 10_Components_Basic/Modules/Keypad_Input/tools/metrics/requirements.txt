@@ -1,0 +1,26 @@
+# 메트릭스 분석을 위한 의존성 패키지
+
+# 테스트 및 커버리지
+pytest>=7.0.0
+pytest-cov>=4.0.0
+coverage>=7.0.0
+
+# 코드 품질 분석
+radon>=5.1.0
+pylint>=2.15.0
+flake8>=5.0.0
+mypy>=1.0.0
+
+# 시각화 (선택적)
+matplotlib>=3.5.0
+pandas>=1.5.0
+seaborn>=0.11.0
+
+# 리포트 생성
+jinja2>=3.1.0
+markdown>=3.4.0
+
+# 유틸리티
+click>=8.0.0
+colorama>=0.4.0
+tqdm>=4.64.0

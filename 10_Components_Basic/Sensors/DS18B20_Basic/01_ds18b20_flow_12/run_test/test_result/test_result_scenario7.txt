@@ -1,0 +1,21 @@
+A subdirectory or file -p already exists.
+Error occurred while processing: -p.
+A subdirectory or file test_result already exists.
+Error occurred while processing: test_result.
+===== 테스트 시작 =====
+테스트 시작
+Running scenario7 tests...
+Running scenario7 tests...
+Running scenario7 tests...
+Running scenario7 tests...
+테스트 케이스 시작
+Running test: test_invalid_input_handling_7
+[SCENARIO07] 잘못된 입력 처리 테스트 시작
+[SCENARIO07] 잘못된 입력 처리 테스트 성공
+테스트 케이스 종료: test_invalid_input_handling_7 (PASS)
+테스트 'test_invalid_input_handling_7' 결과: PASS
+..\test\test_scenario7.cpp:23:test_invalid_input_handling_7:PASS
+
+-----------------------
+1 Tests 0 Failures 0 Ignored 
+OK

@@ -1,0 +1,21 @@
+A subdirectory or file -p already exists.
+Error occurred while processing: -p.
+A subdirectory or file test_result already exists.
+Error occurred while processing: test_result.
+===== 테스트 시작 =====
+테스트 시작
+Running scenario8 tests...
+Running scenario8 tests...
+Running scenario8 tests...
+Running scenario8 tests...
+테스트 케이스 시작
+Running test: test_sensor_error_handling
+[SCENARIO08] 센서 오류 처리 테스트 시작
+[SCENARIO08] 센서 오류 처리 테스트 성공
+테스트 케이스 종료: test_sensor_error_handling (PASS)
+테스트 'test_sensor_error_handling' 결과: PASS
+..\test\test_scenario8.cpp:23:test_sensor_error_handling:PASS
+
+-----------------------
+1 Tests 0 Failures 0 Ignored 
+OK

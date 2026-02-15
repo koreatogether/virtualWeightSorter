@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-08-20T09:26:25.304842",
+  "summary": {
+    "total_checks": 5,
+    "passed": 1,
+    "failed": 4,
+    "success_rate": 20.0
+  },
+  "results": {
+    "Import Check": {
+      "passed": true,
+      "output": "Core imports successful (dashboard optional import skipped: cannot import name 'Input' from 'dash' (unknown location))"
+    },
+    "Ruff Linting": {
+      "passed": false,
+      "output": "Using CPython 3.10.18\nRemoved virtual environment at: .venv\nCreating virtual environment at: .venv\nwarning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.\n         If the cache and target directories are on different filesystems, hardlinking may not be supported.\n         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.\nInstalled 61 packages in 10.82s\n"
+    },
+    "Ruff Formatting": {
+      "passed": false,
+      "output": ""
+    },
+    "MyPy Type Check": {
+      "passed": false,
+      "output": ""
+    },
+    "Unit Tests": {
+      "passed": false,
+      "output": "�޽��� ���� ����: �ʼ� �ʵ� ����: sensor_addr\n"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+A subdirectory or file -p already exists.
+Error occurred while processing: -p.
+A subdirectory or file test_result already exists.
+Error occurred while processing: test_result.
+Error opening unity output file: test_result/test_result_scenario9_v2.txt
+===== 테스트 시작 =====
+테스트 시작
+Running scenario9_v2 tests...
+Running scenario9_v2 tests...
+테스트 케이스 시작
+Running test: test_sensor_threshold_status_check
+테스트 케이스 종료: test_sensor_threshold_status_check (PASS)
+테스트 'test_sensor_threshold_status_check' 결과: PASS
+..\test\test_scenario9_v2.cpp:98:test_sensor_threshold_status_check:PASS
+
+-----------------------
+1 Tests 0 Failures 0 Ignored 
+OK

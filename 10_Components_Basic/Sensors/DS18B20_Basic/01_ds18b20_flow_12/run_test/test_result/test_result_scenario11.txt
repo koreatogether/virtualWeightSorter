@@ -1,0 +1,77 @@
+A subdirectory or file -p already exists.
+Error occurred while processing: -p.
+A subdirectory or file test_result already exists.
+Error occurred while processing: test_result.
+Error opening unity output file: test_result/test_result_scenario11.txt
+===== 테스트 시작 =====
+테스트 시작
+Running scenario11 (menu cancel) tests...
+Running scenario11 (menu cancel) tests...
+테스트 케이스 시작
+Running test: test_menu_cancel_from_main_menu
+Serial communication initialized.
+[INFO] Serial communication started
+ID 변경 메뉴를 호출합니다...
+
+
+==================== NEW REPORT ====================
+테스트 케이스 종료: test_menu_cancel_from_main_menu (PASS)
+테스트 'test_menu_cancel_from_main_menu' 결과: PASS
+..\test\test_scenario11.cpp:223:test_menu_cancel_from_main_menu:PASS
+테스트 케이스 시작
+Running test: test_menu_cancel_from_threshold_menu
+Serial communication initialized.
+[INFO] Serial communication started
+ID 변경 메뉴를 호출합니다...
+테스트 케이스 종료: test_menu_cancel_from_threshold_menu (PASS)
+테스트 'test_menu_cancel_from_threshold_menu' 결과: PASS
+..\test\test_scenario11.cpp:224:test_menu_cancel_from_threshold_menu:PASS
+테스트 케이스 시작
+Running test: test_consecutive_menu_cancel_operations
+Serial communication initialized.
+[INFO] Serial communication started
+ID 변경 메뉴를 호출합니다...
+
+
+==================== NEW REPORT ====================
+테스트 케이스 종료: test_consecutive_menu_cancel_operations (PASS)
+테스트 'test_consecutive_menu_cancel_operations' 결과: PASS
+..\test\test_scenario11.cpp:225:test_consecutive_menu_cancel_operations:PASS
+테스트 케이스 시작
+Running test: test_input_buffer_clear_after_cancel
+Serial communication initialized.
+[INFO] Serial communication started
+ID 변경 메뉴를 호출합니다...
+
+
+==================== NEW REPORT ====================
+ID 변경 메뉴를 호출합니다...
+테스트 케이스 종료: test_input_buffer_clear_after_cancel (PASS)
+테스트 'test_input_buffer_clear_after_cancel' 결과: PASS
+..\test\test_scenario11.cpp:226:test_input_buffer_clear_after_cancel:PASS
+테스트 케이스 시작
+Running test: test_invalid_input_then_cancel
+Serial communication initialized.
+[INFO] Serial communication started
+ID 변경 메뉴를 호출합니다...
+
+
+==================== NEW REPORT ====================
+테스트 케이스 종료: test_invalid_input_then_cancel (PASS)
+테스트 'test_invalid_input_then_cancel' 결과: PASS
+..\test\test_scenario11.cpp:227:test_invalid_input_then_cancel:PASS
+테스트 케이스 시작
+Running test: test_state_transition_flags_on_cancel
+Serial communication initialized.
+[INFO] Serial communication started
+ID 변경 메뉴를 호출합니다...
+
+
+==================== NEW REPORT ====================
+테스트 케이스 종료: test_state_transition_flags_on_cancel (PASS)
+테스트 'test_state_transition_flags_on_cancel' 결과: PASS
+..\test\test_scenario11.cpp:228:test_state_transition_flags_on_cancel:PASS
+
+-----------------------
+6 Tests 0 Failures 0 Ignored 
+OK

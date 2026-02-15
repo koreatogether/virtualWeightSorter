@@ -1,0 +1,35 @@
+{
+  "timestamp": "2025-08-15T12:20:23.170525",
+  "summary": {
+    "total_checks": 6,
+    "passed": 2,
+    "failed": 4,
+    "success_rate": 33.33
+  },
+  "results": {
+    "Import Check": {
+      "passed": true,
+      "output": "All imports successful"
+    },
+    "Black Formatting": {
+      "passed": true,
+      "output": ""
+    },
+    "Ruff Linting": {
+      "passed": false,
+      "output": ""
+    },
+    "Ruff Formatting": {
+      "passed": false,
+      "output": ""
+    },
+    "MyPy Type Check": {
+      "passed": false,
+      "output": ""
+    },
+    "Unit Tests": {
+      "passed": false,
+      "output": ""
+    }
+  }
+}

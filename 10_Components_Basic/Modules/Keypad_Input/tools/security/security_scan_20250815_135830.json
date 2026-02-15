@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-08-15T13:58:30.532134",
+  "summary": {
+    "total_findings": 2,
+    "severity_breakdown": {
+      "HIGH": 0,
+      "MEDIUM": 1,
+      "LOW": 1
+    }
+  },
+  "findings": [
+    {
+      "type": "Environment File",
+      "file": ".env",
+      "line": 1,
+      "content": ".env file found",
+      "severity": "MEDIUM",
+      "recommendation": "Add .env file to .gitignore"
+    },
+    {
+      "type": "Hardcoded URL",
+      "file": "tools\\security\\trufflehog_check.py",
+      "line": 35,
+      "content": "\"https://github.com/trufflesecurity/trufflehog/releases/latest/download/trufflehog_3.63.2_windows_amd64.tar.gz\",",
+      "severity": "LOW",
+      "recommendation": "Manage URLs with environment variables"
+    }
+  ]
+}
