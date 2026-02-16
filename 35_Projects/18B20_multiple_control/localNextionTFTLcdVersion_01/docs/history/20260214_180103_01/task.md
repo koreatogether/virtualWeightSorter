@@ -1,4 +1,0 @@
-- [x] Migrate source files from `serialVersion_02` to `localNextionTFTLcdVersion_01`
-- [x] Create documentation for the migration (Plan, Walkthrough)
-- [x] Archive the migration documentation to history folder
-- [x] Update `progressLog.md` with migration details
