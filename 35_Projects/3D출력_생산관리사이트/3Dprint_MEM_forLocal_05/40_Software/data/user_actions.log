@@ -141,3 +141,8 @@
 [2026-02-14 09:55:28] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 143a2be9] - New actual total: 46.0
 [2026-02-14 20:42:36] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 143a2be9] - New actual total: 61.0
 [2026-02-14 20:42:40] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: 143a2be9] - New actual total: 76.0
+[2026-02-16 12:10:13] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: ad49d072] - New actual total: 30.0
+[2026-02-16 12:10:34] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: ad49d072] - New actual total: 45.0
+[2026-02-16 12:23:06] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: e8da40eb] - Updated fields: ['material', 'color', 'batch', 'remaining_weight_g']
+[2026-02-16 12:23:17] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 651f3e98] - Updated fields: ['material', 'color', 'batch', 'remaining_weight_g']
+[2026-02-16 12:23:25] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 1cc798c9] - Updated fields: ['material', 'color', 'batch', 'remaining_weight_g']

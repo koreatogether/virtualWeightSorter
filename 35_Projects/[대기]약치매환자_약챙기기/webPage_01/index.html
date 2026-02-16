@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>약 디스펜서 회전 시뮬레이터</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="app">
+    <section class="panel">
+      <h1>7일 x 3회 약 디스펜서</h1>
+      <p class="subtitle">대회전(요일) + 소회전(아침/점심/저녁)</p>
+
+      <div class="status-grid">
+        <div class="status-box">
+          <span class="label">현재 요일</span>
+          <strong id="dayLabel">월요일</strong>
+        </div>
+        <div class="status-box">
+          <span class="label">현재 회차</span>
+          <strong id="slotLabel">아침</strong>
+        </div>
+        <div class="status-box">
+          <span class="label">전체 진행</span>
+          <strong id="stepLabel">1 / 21</strong>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button id="playBtn" type="button">자동 재생</button>
+        <button id="stepBtn" type="button">1스텝 진행</button>
+        <button id="resetBtn" type="button">초기화</button>
+      </div>
+    </section>
+
+    <section class="viz-wrap">
+      <div class="viz-card">
+        <h2>대회전: 7일 링</h2>
+        <div class="ring-area">
+          <div id="weekRing" class="week-ring"></div>
+          <div class="ring-center">DAY</div>
+          <div class="pointer" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <div class="viz-card">
+        <h2>소회전: 1일 3회 링</h2>
+        <div class="ring-area small">
+          <div id="dayRing" class="day-ring"></div>
+          <div class="ring-center">DOSE</div>
+          <div class="pointer" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

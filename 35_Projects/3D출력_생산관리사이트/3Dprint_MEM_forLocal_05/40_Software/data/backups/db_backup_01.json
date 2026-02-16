@@ -9,7 +9,7 @@
       "unit_weight_g": 4.16,
       "deadline": "2026-02-19",
       "id": "667108ad",
-      "completed_quantity": 119.0,
+      "completed_quantity": 164.0,
       "status": "in_progress",
       "created_at": "2026-02-12T22:17:01.339997",
       "batch": "A2"
@@ -151,8 +151,8 @@
       "order_id": "667108ad",
       "printer_id": "419f8dc7",
       "planned_quantity": 45.0,
-      "actual_quantity": 0,
-      "status": "pending",
+      "actual_quantity": 45.0,
+      "status": "completed",
       "start_time": "2026-02-16T09:00",
       "created_at": "2026-02-13T12:54:05.710950",
       "conflict": false
@@ -174,25 +174,25 @@
       "material": "PLA",
       "color": "검정",
       "batch": "A1",
-      "remaining_weight_g": 300,
+      "remaining_weight_g": 150.0,
       "id": "1cc798c9",
-      "updated_at": "2026-02-13 09:00:00"
+      "updated_at": "2026-02-16 12:23:25"
     },
     {
       "material": "PLA",
       "color": "검정",
       "batch": "A2",
-      "remaining_weight_g": 350,
+      "remaining_weight_g": 150.0,
       "id": "e8da40eb",
-      "updated_at": "2026-02-13 09:00:00"
+      "updated_at": "2026-02-16 12:23:06"
     },
     {
       "material": "PLA",
       "color": "검정",
       "batch": "A3",
-      "remaining_weight_g": 300,
+      "remaining_weight_g": 150.0,
       "id": "651f3e98",
-      "updated_at": "2026-02-13 09:00:00"
+      "updated_at": "2026-02-16 12:23:17"
     },
     {
       "material": "PLA",
