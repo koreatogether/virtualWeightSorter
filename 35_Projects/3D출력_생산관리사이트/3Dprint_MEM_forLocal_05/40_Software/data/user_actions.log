@@ -146,3 +146,4 @@
 [2026-02-16 12:23:06] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: e8da40eb] - Updated fields: ['material', 'color', 'batch', 'remaining_weight_g']
 [2026-02-16 12:23:17] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 651f3e98] - Updated fields: ['material', 'color', 'batch', 'remaining_weight_g']
 [2026-02-16 12:23:25] [IP: 127.0.0.1] [ACTION: UPDATE_INVENTORY] [TARGET: 1cc798c9] - Updated fields: ['material', 'color', 'batch', 'remaining_weight_g']
+[2026-02-16 17:30:05] [IP: 127.0.0.1] [ACTION: UPDATE_SCHEDULE_ACTUAL] [TARGET: ad49d072] - New actual total: 60.0
