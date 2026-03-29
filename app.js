@@ -170,12 +170,76 @@ function colorBoxes(selectedBoxes) {
   });
 }
 
+function updateDashboardSummary(settings, candidates, selectedBoxes) {
+  const selectedCount = selectedBoxes.length;
+  const bestDiff = candidates.length ? candidates[0].diff : null;
+  const selectedWeightTotal = selectedBoxes.reduce((sum, box) => sum + box.sum, 0);
+  const filledTrays = selectedBoxes.reduce((sum, box) => sum + box.indices.length, 0);
+  const idleTrays = Math.max(0, TRAY_COUNT - filledTrays);
+
+  document.getElementById("summaryTargetKg").textContent = (settings.targetG / 1000).toFixed(2);
+  document.getElementById("summaryTolerance").textContent = `${settings.toleranceG}g`;
+  document.getElementById("summaryWeights").textContent = `${weights.length || TRAY_COUNT} trays`;
+  document.getElementById("summarySelected").textContent = `${selectedCount} boxes`;
+  document.getElementById("summaryCandidates").textContent = `${candidates.length} sets`;
+  document.getElementById("summaryBestDiff").textContent = bestDiff === null ? "-" : `${bestDiff}g`;
+  document.getElementById("summaryStatus").textContent =
+    weights.length === 0 ? "READY · waiting for weights" : `RUNNING · idle ${idleTrays} trays`;
+  document.getElementById("insightTarget").textContent = `${(settings.targetG / 1000).toFixed(2)}kg`;
+  document.getElementById("insightTolerance").textContent = `${settings.toleranceG}g`;
+  document.getElementById("insightCandidates").textContent = String(candidates.length);
+  document.getElementById("insightSelected").textContent = String(selectedCount);
+  document.getElementById("trayCountCenter").textContent = String(TRAY_COUNT);
+
+  const summaryWeightsBar = document.getElementById("summaryWeightsBar");
+  const summarySelectedBar = document.getElementById("summarySelectedBar");
+  const summaryCandidatesBar = document.getElementById("summaryCandidatesBar");
+  const summaryBestDiffBar = document.getElementById("summaryBestDiffBar");
+
+  if (summaryWeightsBar) summaryWeightsBar.style.width = "100%";
+  if (summarySelectedBar) summarySelectedBar.style.width = `${Math.min(100, (selectedCount / BOX_LIMIT) * 100)}%`;
+  if (summaryCandidatesBar) summaryCandidatesBar.style.width = `${Math.min(100, (candidates.length / 12) * 100)}%`;
+  if (summaryBestDiffBar) summaryBestDiffBar.style.width = bestDiff === null ? "0%" : `${Math.max(8, 100 - bestDiff)}%`;
+
+  const donut = document.getElementById("assignmentDonut");
+  if (donut) {
+    const counts = selectedBoxes.map((box) => box.indices.length);
+    const idleRatio = idleTrays / TRAY_COUNT;
+    const box1 = counts[0] || 0;
+    const box2 = counts[1] || 0;
+    const box3 = counts[2] || 0;
+    const box4 = counts[3] || 0;
+    const totalAssigned = Math.max(1, box1 + box2 + box3 + box4 + idleTrays);
+    const p1 = (box1 / totalAssigned) * 100;
+    const p2 = (box2 / totalAssigned) * 100;
+    const p3 = (box3 / totalAssigned) * 100;
+    const p4 = (box4 / totalAssigned) * 100;
+    const pIdle = idleRatio * 100;
+
+    donut.style.background = `conic-gradient(
+      var(--success) 0deg ${p1 * 3.6}deg,
+      var(--orange) ${p1 * 3.6}deg ${(p1 + p2) * 3.6}deg,
+      var(--violet) ${(p1 + p2) * 3.6}deg ${(p1 + p2 + p3) * 3.6}deg,
+      var(--warning) ${(p1 + p2 + p3) * 3.6}deg ${(p1 + p2 + p3 + p4) * 3.6}deg,
+      var(--idle) ${(p1 + p2 + p3 + p4) * 3.6}deg 360deg
+    )`;
+
+    document.getElementById("legendBox1").textContent = `${box1} trays`;
+    document.getElementById("legendBox2").textContent = `${box2} trays`;
+    document.getElementById("legendBox3").textContent = `${box3} trays`;
+    document.getElementById("legendBox4").textContent = `${box4} trays`;
+    document.getElementById("legendIdle").textContent = `${idleTrays} trays`;
+  }
+
+  return { selectedWeightTotal, filledTrays, idleTrays };
+}
+
 function renderResults(selectedBoxes, settings) {
   resultList.innerHTML = "";
 
   if (!selectedBoxes.length) {
     const countText = settings.itemCount === null ? "개수 제한 없음" : `${settings.itemCount}개 고정`;
-    resultList.textContent = `조건(${settings.targetG}g ±${settings.toleranceG}g, ${countText})을 만족하는 조합을 찾지 못했습니다.`;
+    resultList.textContent = `조건(${(settings.targetG / 1000).toFixed(2)}kg ±${settings.toleranceG}g, ${countText})을 만족하는 조합을 찾지 못했습니다.`;
     return;
   }
 
@@ -206,6 +270,7 @@ runBtn.addEventListener("click", () => {
   boxes = [];
   renderTrays();
   clearTrayColors();
+  updateDashboardSummary(settings, [], []);
   resultList.textContent = `포도 무게 생성 범위: ${settings.weightMin}g ~ ${settings.weightMax}g. 조합 시작 버튼을 눌러 최적 조합을 탐색하세요.`;
   startBtn.disabled = false;
 });
@@ -214,11 +279,21 @@ startBtn.addEventListener("click", () => {
   if (!weights.length) {
     return;
   }
+
   const settings = parseSettings();
   const candidates = findCandidates(weights, settings);
   boxes = pickNonOverlapping(candidates, BOX_LIMIT);
   colorBoxes(boxes);
+  const summary = updateDashboardSummary(settings, candidates, boxes);
   renderResults(boxes, settings);
+
+  const status = document.getElementById("summaryStatus");
+  if (status) {
+    status.textContent = boxes.length
+      ? `MATCHED · ${boxes.length} boxes / ${summary.idleTrays} idle`
+      : "NO MATCH · refine the range";
+  }
 });
 
 renderTrays();
+updateDashboardSummary(parseSettings(), [], []);
