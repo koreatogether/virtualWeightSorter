@@ -886,28 +886,35 @@ button {
 
 @media (max-width: 1080px) {
   .layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: 240px minmax(0, 1fr);
   }
 
   .sidebar {
-    position: static;
-    height: auto;
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
+    width: 240px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    border-right: 1px solid var(--line);
+    border-bottom: 0;
   }
 
   .nav {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    display: flex;
+    flex-direction: column;
   }
 
   .account-card {
-    max-width: 360px;
+    max-width: none;
   }
 
   .hero-grid,
+  .settings-grid,
   .analytics-grid {
     grid-template-columns: 1fr;
+  }
+
+  .workspace {
+    padding: 18px 16px 22px;
   }
 }
 
